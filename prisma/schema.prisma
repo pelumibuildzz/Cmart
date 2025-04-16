@@ -39,6 +39,7 @@ model Business {
   description  String
   universityId String
   categoryId   String
+  category     Category  @relation(fields: [categoryId], references: [id])
   products     Product[]
   orders       Order[]
   isVerified   Boolean   @default(false)
@@ -46,16 +47,24 @@ model Business {
 }
 
 model Product {
-  id          String   @id @default(cuid())
+  id          String         @id @default(cuid())
   name        String
   description String
   imageUrl    String
   price       Float
   stock       Int
-  isAvailable Boolean  @default(true)
+  isAvailable Boolean        @default(true)
   businessId  String
   categoryId  String
-  Business    Business @relation(fields: [businessId], references: [id])
+  Business    Business       @relation(fields: [businessId], references: [id])
+  images      ProductImage[]
+}
+
+model ProductImage {
+  id        String  @id @default(cuid())
+  url       String // URL of the image
+  productId String // Foreign key to Product
+  Product   Product @relation(fields: [productId], references: [id])
 }
 
 model Order {
@@ -72,9 +81,10 @@ model Order {
 }
 
 model Category {
-  id       String  @id @default(cuid())
-  name     String  @unique
-  isCustom Boolean @default(false)
+  id         String     @id @default(cuid())
+  name       String     @unique
+  isCustom   Boolean    @default(false)
+  businesses Business[]
 }
 
 model University {

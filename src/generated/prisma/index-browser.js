@@ -149,6 +149,12 @@ exports.Prisma.ProductScalarFieldEnum = {
   categoryId: 'categoryId'
 };
 
+exports.Prisma.ProductImageScalarFieldEnum = {
+  id: 'id',
+  url: 'url',
+  productId: 'productId'
+};
+
 exports.Prisma.OrderScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
@@ -195,6 +201,7 @@ exports.Prisma.ModelName = {
   User: 'User',
   Business: 'Business',
   Product: 'Product',
+  ProductImage: 'ProductImage',
   Order: 'Order',
   Category: 'Category',
   University: 'University'

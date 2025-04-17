@@ -7,7 +7,7 @@ export interface ProductImage {
 export interface CreateProductData {
   name: string;
   description: string;
-  imageUrl: string;  // Main product image
+  image: File;  // Main product image
   price: number;
   stock: number;
   businessId: string;

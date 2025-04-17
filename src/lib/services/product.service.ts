@@ -40,20 +40,28 @@ export async function createProduct(data: CreateProductData) {
     throw new Error('Invalid business or category ID');
   }
 
+  // Upload main image
+  const mainImageUrl = await uploadImage(
+    data.image, 
+    `${Date.now()}-${data.image.name}`,
+    'products'
+  );
+
   // Handle additional image uploads if present
   let additionalImages: ProductImage[] = [];
   if (data.images && data.images.length > 0) {
     const uploadedImages = await uploadMultipleImages(data.images);
     additionalImages = uploadedImages.map(img => ({
-      url: img.url,
+      url: img,
     }));
   }
 
   // Create product with main image and additional images
-  const { images: imageFiles, ...productData } = data;
+  const { image, images: imageFiles, ...productData } = data;
   return prisma.product.create({
     data: {
       ...productData,
+      imageUrl: mainImageUrl,
       images: {
         create: additionalImages,
       },
@@ -80,9 +88,17 @@ export async function updateProduct(id: string, data: Partial<CreateProductData>
   if (data.images && data.images.length > 0) {
     // Upload new images
     const uploadedImages = await uploadMultipleImages(data.images);
-    additionalImages = uploadedImages.map(img => ({
-      url: img.url,
+    additionalImages = uploadedImages.map((url) => ({
+      url, // Map the uploaded image URLs correctly
     }));
+  }
+
+  // Delete old images from ImageKit
+  if (product.images.length > 0) {
+    const deletePromises = product.images.map((image) =>
+      deleteImage(image.id) // Assuming `image.id` is the ImageKit file ID
+    );
+    await Promise.all(deletePromises);
   }
 
   // Update product with new data and images
@@ -93,8 +109,8 @@ export async function updateProduct(id: string, data: Partial<CreateProductData>
       ...updateData,
       ...(additionalImages.length > 0 && {
         images: {
-          deleteMany: {},
-          create: additionalImages,
+          deleteMany: {}, // Clear old images from the database
+          create: additionalImages, // Add new images
         },
       }),
     },

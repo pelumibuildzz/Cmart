@@ -1,8 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { University } from '@/generated/prisma';
+import { fetchUniversities } from '@/app/actions/university.action';
 
 export default function SignUp() {
   const router = useRouter();
@@ -13,10 +15,33 @@ export default function SignUp() {
     confirmPassword: '',
     universityId: '',
   });
+  const [universities, setUniversities] = useState<University[]>([]);
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isFetchingUniversities, setIsFetchingUniversities] = useState(true);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  useEffect(() => {
+    const loadUniversities = async () => {
+      setIsFetchingUniversities(true);
+      try {
+        const result = await fetchUniversities();
+        if (result.error) {
+          throw new Error(result.error);
+        }
+        if (result.universities) {
+          setUniversities(result.universities);
+        }
+      } catch (err: any) {
+        setError('Could not load universities. Please try again later.');
+        console.error(err);
+      } finally {
+        setIsFetchingUniversities(false);
+      }
+    };
+    loadUniversities();
+  }, []);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
@@ -72,7 +97,7 @@ export default function SignUp() {
 
   return (
     <main className="container mx-auto px-4 py-8 max-w-md">
-      <h1 className="text-3xl font-bold mb-6 text-center">Sign Up</h1>
+      <h1 className="text-3xl font-bold mb-6 text-center text-secondary">Sign Up</h1>
       
       {error && (
         <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
@@ -82,7 +107,7 @@ export default function SignUp() {
       
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label htmlFor="name" className="block mb-1 font-medium">
+          <label htmlFor="name" className="block mb-1 font-medium text-secondary">
             Full Name
           </label>
           <input
@@ -91,14 +116,14 @@ export default function SignUp() {
             type="text"
             value={formData.name}
             onChange={handleChange}
-            className="w-full px-3 py-2 border rounded-md"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/50"
             disabled={isLoading}
             required
           />
         </div>
         
         <div>
-          <label htmlFor="email" className="block mb-1 font-medium">
+          <label htmlFor="email" className="block mb-1 font-medium text-secondary">
             Email
           </label>
           <input
@@ -107,30 +132,38 @@ export default function SignUp() {
             type="email"
             value={formData.email}
             onChange={handleChange}
-            className="w-full px-3 py-2 border rounded-md"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/50"
             disabled={isLoading}
             required
           />
         </div>
         
         <div>
-          <label htmlFor="universityId" className="block mb-1 font-medium">
-            University ID
+          <label htmlFor="universityId" className="block mb-1 font-medium text-secondary">
+            University
           </label>
-          <input
+          <select
             id="universityId"
             name="universityId"
-            type="text"
             value={formData.universityId}
             onChange={handleChange}
-            className="w-full px-3 py-2 border rounded-md"
-            disabled={isLoading}
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/50 bg-white"
+            disabled={isLoading || isFetchingUniversities}
             required
-          />
+          >
+            <option value="" disabled>
+              {isFetchingUniversities ? 'Loading...' : 'Select your university'}
+            </option>
+            {universities.map((uni) => (
+              <option key={uni.id} value={uni.id}>
+                {uni.name}
+              </option>
+            ))}
+          </select>
         </div>
         
         <div>
-          <label htmlFor="password" className="block mb-1 font-medium">
+          <label htmlFor="password" className="block mb-1 font-medium text-secondary">
             Password
           </label>
           <input
@@ -139,14 +172,14 @@ export default function SignUp() {
             type="password"
             value={formData.password}
             onChange={handleChange}
-            className="w-full px-3 py-2 border rounded-md"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/50"
             disabled={isLoading}
             required
           />
         </div>
         
         <div>
-          <label htmlFor="confirmPassword" className="block mb-1 font-medium">
+          <label htmlFor="confirmPassword" className="block mb-1 font-medium text-secondary">
             Confirm Password
           </label>
           <input
@@ -155,7 +188,7 @@ export default function SignUp() {
             type="password"
             value={formData.confirmPassword}
             onChange={handleChange}
-            className="w-full px-3 py-2 border rounded-md"
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/50"
             disabled={isLoading}
             required
           />
@@ -164,17 +197,17 @@ export default function SignUp() {
         <div>
           <button
             type="submit"
-            className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 disabled:opacity-50"
-            disabled={isLoading}
+            className="w-full bg-primary text-white py-2 rounded-md hover:bg-primary/90 transition-colors disabled:opacity-50"
+            disabled={isLoading || isFetchingUniversities}
           >
-            {isLoading ? 'Signing Up...' : 'Sign Up'}
+            {isLoading ? 'Signing up...' : 'Sign Up'}
           </button>
         </div>
       </form>
       
-      <p className="mt-4 text-center">
+      <p className="mt-4 text-center text-secondary/80">
         Already have an account?{' '}
-        <Link href="/auth/signin" className="text-blue-600 hover:text-blue-800">
+        <Link href="/auth/signin" className="text-primary hover:underline">
           Sign In
         </Link>
       </p>

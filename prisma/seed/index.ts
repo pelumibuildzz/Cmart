@@ -1,5 +1,5 @@
-import { PrismaClient } from '@prisma/client';
-import { Role } from '../../src/lib/constants';
+const { PrismaClient } = require('../../src/generated/prisma');
+const { Role } = require("../../src/lib/constants.ts");
 
 const prisma = new PrismaClient();
 
@@ -8,6 +8,7 @@ async function main() {
 
   // Clear existing data
   await prisma.order.deleteMany();
+  await prisma.productImage.deleteMany();
   await prisma.product.deleteMany();
   await prisma.business.deleteMany();
   await prisma.user.deleteMany();
@@ -116,33 +117,60 @@ async function main() {
       data: {
         name: 'Laptop',
         description: 'Powerful laptop for students',
-        imageUrl: 'https://picsum.photos/id/1/500/300',
+        imageUrl: 'https://ik.imagekit.io/demo/laptop-main.jpg',
         price: 999.99,
         stock: 10,
         businessId: business.id,
         categoryId: categories[0].id,
+        images: {
+          create: [
+            { url: 'https://ik.imagekit.io/demo/laptop-angle1.jpg' },
+            { url: 'https://ik.imagekit.io/demo/laptop-angle2.jpg' },
+          ],
+        },
+      },
+      include: {
+        images: true,
       },
     }),
     prisma.product.create({
       data: {
         name: 'Headphones',
         description: 'Noise-cancelling headphones',
-        imageUrl: 'https://picsum.photos/id/2/500/300',
+        imageUrl: 'https://ik.imagekit.io/demo/headphones-main.jpg',
         price: 199.99,
         stock: 20,
         businessId: business.id,
         categoryId: categories[0].id,
+        images: {
+          create: [
+            { url: 'https://ik.imagekit.io/demo/headphones-side.jpg' },
+            { url: 'https://ik.imagekit.io/demo/headphones-back.jpg' },
+          ],
+        },
+      },
+      include: {
+        images: true,
       },
     }),
     prisma.product.create({
       data: {
         name: 'Textbook',
         description: 'Computer Science 101 Textbook',
-        imageUrl: 'https://picsum.photos/id/3/500/300',
+        imageUrl: 'https://ik.imagekit.io/demo/textbook-cover.jpg',
         price: 79.99,
         stock: 15,
         businessId: business.id,
         categoryId: categories[1].id,
+        images: {
+          create: [
+            { url: 'https://ik.imagekit.io/demo/textbook-back.jpg' },
+            { url: 'https://ik.imagekit.io/demo/textbook-contents.jpg' },
+          ],
+        },
+      },
+      include: {
+        images: true,
       },
     }),
   ]);

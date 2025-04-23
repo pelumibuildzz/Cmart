@@ -123,8 +123,7 @@ exports.Prisma.UserScalarFieldEnum = {
   password: 'password',
   name: 'name',
   universityId: 'universityId',
-  role: 'role',
-  businessId: 'businessId'
+  role: 'role'
 };
 
 exports.Prisma.BusinessScalarFieldEnum = {

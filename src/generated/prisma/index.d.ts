@@ -1466,13 +1466,11 @@ export namespace Prisma {
   export type BusinessCountOutputType = {
     products: number
     orders: number
-    User: number
   }
 
   export type BusinessCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     products?: boolean | BusinessCountOutputTypeCountProductsArgs
     orders?: boolean | BusinessCountOutputTypeCountOrdersArgs
-    User?: boolean | BusinessCountOutputTypeCountUserArgs
   }
 
   // Custom InputTypes
@@ -1498,13 +1496,6 @@ export namespace Prisma {
    */
   export type BusinessCountOutputTypeCountOrdersArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: OrderWhereInput
-  }
-
-  /**
-   * BusinessCountOutputType without action
-   */
-  export type BusinessCountOutputTypeCountUserArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    where?: UserWhereInput
   }
 
 
@@ -1591,7 +1582,6 @@ export namespace Prisma {
     name: string | null
     universityId: string | null
     role: $Enums.Role | null
-    businessId: string | null
   }
 
   export type UserMaxAggregateOutputType = {
@@ -1601,7 +1591,6 @@ export namespace Prisma {
     name: string | null
     universityId: string | null
     role: $Enums.Role | null
-    businessId: string | null
   }
 
   export type UserCountAggregateOutputType = {
@@ -1611,7 +1600,6 @@ export namespace Prisma {
     name: number
     universityId: number
     role: number
-    businessId: number
     _all: number
   }
 
@@ -1623,7 +1611,6 @@ export namespace Prisma {
     name?: true
     universityId?: true
     role?: true
-    businessId?: true
   }
 
   export type UserMaxAggregateInputType = {
@@ -1633,7 +1620,6 @@ export namespace Prisma {
     name?: true
     universityId?: true
     role?: true
-    businessId?: true
   }
 
   export type UserCountAggregateInputType = {
@@ -1643,7 +1629,6 @@ export namespace Prisma {
     name?: true
     universityId?: true
     role?: true
-    businessId?: true
     _all?: true
   }
 
@@ -1726,7 +1711,6 @@ export namespace Prisma {
     name: string
     universityId: string
     role: $Enums.Role
-    businessId: string | null
     _count: UserCountAggregateOutputType | null
     _min: UserMinAggregateOutputType | null
     _max: UserMaxAggregateOutputType | null
@@ -1753,7 +1737,6 @@ export namespace Prisma {
     name?: boolean
     universityId?: boolean
     role?: boolean
-    businessId?: boolean
     orders?: boolean | User$ordersArgs<ExtArgs>
     business?: boolean | User$businessArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
@@ -1766,8 +1749,6 @@ export namespace Prisma {
     name?: boolean
     universityId?: boolean
     role?: boolean
-    businessId?: boolean
-    business?: boolean | User$businessArgs<ExtArgs>
   }, ExtArgs["result"]["user"]>
 
   export type UserSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -1777,8 +1758,6 @@ export namespace Prisma {
     name?: boolean
     universityId?: boolean
     role?: boolean
-    businessId?: boolean
-    business?: boolean | User$businessArgs<ExtArgs>
   }, ExtArgs["result"]["user"]>
 
   export type UserSelectScalar = {
@@ -1788,21 +1767,16 @@ export namespace Prisma {
     name?: boolean
     universityId?: boolean
     role?: boolean
-    businessId?: boolean
   }
 
-  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "email" | "password" | "name" | "universityId" | "role" | "businessId", ExtArgs["result"]["user"]>
+  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "email" | "password" | "name" | "universityId" | "role", ExtArgs["result"]["user"]>
   export type UserInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     orders?: boolean | User$ordersArgs<ExtArgs>
     business?: boolean | User$businessArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }
-  export type UserIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    business?: boolean | User$businessArgs<ExtArgs>
-  }
-  export type UserIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    business?: boolean | User$businessArgs<ExtArgs>
-  }
+  export type UserIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
+  export type UserIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
 
   export type $UserPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "User"
@@ -1817,7 +1791,6 @@ export namespace Prisma {
       name: string
       universityId: string
       role: $Enums.Role
-      businessId: string | null
     }, ExtArgs["result"]["user"]>
     composites: {}
   }
@@ -2249,7 +2222,6 @@ export namespace Prisma {
     readonly name: FieldRef<"User", 'String'>
     readonly universityId: FieldRef<"User", 'String'>
     readonly role: FieldRef<"User", 'Role'>
-    readonly businessId: FieldRef<"User", 'String'>
   }
     
 
@@ -2499,10 +2471,6 @@ export namespace Prisma {
      */
     data: UserCreateManyInput | UserCreateManyInput[]
     skipDuplicates?: boolean
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: UserIncludeCreateManyAndReturn<ExtArgs> | null
   }
 
   /**
@@ -2573,10 +2541,6 @@ export namespace Prisma {
      * Limit how many Users to update.
      */
     limit?: number
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: UserIncludeUpdateManyAndReturn<ExtArgs> | null
   }
 
   /**
@@ -2890,7 +2854,7 @@ export namespace Prisma {
     category?: boolean | CategoryDefaultArgs<ExtArgs>
     products?: boolean | Business$productsArgs<ExtArgs>
     orders?: boolean | Business$ordersArgs<ExtArgs>
-    User?: boolean | Business$UserArgs<ExtArgs>
+    user?: boolean | UserDefaultArgs<ExtArgs>
     _count?: boolean | BusinessCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["business"]>
 
@@ -2903,6 +2867,7 @@ export namespace Prisma {
     categoryId?: boolean
     isVerified?: boolean
     category?: boolean | CategoryDefaultArgs<ExtArgs>
+    user?: boolean | UserDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["business"]>
 
   export type BusinessSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -2914,6 +2879,7 @@ export namespace Prisma {
     categoryId?: boolean
     isVerified?: boolean
     category?: boolean | CategoryDefaultArgs<ExtArgs>
+    user?: boolean | UserDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["business"]>
 
   export type BusinessSelectScalar = {
@@ -2931,14 +2897,16 @@ export namespace Prisma {
     category?: boolean | CategoryDefaultArgs<ExtArgs>
     products?: boolean | Business$productsArgs<ExtArgs>
     orders?: boolean | Business$ordersArgs<ExtArgs>
-    User?: boolean | Business$UserArgs<ExtArgs>
+    user?: boolean | UserDefaultArgs<ExtArgs>
     _count?: boolean | BusinessCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type BusinessIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     category?: boolean | CategoryDefaultArgs<ExtArgs>
+    user?: boolean | UserDefaultArgs<ExtArgs>
   }
   export type BusinessIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     category?: boolean | CategoryDefaultArgs<ExtArgs>
+    user?: boolean | UserDefaultArgs<ExtArgs>
   }
 
   export type $BusinessPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -2947,7 +2915,7 @@ export namespace Prisma {
       category: Prisma.$CategoryPayload<ExtArgs>
       products: Prisma.$ProductPayload<ExtArgs>[]
       orders: Prisma.$OrderPayload<ExtArgs>[]
-      User: Prisma.$UserPayload<ExtArgs>[]
+      user: Prisma.$UserPayload<ExtArgs>
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -3354,7 +3322,7 @@ export namespace Prisma {
     category<T extends CategoryDefaultArgs<ExtArgs> = {}>(args?: Subset<T, CategoryDefaultArgs<ExtArgs>>): Prisma__CategoryClient<$Result.GetResult<Prisma.$CategoryPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     products<T extends Business$productsArgs<ExtArgs> = {}>(args?: Subset<T, Business$productsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ProductPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     orders<T extends Business$ordersArgs<ExtArgs> = {}>(args?: Subset<T, Business$ordersArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$OrderPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-    User<T extends Business$UserArgs<ExtArgs> = {}>(args?: Subset<T, Business$UserArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -3832,30 +3800,6 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: OrderScalarFieldEnum | OrderScalarFieldEnum[]
-  }
-
-  /**
-   * Business.User
-   */
-  export type Business$UserArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the User
-     */
-    select?: UserSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the User
-     */
-    omit?: UserOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: UserInclude<ExtArgs> | null
-    where?: UserWhereInput
-    orderBy?: UserOrderByWithRelationInput | UserOrderByWithRelationInput[]
-    cursor?: UserWhereUniqueInput
-    take?: number
-    skip?: number
-    distinct?: UserScalarFieldEnum | UserScalarFieldEnum[]
   }
 
   /**
@@ -9246,8 +9190,7 @@ export namespace Prisma {
     password: 'password',
     name: 'name',
     universityId: 'universityId',
-    role: 'role',
-    businessId: 'businessId'
+    role: 'role'
   };
 
   export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
@@ -9440,7 +9383,6 @@ export namespace Prisma {
     name?: StringFilter<"User"> | string
     universityId?: StringFilter<"User"> | string
     role?: EnumRoleFilter<"User"> | $Enums.Role
-    businessId?: StringNullableFilter<"User"> | string | null
     orders?: OrderListRelationFilter
     business?: XOR<BusinessNullableScalarRelationFilter, BusinessWhereInput> | null
   }
@@ -9452,7 +9394,6 @@ export namespace Prisma {
     name?: SortOrder
     universityId?: SortOrder
     role?: SortOrder
-    businessId?: SortOrderInput | SortOrder
     orders?: OrderOrderByRelationAggregateInput
     business?: BusinessOrderByWithRelationInput
   }
@@ -9467,7 +9408,6 @@ export namespace Prisma {
     name?: StringFilter<"User"> | string
     universityId?: StringFilter<"User"> | string
     role?: EnumRoleFilter<"User"> | $Enums.Role
-    businessId?: StringNullableFilter<"User"> | string | null
     orders?: OrderListRelationFilter
     business?: XOR<BusinessNullableScalarRelationFilter, BusinessWhereInput> | null
   }, "id" | "email">
@@ -9479,7 +9419,6 @@ export namespace Prisma {
     name?: SortOrder
     universityId?: SortOrder
     role?: SortOrder
-    businessId?: SortOrderInput | SortOrder
     _count?: UserCountOrderByAggregateInput
     _max?: UserMaxOrderByAggregateInput
     _min?: UserMinOrderByAggregateInput
@@ -9495,7 +9434,6 @@ export namespace Prisma {
     name?: StringWithAggregatesFilter<"User"> | string
     universityId?: StringWithAggregatesFilter<"User"> | string
     role?: EnumRoleWithAggregatesFilter<"User"> | $Enums.Role
-    businessId?: StringNullableWithAggregatesFilter<"User"> | string | null
   }
 
   export type BusinessWhereInput = {
@@ -9512,7 +9450,7 @@ export namespace Prisma {
     category?: XOR<CategoryScalarRelationFilter, CategoryWhereInput>
     products?: ProductListRelationFilter
     orders?: OrderListRelationFilter
-    User?: UserListRelationFilter
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
   }
 
   export type BusinessOrderByWithRelationInput = {
@@ -9526,7 +9464,7 @@ export namespace Prisma {
     category?: CategoryOrderByWithRelationInput
     products?: ProductOrderByRelationAggregateInput
     orders?: OrderOrderByRelationAggregateInput
-    User?: UserOrderByRelationAggregateInput
+    user?: UserOrderByWithRelationInput
   }
 
   export type BusinessWhereUniqueInput = Prisma.AtLeast<{
@@ -9543,7 +9481,7 @@ export namespace Prisma {
     category?: XOR<CategoryScalarRelationFilter, CategoryWhereInput>
     products?: ProductListRelationFilter
     orders?: OrderListRelationFilter
-    User?: UserListRelationFilter
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
   }, "id" | "userId">
 
   export type BusinessOrderByWithAggregationInput = {
@@ -9872,8 +9810,8 @@ export namespace Prisma {
     name: string
     universityId: string
     role?: $Enums.Role
-    businessId?: string | null
     orders?: OrderUncheckedCreateNestedManyWithoutUserInput
+    business?: BusinessUncheckedCreateNestedOneWithoutUserInput
   }
 
   export type UserUpdateInput = {
@@ -9894,8 +9832,8 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     universityId?: StringFieldUpdateOperationsInput | string
     role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
-    businessId?: NullableStringFieldUpdateOperationsInput | string | null
     orders?: OrderUncheckedUpdateManyWithoutUserNestedInput
+    business?: BusinessUncheckedUpdateOneWithoutUserNestedInput
   }
 
   export type UserCreateManyInput = {
@@ -9905,7 +9843,6 @@ export namespace Prisma {
     name: string
     universityId: string
     role?: $Enums.Role
-    businessId?: string | null
   }
 
   export type UserUpdateManyMutationInput = {
@@ -9924,12 +9861,10 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     universityId?: StringFieldUpdateOperationsInput | string
     role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
-    businessId?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type BusinessCreateInput = {
     id?: string
-    userId: string
     name: string
     description: string
     universityId: string
@@ -9937,7 +9872,7 @@ export namespace Prisma {
     category: CategoryCreateNestedOneWithoutBusinessesInput
     products?: ProductCreateNestedManyWithoutBusinessInput
     orders?: OrderCreateNestedManyWithoutBusinessInput
-    User?: UserCreateNestedManyWithoutBusinessInput
+    user: UserCreateNestedOneWithoutBusinessInput
   }
 
   export type BusinessUncheckedCreateInput = {
@@ -9950,12 +9885,10 @@ export namespace Prisma {
     isVerified?: boolean
     products?: ProductUncheckedCreateNestedManyWithoutBusinessInput
     orders?: OrderUncheckedCreateNestedManyWithoutBusinessInput
-    User?: UserUncheckedCreateNestedManyWithoutBusinessInput
   }
 
   export type BusinessUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
-    userId?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     description?: StringFieldUpdateOperationsInput | string
     universityId?: StringFieldUpdateOperationsInput | string
@@ -9963,7 +9896,7 @@ export namespace Prisma {
     category?: CategoryUpdateOneRequiredWithoutBusinessesNestedInput
     products?: ProductUpdateManyWithoutBusinessNestedInput
     orders?: OrderUpdateManyWithoutBusinessNestedInput
-    User?: UserUpdateManyWithoutBusinessNestedInput
+    user?: UserUpdateOneRequiredWithoutBusinessNestedInput
   }
 
   export type BusinessUncheckedUpdateInput = {
@@ -9976,7 +9909,6 @@ export namespace Prisma {
     isVerified?: BoolFieldUpdateOperationsInput | boolean
     products?: ProductUncheckedUpdateManyWithoutBusinessNestedInput
     orders?: OrderUncheckedUpdateManyWithoutBusinessNestedInput
-    User?: UserUncheckedUpdateManyWithoutBusinessNestedInput
   }
 
   export type BusinessCreateManyInput = {
@@ -9991,7 +9923,6 @@ export namespace Prisma {
 
   export type BusinessUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
-    userId?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     description?: StringFieldUpdateOperationsInput | string
     universityId?: StringFieldUpdateOperationsInput | string
@@ -10314,21 +10245,6 @@ export namespace Prisma {
     not?: NestedEnumRoleFilter<$PrismaModel> | $Enums.Role
   }
 
-  export type StringNullableFilter<$PrismaModel = never> = {
-    equals?: string | StringFieldRefInput<$PrismaModel> | null
-    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
-    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
-    lt?: string | StringFieldRefInput<$PrismaModel>
-    lte?: string | StringFieldRefInput<$PrismaModel>
-    gt?: string | StringFieldRefInput<$PrismaModel>
-    gte?: string | StringFieldRefInput<$PrismaModel>
-    contains?: string | StringFieldRefInput<$PrismaModel>
-    startsWith?: string | StringFieldRefInput<$PrismaModel>
-    endsWith?: string | StringFieldRefInput<$PrismaModel>
-    mode?: QueryMode
-    not?: NestedStringNullableFilter<$PrismaModel> | string | null
-  }
-
   export type OrderListRelationFilter = {
     every?: OrderWhereInput
     some?: OrderWhereInput
@@ -10338,11 +10254,6 @@ export namespace Prisma {
   export type BusinessNullableScalarRelationFilter = {
     is?: BusinessWhereInput | null
     isNot?: BusinessWhereInput | null
-  }
-
-  export type SortOrderInput = {
-    sort: SortOrder
-    nulls?: NullsOrder
   }
 
   export type OrderOrderByRelationAggregateInput = {
@@ -10356,7 +10267,6 @@ export namespace Prisma {
     name?: SortOrder
     universityId?: SortOrder
     role?: SortOrder
-    businessId?: SortOrder
   }
 
   export type UserMaxOrderByAggregateInput = {
@@ -10366,7 +10276,6 @@ export namespace Prisma {
     name?: SortOrder
     universityId?: SortOrder
     role?: SortOrder
-    businessId?: SortOrder
   }
 
   export type UserMinOrderByAggregateInput = {
@@ -10376,7 +10285,6 @@ export namespace Prisma {
     name?: SortOrder
     universityId?: SortOrder
     role?: SortOrder
-    businessId?: SortOrder
   }
 
   export type StringWithAggregatesFilter<$PrismaModel = never> = {
@@ -10407,24 +10315,6 @@ export namespace Prisma {
     _max?: NestedEnumRoleFilter<$PrismaModel>
   }
 
-  export type StringNullableWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: string | StringFieldRefInput<$PrismaModel> | null
-    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
-    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
-    lt?: string | StringFieldRefInput<$PrismaModel>
-    lte?: string | StringFieldRefInput<$PrismaModel>
-    gt?: string | StringFieldRefInput<$PrismaModel>
-    gte?: string | StringFieldRefInput<$PrismaModel>
-    contains?: string | StringFieldRefInput<$PrismaModel>
-    startsWith?: string | StringFieldRefInput<$PrismaModel>
-    endsWith?: string | StringFieldRefInput<$PrismaModel>
-    mode?: QueryMode
-    not?: NestedStringNullableWithAggregatesFilter<$PrismaModel> | string | null
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _min?: NestedStringNullableFilter<$PrismaModel>
-    _max?: NestedStringNullableFilter<$PrismaModel>
-  }
-
   export type BoolFilter<$PrismaModel = never> = {
     equals?: boolean | BooleanFieldRefInput<$PrismaModel>
     not?: NestedBoolFilter<$PrismaModel> | boolean
@@ -10441,17 +10331,12 @@ export namespace Prisma {
     none?: ProductWhereInput
   }
 
-  export type UserListRelationFilter = {
-    every?: UserWhereInput
-    some?: UserWhereInput
-    none?: UserWhereInput
+  export type UserScalarRelationFilter = {
+    is?: UserWhereInput
+    isNot?: UserWhereInput
   }
 
   export type ProductOrderByRelationAggregateInput = {
-    _count?: SortOrder
-  }
-
-  export type UserOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -10631,6 +10516,21 @@ export namespace Prisma {
     productId?: SortOrder
   }
 
+  export type StringNullableFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel> | null
+    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    contains?: string | StringFieldRefInput<$PrismaModel>
+    startsWith?: string | StringFieldRefInput<$PrismaModel>
+    endsWith?: string | StringFieldRefInput<$PrismaModel>
+    mode?: QueryMode
+    not?: NestedStringNullableFilter<$PrismaModel> | string | null
+  }
+
   export type DateTimeFilter<$PrismaModel = never> = {
     equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
@@ -10642,9 +10542,9 @@ export namespace Prisma {
     not?: NestedDateTimeFilter<$PrismaModel> | Date | string
   }
 
-  export type UserScalarRelationFilter = {
-    is?: UserWhereInput
-    isNot?: UserWhereInput
+  export type SortOrderInput = {
+    sort: SortOrder
+    nulls?: NullsOrder
   }
 
   export type OrderCountOrderByAggregateInput = {
@@ -10686,6 +10586,24 @@ export namespace Prisma {
 
   export type OrderSumOrderByAggregateInput = {
     total?: SortOrder
+  }
+
+  export type StringNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel> | null
+    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    contains?: string | StringFieldRefInput<$PrismaModel>
+    startsWith?: string | StringFieldRefInput<$PrismaModel>
+    endsWith?: string | StringFieldRefInput<$PrismaModel>
+    mode?: QueryMode
+    not?: NestedStringNullableWithAggregatesFilter<$PrismaModel> | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedStringNullableFilter<$PrismaModel>
+    _max?: NestedStringNullableFilter<$PrismaModel>
   }
 
   export type DateTimeWithAggregatesFilter<$PrismaModel = never> = {
@@ -10765,6 +10683,12 @@ export namespace Prisma {
     connect?: OrderWhereUniqueInput | OrderWhereUniqueInput[]
   }
 
+  export type BusinessUncheckedCreateNestedOneWithoutUserInput = {
+    create?: XOR<BusinessCreateWithoutUserInput, BusinessUncheckedCreateWithoutUserInput>
+    connectOrCreate?: BusinessCreateOrConnectWithoutUserInput
+    connect?: BusinessWhereUniqueInput
+  }
+
   export type StringFieldUpdateOperationsInput = {
     set?: string
   }
@@ -10797,10 +10721,6 @@ export namespace Prisma {
     update?: XOR<XOR<BusinessUpdateToOneWithWhereWithoutUserInput, BusinessUpdateWithoutUserInput>, BusinessUncheckedUpdateWithoutUserInput>
   }
 
-  export type NullableStringFieldUpdateOperationsInput = {
-    set?: string | null
-  }
-
   export type OrderUncheckedUpdateManyWithoutUserNestedInput = {
     create?: XOR<OrderCreateWithoutUserInput, OrderUncheckedCreateWithoutUserInput> | OrderCreateWithoutUserInput[] | OrderUncheckedCreateWithoutUserInput[]
     connectOrCreate?: OrderCreateOrConnectWithoutUserInput | OrderCreateOrConnectWithoutUserInput[]
@@ -10813,6 +10733,16 @@ export namespace Prisma {
     update?: OrderUpdateWithWhereUniqueWithoutUserInput | OrderUpdateWithWhereUniqueWithoutUserInput[]
     updateMany?: OrderUpdateManyWithWhereWithoutUserInput | OrderUpdateManyWithWhereWithoutUserInput[]
     deleteMany?: OrderScalarWhereInput | OrderScalarWhereInput[]
+  }
+
+  export type BusinessUncheckedUpdateOneWithoutUserNestedInput = {
+    create?: XOR<BusinessCreateWithoutUserInput, BusinessUncheckedCreateWithoutUserInput>
+    connectOrCreate?: BusinessCreateOrConnectWithoutUserInput
+    upsert?: BusinessUpsertWithoutUserInput
+    disconnect?: BusinessWhereInput | boolean
+    delete?: BusinessWhereInput | boolean
+    connect?: BusinessWhereUniqueInput
+    update?: XOR<XOR<BusinessUpdateToOneWithWhereWithoutUserInput, BusinessUpdateWithoutUserInput>, BusinessUncheckedUpdateWithoutUserInput>
   }
 
   export type CategoryCreateNestedOneWithoutBusinessesInput = {
@@ -10835,11 +10765,10 @@ export namespace Prisma {
     connect?: OrderWhereUniqueInput | OrderWhereUniqueInput[]
   }
 
-  export type UserCreateNestedManyWithoutBusinessInput = {
-    create?: XOR<UserCreateWithoutBusinessInput, UserUncheckedCreateWithoutBusinessInput> | UserCreateWithoutBusinessInput[] | UserUncheckedCreateWithoutBusinessInput[]
-    connectOrCreate?: UserCreateOrConnectWithoutBusinessInput | UserCreateOrConnectWithoutBusinessInput[]
-    createMany?: UserCreateManyBusinessInputEnvelope
-    connect?: UserWhereUniqueInput | UserWhereUniqueInput[]
+  export type UserCreateNestedOneWithoutBusinessInput = {
+    create?: XOR<UserCreateWithoutBusinessInput, UserUncheckedCreateWithoutBusinessInput>
+    connectOrCreate?: UserCreateOrConnectWithoutBusinessInput
+    connect?: UserWhereUniqueInput
   }
 
   export type ProductUncheckedCreateNestedManyWithoutBusinessInput = {
@@ -10854,13 +10783,6 @@ export namespace Prisma {
     connectOrCreate?: OrderCreateOrConnectWithoutBusinessInput | OrderCreateOrConnectWithoutBusinessInput[]
     createMany?: OrderCreateManyBusinessInputEnvelope
     connect?: OrderWhereUniqueInput | OrderWhereUniqueInput[]
-  }
-
-  export type UserUncheckedCreateNestedManyWithoutBusinessInput = {
-    create?: XOR<UserCreateWithoutBusinessInput, UserUncheckedCreateWithoutBusinessInput> | UserCreateWithoutBusinessInput[] | UserUncheckedCreateWithoutBusinessInput[]
-    connectOrCreate?: UserCreateOrConnectWithoutBusinessInput | UserCreateOrConnectWithoutBusinessInput[]
-    createMany?: UserCreateManyBusinessInputEnvelope
-    connect?: UserWhereUniqueInput | UserWhereUniqueInput[]
   }
 
   export type BoolFieldUpdateOperationsInput = {
@@ -10903,18 +10825,12 @@ export namespace Prisma {
     deleteMany?: OrderScalarWhereInput | OrderScalarWhereInput[]
   }
 
-  export type UserUpdateManyWithoutBusinessNestedInput = {
-    create?: XOR<UserCreateWithoutBusinessInput, UserUncheckedCreateWithoutBusinessInput> | UserCreateWithoutBusinessInput[] | UserUncheckedCreateWithoutBusinessInput[]
-    connectOrCreate?: UserCreateOrConnectWithoutBusinessInput | UserCreateOrConnectWithoutBusinessInput[]
-    upsert?: UserUpsertWithWhereUniqueWithoutBusinessInput | UserUpsertWithWhereUniqueWithoutBusinessInput[]
-    createMany?: UserCreateManyBusinessInputEnvelope
-    set?: UserWhereUniqueInput | UserWhereUniqueInput[]
-    disconnect?: UserWhereUniqueInput | UserWhereUniqueInput[]
-    delete?: UserWhereUniqueInput | UserWhereUniqueInput[]
-    connect?: UserWhereUniqueInput | UserWhereUniqueInput[]
-    update?: UserUpdateWithWhereUniqueWithoutBusinessInput | UserUpdateWithWhereUniqueWithoutBusinessInput[]
-    updateMany?: UserUpdateManyWithWhereWithoutBusinessInput | UserUpdateManyWithWhereWithoutBusinessInput[]
-    deleteMany?: UserScalarWhereInput | UserScalarWhereInput[]
+  export type UserUpdateOneRequiredWithoutBusinessNestedInput = {
+    create?: XOR<UserCreateWithoutBusinessInput, UserUncheckedCreateWithoutBusinessInput>
+    connectOrCreate?: UserCreateOrConnectWithoutBusinessInput
+    upsert?: UserUpsertWithoutBusinessInput
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutBusinessInput, UserUpdateWithoutBusinessInput>, UserUncheckedUpdateWithoutBusinessInput>
   }
 
   export type ProductUncheckedUpdateManyWithoutBusinessNestedInput = {
@@ -10943,20 +10859,6 @@ export namespace Prisma {
     update?: OrderUpdateWithWhereUniqueWithoutBusinessInput | OrderUpdateWithWhereUniqueWithoutBusinessInput[]
     updateMany?: OrderUpdateManyWithWhereWithoutBusinessInput | OrderUpdateManyWithWhereWithoutBusinessInput[]
     deleteMany?: OrderScalarWhereInput | OrderScalarWhereInput[]
-  }
-
-  export type UserUncheckedUpdateManyWithoutBusinessNestedInput = {
-    create?: XOR<UserCreateWithoutBusinessInput, UserUncheckedCreateWithoutBusinessInput> | UserCreateWithoutBusinessInput[] | UserUncheckedCreateWithoutBusinessInput[]
-    connectOrCreate?: UserCreateOrConnectWithoutBusinessInput | UserCreateOrConnectWithoutBusinessInput[]
-    upsert?: UserUpsertWithWhereUniqueWithoutBusinessInput | UserUpsertWithWhereUniqueWithoutBusinessInput[]
-    createMany?: UserCreateManyBusinessInputEnvelope
-    set?: UserWhereUniqueInput | UserWhereUniqueInput[]
-    disconnect?: UserWhereUniqueInput | UserWhereUniqueInput[]
-    delete?: UserWhereUniqueInput | UserWhereUniqueInput[]
-    connect?: UserWhereUniqueInput | UserWhereUniqueInput[]
-    update?: UserUpdateWithWhereUniqueWithoutBusinessInput | UserUpdateWithWhereUniqueWithoutBusinessInput[]
-    updateMany?: UserUpdateManyWithWhereWithoutBusinessInput | UserUpdateManyWithWhereWithoutBusinessInput[]
-    deleteMany?: UserScalarWhereInput | UserScalarWhereInput[]
   }
 
   export type BusinessCreateNestedOneWithoutProductsInput = {
@@ -11057,6 +10959,10 @@ export namespace Prisma {
     connect?: BusinessWhereUniqueInput
   }
 
+  export type NullableStringFieldUpdateOperationsInput = {
+    set?: string | null
+  }
+
   export type DateTimeFieldUpdateOperationsInput = {
     set?: Date | string
   }
@@ -11140,20 +11046,6 @@ export namespace Prisma {
     not?: NestedEnumRoleFilter<$PrismaModel> | $Enums.Role
   }
 
-  export type NestedStringNullableFilter<$PrismaModel = never> = {
-    equals?: string | StringFieldRefInput<$PrismaModel> | null
-    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
-    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
-    lt?: string | StringFieldRefInput<$PrismaModel>
-    lte?: string | StringFieldRefInput<$PrismaModel>
-    gt?: string | StringFieldRefInput<$PrismaModel>
-    gte?: string | StringFieldRefInput<$PrismaModel>
-    contains?: string | StringFieldRefInput<$PrismaModel>
-    startsWith?: string | StringFieldRefInput<$PrismaModel>
-    endsWith?: string | StringFieldRefInput<$PrismaModel>
-    not?: NestedStringNullableFilter<$PrismaModel> | string | null
-  }
-
   export type NestedStringWithAggregatesFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel>
     in?: string[] | ListStringFieldRefInput<$PrismaModel>
@@ -11190,34 +11082,6 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedEnumRoleFilter<$PrismaModel>
     _max?: NestedEnumRoleFilter<$PrismaModel>
-  }
-
-  export type NestedStringNullableWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: string | StringFieldRefInput<$PrismaModel> | null
-    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
-    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
-    lt?: string | StringFieldRefInput<$PrismaModel>
-    lte?: string | StringFieldRefInput<$PrismaModel>
-    gt?: string | StringFieldRefInput<$PrismaModel>
-    gte?: string | StringFieldRefInput<$PrismaModel>
-    contains?: string | StringFieldRefInput<$PrismaModel>
-    startsWith?: string | StringFieldRefInput<$PrismaModel>
-    endsWith?: string | StringFieldRefInput<$PrismaModel>
-    not?: NestedStringNullableWithAggregatesFilter<$PrismaModel> | string | null
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _min?: NestedStringNullableFilter<$PrismaModel>
-    _max?: NestedStringNullableFilter<$PrismaModel>
-  }
-
-  export type NestedIntNullableFilter<$PrismaModel = never> = {
-    equals?: number | IntFieldRefInput<$PrismaModel> | null
-    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
-    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
-    lt?: number | IntFieldRefInput<$PrismaModel>
-    lte?: number | IntFieldRefInput<$PrismaModel>
-    gt?: number | IntFieldRefInput<$PrismaModel>
-    gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntNullableFilter<$PrismaModel> | number | null
   }
 
   export type NestedBoolFilter<$PrismaModel = never> = {
@@ -11276,6 +11140,20 @@ export namespace Prisma {
     _max?: NestedIntFilter<$PrismaModel>
   }
 
+  export type NestedStringNullableFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel> | null
+    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    contains?: string | StringFieldRefInput<$PrismaModel>
+    startsWith?: string | StringFieldRefInput<$PrismaModel>
+    endsWith?: string | StringFieldRefInput<$PrismaModel>
+    not?: NestedStringNullableFilter<$PrismaModel> | string | null
+  }
+
   export type NestedDateTimeFilter<$PrismaModel = never> = {
     equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
@@ -11285,6 +11163,34 @@ export namespace Prisma {
     gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     not?: NestedDateTimeFilter<$PrismaModel> | Date | string
+  }
+
+  export type NestedStringNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel> | null
+    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    contains?: string | StringFieldRefInput<$PrismaModel>
+    startsWith?: string | StringFieldRefInput<$PrismaModel>
+    endsWith?: string | StringFieldRefInput<$PrismaModel>
+    not?: NestedStringNullableWithAggregatesFilter<$PrismaModel> | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedStringNullableFilter<$PrismaModel>
+    _max?: NestedStringNullableFilter<$PrismaModel>
+  }
+
+  export type NestedIntNullableFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntNullableFilter<$PrismaModel> | number | null
   }
 
   export type NestedDateTimeWithAggregatesFilter<$PrismaModel = never> = {
@@ -11333,7 +11239,6 @@ export namespace Prisma {
 
   export type BusinessCreateWithoutUserInput = {
     id?: string
-    userId: string
     name: string
     description: string
     universityId: string
@@ -11345,7 +11250,6 @@ export namespace Prisma {
 
   export type BusinessUncheckedCreateWithoutUserInput = {
     id?: string
-    userId: string
     name: string
     description: string
     universityId: string
@@ -11403,7 +11307,6 @@ export namespace Prisma {
 
   export type BusinessUpdateWithoutUserInput = {
     id?: StringFieldUpdateOperationsInput | string
-    userId?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     description?: StringFieldUpdateOperationsInput | string
     universityId?: StringFieldUpdateOperationsInput | string
@@ -11415,7 +11318,6 @@ export namespace Prisma {
 
   export type BusinessUncheckedUpdateWithoutUserInput = {
     id?: StringFieldUpdateOperationsInput | string
-    userId?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     description?: StringFieldUpdateOperationsInput | string
     universityId?: StringFieldUpdateOperationsInput | string
@@ -11531,11 +11433,6 @@ export namespace Prisma {
     create: XOR<UserCreateWithoutBusinessInput, UserUncheckedCreateWithoutBusinessInput>
   }
 
-  export type UserCreateManyBusinessInputEnvelope = {
-    data: UserCreateManyBusinessInput | UserCreateManyBusinessInput[]
-    skipDuplicates?: boolean
-  }
-
   export type CategoryUpsertWithoutBusinessesInput = {
     update: XOR<CategoryUpdateWithoutBusinessesInput, CategoryUncheckedUpdateWithoutBusinessesInput>
     create: XOR<CategoryCreateWithoutBusinessesInput, CategoryUncheckedCreateWithoutBusinessesInput>
@@ -11606,45 +11503,46 @@ export namespace Prisma {
     data: XOR<OrderUpdateManyMutationInput, OrderUncheckedUpdateManyWithoutBusinessInput>
   }
 
-  export type UserUpsertWithWhereUniqueWithoutBusinessInput = {
-    where: UserWhereUniqueInput
+  export type UserUpsertWithoutBusinessInput = {
     update: XOR<UserUpdateWithoutBusinessInput, UserUncheckedUpdateWithoutBusinessInput>
     create: XOR<UserCreateWithoutBusinessInput, UserUncheckedCreateWithoutBusinessInput>
+    where?: UserWhereInput
   }
 
-  export type UserUpdateWithWhereUniqueWithoutBusinessInput = {
-    where: UserWhereUniqueInput
+  export type UserUpdateToOneWithWhereWithoutBusinessInput = {
+    where?: UserWhereInput
     data: XOR<UserUpdateWithoutBusinessInput, UserUncheckedUpdateWithoutBusinessInput>
   }
 
-  export type UserUpdateManyWithWhereWithoutBusinessInput = {
-    where: UserScalarWhereInput
-    data: XOR<UserUpdateManyMutationInput, UserUncheckedUpdateManyWithoutBusinessInput>
+  export type UserUpdateWithoutBusinessInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    universityId?: StringFieldUpdateOperationsInput | string
+    role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
+    orders?: OrderUpdateManyWithoutUserNestedInput
   }
 
-  export type UserScalarWhereInput = {
-    AND?: UserScalarWhereInput | UserScalarWhereInput[]
-    OR?: UserScalarWhereInput[]
-    NOT?: UserScalarWhereInput | UserScalarWhereInput[]
-    id?: StringFilter<"User"> | string
-    email?: StringFilter<"User"> | string
-    password?: StringFilter<"User"> | string
-    name?: StringFilter<"User"> | string
-    universityId?: StringFilter<"User"> | string
-    role?: EnumRoleFilter<"User"> | $Enums.Role
-    businessId?: StringNullableFilter<"User"> | string | null
+  export type UserUncheckedUpdateWithoutBusinessInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    universityId?: StringFieldUpdateOperationsInput | string
+    role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
+    orders?: OrderUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type BusinessCreateWithoutProductsInput = {
     id?: string
-    userId: string
     name: string
     description: string
     universityId: string
     isVerified?: boolean
     category: CategoryCreateNestedOneWithoutBusinessesInput
     orders?: OrderCreateNestedManyWithoutBusinessInput
-    User?: UserCreateNestedManyWithoutBusinessInput
+    user: UserCreateNestedOneWithoutBusinessInput
   }
 
   export type BusinessUncheckedCreateWithoutProductsInput = {
@@ -11656,7 +11554,6 @@ export namespace Prisma {
     categoryId: string
     isVerified?: boolean
     orders?: OrderUncheckedCreateNestedManyWithoutBusinessInput
-    User?: UserUncheckedCreateNestedManyWithoutBusinessInput
   }
 
   export type BusinessCreateOrConnectWithoutProductsInput = {
@@ -11697,14 +11594,13 @@ export namespace Prisma {
 
   export type BusinessUpdateWithoutProductsInput = {
     id?: StringFieldUpdateOperationsInput | string
-    userId?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     description?: StringFieldUpdateOperationsInput | string
     universityId?: StringFieldUpdateOperationsInput | string
     isVerified?: BoolFieldUpdateOperationsInput | boolean
     category?: CategoryUpdateOneRequiredWithoutBusinessesNestedInput
     orders?: OrderUpdateManyWithoutBusinessNestedInput
-    User?: UserUpdateManyWithoutBusinessNestedInput
+    user?: UserUpdateOneRequiredWithoutBusinessNestedInput
   }
 
   export type BusinessUncheckedUpdateWithoutProductsInput = {
@@ -11716,7 +11612,6 @@ export namespace Prisma {
     categoryId?: StringFieldUpdateOperationsInput | string
     isVerified?: BoolFieldUpdateOperationsInput | boolean
     orders?: OrderUncheckedUpdateManyWithoutBusinessNestedInput
-    User?: UserUncheckedUpdateManyWithoutBusinessNestedInput
   }
 
   export type ProductImageUpsertWithWhereUniqueWithoutProductInput = {
@@ -11825,7 +11720,7 @@ export namespace Prisma {
     name: string
     universityId: string
     role?: $Enums.Role
-    businessId?: string | null
+    business?: BusinessUncheckedCreateNestedOneWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutOrdersInput = {
@@ -11835,14 +11730,13 @@ export namespace Prisma {
 
   export type BusinessCreateWithoutOrdersInput = {
     id?: string
-    userId: string
     name: string
     description: string
     universityId: string
     isVerified?: boolean
     category: CategoryCreateNestedOneWithoutBusinessesInput
     products?: ProductCreateNestedManyWithoutBusinessInput
-    User?: UserCreateNestedManyWithoutBusinessInput
+    user: UserCreateNestedOneWithoutBusinessInput
   }
 
   export type BusinessUncheckedCreateWithoutOrdersInput = {
@@ -11854,7 +11748,6 @@ export namespace Prisma {
     categoryId: string
     isVerified?: boolean
     products?: ProductUncheckedCreateNestedManyWithoutBusinessInput
-    User?: UserUncheckedCreateNestedManyWithoutBusinessInput
   }
 
   export type BusinessCreateOrConnectWithoutOrdersInput = {
@@ -11890,7 +11783,7 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     universityId?: StringFieldUpdateOperationsInput | string
     role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
-    businessId?: NullableStringFieldUpdateOperationsInput | string | null
+    business?: BusinessUncheckedUpdateOneWithoutUserNestedInput
   }
 
   export type BusinessUpsertWithoutOrdersInput = {
@@ -11906,14 +11799,13 @@ export namespace Prisma {
 
   export type BusinessUpdateWithoutOrdersInput = {
     id?: StringFieldUpdateOperationsInput | string
-    userId?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     description?: StringFieldUpdateOperationsInput | string
     universityId?: StringFieldUpdateOperationsInput | string
     isVerified?: BoolFieldUpdateOperationsInput | boolean
     category?: CategoryUpdateOneRequiredWithoutBusinessesNestedInput
     products?: ProductUpdateManyWithoutBusinessNestedInput
-    User?: UserUpdateManyWithoutBusinessNestedInput
+    user?: UserUpdateOneRequiredWithoutBusinessNestedInput
   }
 
   export type BusinessUncheckedUpdateWithoutOrdersInput = {
@@ -11925,19 +11817,17 @@ export namespace Prisma {
     categoryId?: StringFieldUpdateOperationsInput | string
     isVerified?: BoolFieldUpdateOperationsInput | boolean
     products?: ProductUncheckedUpdateManyWithoutBusinessNestedInput
-    User?: UserUncheckedUpdateManyWithoutBusinessNestedInput
   }
 
   export type BusinessCreateWithoutCategoryInput = {
     id?: string
-    userId: string
     name: string
     description: string
     universityId: string
     isVerified?: boolean
     products?: ProductCreateNestedManyWithoutBusinessInput
     orders?: OrderCreateNestedManyWithoutBusinessInput
-    User?: UserCreateNestedManyWithoutBusinessInput
+    user: UserCreateNestedOneWithoutBusinessInput
   }
 
   export type BusinessUncheckedCreateWithoutCategoryInput = {
@@ -11949,7 +11839,6 @@ export namespace Prisma {
     isVerified?: boolean
     products?: ProductUncheckedCreateNestedManyWithoutBusinessInput
     orders?: OrderUncheckedCreateNestedManyWithoutBusinessInput
-    User?: UserUncheckedCreateNestedManyWithoutBusinessInput
   }
 
   export type BusinessCreateOrConnectWithoutCategoryInput = {
@@ -12052,15 +11941,6 @@ export namespace Prisma {
     createdAt?: Date | string
   }
 
-  export type UserCreateManyBusinessInput = {
-    id?: string
-    email: string
-    password: string
-    name: string
-    universityId: string
-    role?: $Enums.Role
-  }
-
   export type ProductUpdateWithoutBusinessInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
@@ -12126,35 +12006,6 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
-  export type UserUpdateWithoutBusinessInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    email?: StringFieldUpdateOperationsInput | string
-    password?: StringFieldUpdateOperationsInput | string
-    name?: StringFieldUpdateOperationsInput | string
-    universityId?: StringFieldUpdateOperationsInput | string
-    role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
-    orders?: OrderUpdateManyWithoutUserNestedInput
-  }
-
-  export type UserUncheckedUpdateWithoutBusinessInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    email?: StringFieldUpdateOperationsInput | string
-    password?: StringFieldUpdateOperationsInput | string
-    name?: StringFieldUpdateOperationsInput | string
-    universityId?: StringFieldUpdateOperationsInput | string
-    role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
-    orders?: OrderUncheckedUpdateManyWithoutUserNestedInput
-  }
-
-  export type UserUncheckedUpdateManyWithoutBusinessInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    email?: StringFieldUpdateOperationsInput | string
-    password?: StringFieldUpdateOperationsInput | string
-    name?: StringFieldUpdateOperationsInput | string
-    universityId?: StringFieldUpdateOperationsInput | string
-    role?: EnumRoleFieldUpdateOperationsInput | $Enums.Role
-  }
-
   export type ProductImageCreateManyProductInput = {
     id?: string
     url: string
@@ -12186,14 +12037,13 @@ export namespace Prisma {
 
   export type BusinessUpdateWithoutCategoryInput = {
     id?: StringFieldUpdateOperationsInput | string
-    userId?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     description?: StringFieldUpdateOperationsInput | string
     universityId?: StringFieldUpdateOperationsInput | string
     isVerified?: BoolFieldUpdateOperationsInput | boolean
     products?: ProductUpdateManyWithoutBusinessNestedInput
     orders?: OrderUpdateManyWithoutBusinessNestedInput
-    User?: UserUpdateManyWithoutBusinessNestedInput
+    user?: UserUpdateOneRequiredWithoutBusinessNestedInput
   }
 
   export type BusinessUncheckedUpdateWithoutCategoryInput = {
@@ -12205,7 +12055,6 @@ export namespace Prisma {
     isVerified?: BoolFieldUpdateOperationsInput | boolean
     products?: ProductUncheckedUpdateManyWithoutBusinessNestedInput
     orders?: OrderUncheckedUpdateManyWithoutBusinessNestedInput
-    User?: UserUncheckedUpdateManyWithoutBusinessNestedInput
   }
 
   export type BusinessUncheckedUpdateManyWithoutCategoryInput = {

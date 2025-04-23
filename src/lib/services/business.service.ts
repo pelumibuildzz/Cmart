@@ -9,12 +9,22 @@ interface CreateBusinessData {
 }
 
 export async function getBusinessById(id: string) {
-  return prisma.business.findUnique({
-    where: { id },
-    include: {
-      products: true
-    }
-  });
+  try {
+    const business = await prisma.business.findUnique({
+      where: { id },
+      include: {
+        products: {
+          include: {
+            images: true // This is likely missing
+          }
+        }
+      }
+    });
+    return business;
+  } catch (error) {
+    console.error('Error fetching business:', error);
+    return null;
+  }
 }
 
 export async function getBusinessByUserId(userId: string) {

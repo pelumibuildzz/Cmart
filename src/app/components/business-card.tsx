@@ -5,7 +5,7 @@ import { Store } from 'lucide-react';
 export default function BusinessCard({ business }: { business: any }) {
     return (
       <Link
-      href={`/market/${business.id}`}
+      href={`/markets/${business.id}`}
       >
         <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
           <div className="p-6">

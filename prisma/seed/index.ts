@@ -1,7 +1,9 @@
+require('dotenv').config();
 const { PrismaClient } = require('../../src/generated/prisma');
 const { Role } = require("../../src/lib/constants.ts");
 
 const prisma = new PrismaClient();
+const defaultImageUrl = process.env.IMAGEKIT_URL_ENDPOINT + "/default-image.jpg";
 
 async function main() {
   console.log('Starting seed...');
@@ -44,7 +46,7 @@ async function main() {
         name: 'Books',
       },
     }),
-    prisma.category.create({
+prisma.category.create({
       data: {
         name: 'Clothing',
       },
@@ -76,6 +78,18 @@ async function main() {
       password: 'password123',
       universityId: university1.id,
       role: Role.BUSINESS,
+      business: {
+        create: {
+          name: 'Campus Tech Store',
+          description: 'We sell the latest tech gadgets for students',
+          universityId: university1.id,
+          categoryId: categories[0].id,
+          isVerified: true,
+        },
+      },
+    },
+    include: {
+      business: true,
     },
   });
 
@@ -89,27 +103,7 @@ async function main() {
     },
   });
 
-  console.log('Users created');
-
-  // Create business
-  const business = await prisma.business.create({
-    data: {
-      name: 'Campus Tech Store',
-      description: 'We sell the latest tech gadgets for students',
-      universityId: university1.id,
-      categoryId: categories[0].id,
-      userId: businessUser.id,
-      isVerified: true,
-    },
-  });
-
-  // Update business user with businessId
-  await prisma.user.update({
-    where: { id: businessUser.id },
-    data: { businessId: business.id },
-  });
-
-  console.log('Business created');
+  console.log('Users created with business');
 
   // Create products
   const products = await Promise.all([
@@ -117,15 +111,15 @@ async function main() {
       data: {
         name: 'Laptop',
         description: 'Powerful laptop for students',
-        imageUrl: 'https://ik.imagekit.io/demo/laptop-main.jpg',
+        imageUrl: defaultImageUrl,
         price: 999.99,
         stock: 10,
-        businessId: business.id,
+        businessId: businessUser.business.id,
         categoryId: categories[0].id,
         images: {
           create: [
-            { url: 'https://ik.imagekit.io/demo/laptop-angle1.jpg' },
-            { url: 'https://ik.imagekit.io/demo/laptop-angle2.jpg' },
+            { url: defaultImageUrl },
+            { url: defaultImageUrl },
           ],
         },
       },
@@ -137,15 +131,15 @@ async function main() {
       data: {
         name: 'Headphones',
         description: 'Noise-cancelling headphones',
-        imageUrl: 'https://ik.imagekit.io/demo/headphones-main.jpg',
+        imageUrl: defaultImageUrl,
         price: 199.99,
         stock: 20,
-        businessId: business.id,
+        businessId: businessUser.business.id,
         categoryId: categories[0].id,
         images: {
           create: [
-            { url: 'https://ik.imagekit.io/demo/headphones-side.jpg' },
-            { url: 'https://ik.imagekit.io/demo/headphones-back.jpg' },
+            { url: defaultImageUrl },
+            { url: defaultImageUrl },
           ],
         },
       },
@@ -157,15 +151,15 @@ async function main() {
       data: {
         name: 'Textbook',
         description: 'Computer Science 101 Textbook',
-        imageUrl: 'https://ik.imagekit.io/demo/textbook-cover.jpg',
+        imageUrl: defaultImageUrl,
         price: 79.99,
         stock: 15,
-        businessId: business.id,
+        businessId: businessUser.business.id,
         categoryId: categories[1].id,
         images: {
           create: [
-            { url: 'https://ik.imagekit.io/demo/textbook-back.jpg' },
-            { url: 'https://ik.imagekit.io/demo/textbook-contents.jpg' },
+            { url: defaultImageUrl },
+            { url: defaultImageUrl },
           ],
         },
       },
@@ -182,7 +176,7 @@ async function main() {
     data: {
       userId: normalUser.id,
       productId: products[0].id,
-      businessId: business.id,
+      businessId: businessUser.business.id,
       total: products[0].price,
       status: 'PENDING',
     },

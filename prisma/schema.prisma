@@ -28,8 +28,7 @@ model User {
   universityId String
   role         Role      @default(USER)
   orders       Order[]
-  business     Business? @relation(fields: [businessId], references: [id])
-  businessId   String?
+  business     Business?
 }
 
 model Business {
@@ -43,7 +42,7 @@ model Business {
   products     Product[]
   orders       Order[]
   isVerified   Boolean   @default(false)
-  User         User[]
+  user         User      @relation(fields: [userId], references: [id])
 }
 
 model Product {

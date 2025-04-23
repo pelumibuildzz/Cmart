@@ -3,6 +3,7 @@ import { getCategories } from '@/lib/services/category.service';
 import { getUniversities } from '@/lib/services/university.service';
 import Link from 'next/link';
 import { Search, MapPin } from 'lucide-react';
+import { getBusinesses } from '@/lib/services';
 
 export default async function Home() {
   const products = await getProducts({ 
@@ -10,8 +11,9 @@ export default async function Home() {
     take: 8
   });
   
-  const categories = await getCategories();
-  const universities = await getUniversities();
+  const categories = await getCategories({take: 4});
+  const universities = await getUniversities({take: 4});
+  const markets = await getBusinesses({ take: 4});
 
   return (
     <div className="flex flex-col min-h-screen bg-white">
@@ -92,7 +94,7 @@ export default async function Home() {
                 className="group relative overflow-hidden rounded-lg bg-white shadow-md hover:shadow-lg transition-shadow duration-300"
               >
                 <div className="aspect-square w-full bg-gray-200" />
-                <div className="absolute inset-0 flex items-center justify-center bg-secondary/60 group-hover:bg-secondary/70 transition-colors">
+                <div className="absolute inset-0 flex items-center justify-center bg-[url('/images/Books.jpg')] transition-colors">
                   <span className="text-white text-lg font-medium">{category.name}</span>
                 </div>
               </Link>
@@ -101,6 +103,39 @@ export default async function Home() {
         </div>
       </section>
 
+      {/* Featured Markets */}
+      <section className="py-16 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex justify-between items-center mb-8">
+            <h2 className="text-3xl font-bold text-secondary">Featured Markets</h2>
+            <Link href="/markets" className="text-primary hover:text-primary/80 font-medium">
+              View All
+            </Link>
+          </div>
+          
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            {markets.map((business) => (
+              <Link 
+                key={business.id} 
+                href={`/markets/${business.id}`}
+                className="group relative overflow-hidden rounded-lg bg-white shadow-md hover:shadow-lg transition-shadow duration-300"
+              >
+                <div className="aspect-square w-full bg-gray-200" />
+                <div className="absolute inset-0 flex items-center justify-center bg-secondary/60 group-hover:bg-secondary/70 transition-colors">
+                  <span className="text-white text-lg font-medium">{business.name}</span>
+                </div>
+              </Link>
+            ))}
+          </div>
+          
+          {markets.length === 0 && (
+            <p className="text-center py-8 text-gray-500">
+              No products available yet.
+            </p>
+          )}
+        </div>
+      </section>
+      
       {/* Featured Products */}
       <section className="py-16 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
@@ -129,7 +164,7 @@ export default async function Home() {
                   <div className="flex items-center justify-between">
                     <span className="text-primary font-bold">${product.price.toFixed(2)}</span>
                     <Link 
-                      href={`/product/${product.id}`}
+                      href={`/products/${product.id}`}
                       className="text-sm bg-primary text-white px-4 py-2 rounded-md hover:bg-primary/90 transition-colors"
                     >
                       View Details

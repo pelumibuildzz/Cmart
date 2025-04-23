@@ -121,6 +121,33 @@ export async function updateProduct(id: string, data: Partial<CreateProductData>
   });
 }
 
+export async function updateProductMainImage(productId: string, newImage: File) {
+  const product = await prisma.product.findUnique({
+    where: { id: productId },
+  });
+
+  if (!product) {
+    throw new Error('Product not found');
+  }
+
+  const newImageUrl = await uploadImage(
+    newImage,
+    `${Date.now()}-${newImage.name}`,
+    'products'
+  );
+
+  return prisma.product.update({
+    where: { id: productId },
+    data: {
+      imageUrl: newImageUrl,
+    },
+    include: {
+      images: true,
+      Business: true,
+    },
+  });
+}
+
 export async function deleteProduct(id: string) {
   const product = await prisma.product.findUnique({
     where: { id },
@@ -131,8 +158,16 @@ export async function deleteProduct(id: string) {
     throw new Error('Product not found');
   }
 
-  // Delete product and associated images from database
-  return prisma.product.delete({
+  // Delete all associated images from ImageKit
+  const deletePromises = [
+    // Delete main product image
+    deleteImage(product.imageUrl),
+    // Delete additional images
+    ...product.images.map(image => deleteImage(image.id))
+  ];
+  await Promise.all(deletePromises);
+
+return prisma.product.delete({
     where: { id },
   });
 }
@@ -145,5 +180,53 @@ export async function getProductsByBusinessId(businessId: string) {
     include: {
       images: true,
     },
+  });
+}
+
+export async function addProductImages(productId: string, images: File[]) {
+  const product = await prisma.product.findUnique({
+    where: { id: productId },
+    include: { images: true },
+  });
+
+  if (!product) {
+    throw new Error('Product not found');
+  }
+
+  const uploadedImages = await uploadMultipleImages(images);
+  const imageData = uploadedImages.map(url => ({
+    url,
+    productId,
+  }));
+
+  return prisma.product.update({
+    where: { id: productId },
+    data: {
+      images: {
+        create: imageData,
+      },
+    },
+    include: {
+      images: true,
+      Business: true,
+    },
+  });
+}
+
+export async function removeProductImage(productId: string, imageId: string) {
+  const image = await prisma.productImage.findFirst({
+    where: {
+      id: imageId,
+      productId: productId,
+    },
+  });
+
+  if (!image) {
+    throw new Error('Image not found');
+  }
+
+  await deleteImage(imageId);
+  return prisma.productImage.delete({
+    where: { id: imageId },
   });
 }

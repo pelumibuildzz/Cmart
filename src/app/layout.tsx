@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import Providers from "./providers";
 import Header from "./components/header";
+import Footer from "./components/footer";
 
 export const metadata: Metadata = {
   title: "C-Mart - University E-commerce",
@@ -19,11 +20,7 @@ export default function RootLayout({
         <Providers>
           <Header />
           <main className="flex-grow">{children}</main>
-          <footer className="bg-gray-100 py-6 mt-8">
-            <div className="container mx-auto px-4 text-center text-gray-600">
-              &copy; {new Date().getFullYear()} C-Mart. All rights reserved.
-            </div>
-          </footer>
+          <Footer/>
         </Providers>
       </body>
     </html>

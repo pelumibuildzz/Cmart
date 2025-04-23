@@ -1,5 +1,13 @@
 import { prisma } from '../server/prisma';
 
+interface CreateBusinessData {
+  userId: string;
+  name: string;
+  description: string;
+  universityId: string;
+  categoryId: string;
+}
+
 export async function getBusinessById(id: string) {
   return prisma.business.findUnique({
     where: { id },
@@ -33,25 +41,37 @@ export async function getBusinesses(
     where,
     orderBy,
     include: {
-      products: true
+      products: true,
+      User: true,    
+      category: true,
+      orders: true   
     }
   });
 }
 
-export async function createBusiness(data: any) {
+export async function createBusiness(data: CreateBusinessData) {
   const category = await prisma.category.findUnique({ where: { id: data.categoryId } });
   if (!category) {
     throw new Error('Invalid category ID');
   }
 
   return prisma.business.create({
-    data,
+    data: {
+      name: data.name,
+      description: data.description,
+      universityId: data.universityId,
+      categoryId: data.categoryId,
+      userId: data.userId,
+      isVerified: false
+    },
     include: {
       category: true,
       products: true,
+      User: true
     },
   });
 }
+
 export async function updateBusiness(id: string, data: any) {
   return prisma.business.update({
     where: { id },
@@ -69,4 +89,4 @@ export async function deleteBusiness(id: string) {
       products: true
     }
   });
-} 
+}

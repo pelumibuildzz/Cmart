@@ -26,6 +26,18 @@ export default function Header() {
               Home
             </Link>
             <Link 
+              href="/category" 
+              className={`hover:text-primary ${pathname === '/category' ? 'text-primary' : 'text-secondary'}`}
+            >
+              Categories
+            </Link>
+            <Link 
+              href="/markets" 
+              className={`hover:text-primary ${pathname === '/markets' ? 'text-primary' : 'text-secondary'}`}
+            >
+              Markets
+            </Link>
+            <Link 
               href="/products" 
               className={`hover:text-primary ${pathname === '/products' ? 'text-primary' : 'text-secondary'}`}
             >
@@ -94,6 +106,20 @@ export default function Header() {
               onClick={() => setIsMenuOpen(false)}
             >
               Home
+            </Link>
+            <Link 
+              href="/category" 
+              className={`block hover:text-primary ${pathname === '/category' ? 'text-primary' : 'text-secondary'}`}
+              onClick={() => setIsMenuOpen(false)}
+            >
+              Categories
+            </Link>
+            <Link 
+              href="/markets" 
+              className={`block hover:text-primary ${pathname === '/markets' ? 'text-primary' : 'text-secondary'}`}
+              onClick={() => setIsMenuOpen(false)}
+            >
+              Markets
             </Link>
             <Link 
               href="/products" 

@@ -42,7 +42,7 @@ export async function getBusinesses(
     orderBy,
     include: {
       products: true,
-      User: true,    
+      user: true,    
       category: true,
       orders: true   
     }
@@ -67,7 +67,7 @@ export async function createBusiness(data: CreateBusinessData) {
     include: {
       category: true,
       products: true,
-      User: true
+      user: true
     },
   });
 }

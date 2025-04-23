@@ -93,9 +93,18 @@ export default async function Home() {
                 href={`/category/${category.id}`}
                 className="group relative overflow-hidden rounded-lg bg-white shadow-md hover:shadow-lg transition-shadow duration-300"
               >
-                <div className="aspect-square w-full bg-gray-200" />
-                <div className="absolute inset-0 flex items-center justify-center bg-[url('/images/Books.jpg')] transition-colors">
-                  <span className="text-white text-lg font-medium">{category.name}</span>
+                <div className="aspect-square w-full" />
+                <div className="absolute inset-0 flex items-center justify-center bg-gray-100/5" 
+                  style={{
+                    backgroundImage: `url('/images/${category.name}.jpg')`,
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                  }}
+                >
+                  <div className="absolute inset-0 bg-black/40 group-hover:bg-black/10 transition-colors duration-300"></div>
+                  <span className="relative z-10 text-primary text-lg font-medium group-hover:text-white transition-colors duration-300">
+                    {category.name}
+                  </span>
                 </div>
               </Link>
             ))}

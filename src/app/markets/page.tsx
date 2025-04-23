@@ -1,7 +1,8 @@
 import { getCurrentUser } from '@/lib/auth/session';
 import { getBusinesses } from '@/lib/services';
 import { getUniversities } from '@/lib/services/university.service';
-import { MapPin, Store } from 'lucide-react';
+import { MapPin } from 'lucide-react';
+import BusinessCard from '../components/business-card';
 
 export default async function Markets() {
   const currentUser = await getCurrentUser();
@@ -68,23 +69,3 @@ export default async function Markets() {
   );
 }
 
-function BusinessCard({ business }: { business: any }) {
-  return (
-    <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
-      <div className="p-6">
-        <div className="flex items-start justify-between">
-          <div>
-            <h3 className="text-xl font-semibold text-secondary mb-2">{business.name}</h3>
-            <p className="text-gray-600 mb-4 line-clamp-2">{business.description}</p>
-          </div>
-          <Store className="text-primary flex-shrink-0" />
-        </div>
-        {business.category && (
-          <span className="inline-block bg-primary/10 text-primary rounded-full px-3 py-1 text-sm font-medium">
-            {business.category.name}
-          </span>
-        )}
-      </div>
-    </div>
-  );
-}

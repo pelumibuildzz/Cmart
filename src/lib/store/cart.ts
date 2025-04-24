@@ -12,7 +12,9 @@ interface CartItem {
 }
 
 interface CartStore {
+  userId: string | null;
   items: CartItem[];
+  setUserId: (id: string | null) => void;
   addItem: (item: Omit<CartItem, 'quantity'>) => void;
   removeItem: (id: string) => void;
   updateQuantity: (id: string, quantity: number) => void;
@@ -26,13 +28,26 @@ interface CartStore {
 export const useCartStore = create<CartStore>()(
   persist(
     (set, get) => ({
+      userId: null,
       items: [],
       
+      setUserId: (id: string | null) => {
+        set({ userId: id });
+        if (!id) {
+          // Clear cart when user signs out
+          set({ items: [] });
+        }
+      },
+
       addItem: (item) => {
+        if (!get().userId) {
+          // Don't allow adding items without authentication
+          return;
+        }
+
         set((state) => {
           const existingItem = state.items.find((i) => i.id === item.id);
           if (existingItem) {
-            // Don't exceed stock limit
             if (existingItem.quantity >= existingItem.stock) {
               return state;
             }
@@ -90,6 +105,9 @@ export const useCartStore = create<CartStore>()(
     }),
     {
       name: 'cart-storage',
+      // Only persist cart if there's a userId
+      partialize: (state) => 
+        state.userId ? state : { ...state, items: [] },
     }
   )
 );

@@ -34,43 +34,74 @@ export async function getProducts(
 }
 
 export async function createProduct(data: CreateProductData) {
-  const business = await prisma.business.findUnique({ where: { id: data.businessId } });
-  const category = await prisma.category.findUnique({ where: { id: data.categoryId } });
-  if (!business || !category) {
-    throw new Error('Invalid business or category ID');
-  }
+  try {
+    const business = await prisma.business.findUnique({ 
+      where: { id: data.businessId },
+      include: { user: true }
+    });
+    
+    if (!business) {
+      throw new Error('Business not found');
+    }
 
-  // Upload main image
-  const mainImageUrl = await uploadImage(
-    data.image, 
-    `${Date.now()}-${data.image.name}`,
-    'products'
-  );
+    const category = await prisma.category.findUnique({ 
+      where: { id: data.categoryId } 
+    });
+    
+    if (!category) {
+      throw new Error('Category not found');
+    }
 
-  // Handle additional image uploads if present
-  let additionalImages: ProductImage[] = [];
-  if (data.images && data.images.length > 0) {
-    const uploadedImages = await uploadMultipleImages(data.images);
-    additionalImages = uploadedImages.map(img => ({
-      url: img,
-    }));
-  }
+    // Upload main image
+    let mainImageUrl: string;
+    try {
+      mainImageUrl = await uploadImage(
+        data.image, 
+        `${Date.now()}-${data.image.name}`,
+        'products'
+      );
+    } catch (error) {
+      console.error('Error uploading main image:', error);
+      throw new Error('Failed to upload main image');
+    }
 
-  // Create product with main image and additional images
-  const { image, images: imageFiles, ...productData } = data;
-  return prisma.product.create({
-    data: {
-      ...productData,
-      imageUrl: mainImageUrl,
-      images: {
-        create: additionalImages,
+    // Handle additional image uploads if present
+    let additionalImages: { url: string }[] = [];
+    if (data.images && data.images.length > 0) {
+      try {
+        const uploadedImages = await uploadMultipleImages(data.images);
+        additionalImages = uploadedImages.map(url => ({
+          url,
+        }));
+      } catch (error) {
+        console.error('Error uploading additional images:', error);
+        // Don't fail the whole operation if additional images fail
+      }
+    }
+
+    // Create product with main image and additional images
+    const { image, images: imageFiles, ...productData } = data;
+    return await prisma.product.create({
+      data: {
+        ...productData,
+        imageUrl: mainImageUrl,
+        images: {
+          create: additionalImages,
+        },
       },
-    },
-    include: {
-      images: true,
-      Business: true,
-    },
-  });
+      include: {
+        images: true,
+        Business: {
+          include: {
+            user: true
+          }
+        },
+      },
+    });
+  } catch (error) {
+    console.error('Error in createProduct:', error);
+    throw error;
+  }
 }
 
 export async function updateProduct(id: string, data: Partial<CreateProductData>) {

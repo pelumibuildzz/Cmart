@@ -6,6 +6,8 @@ import { ShoppingCart, Check } from 'lucide-react';
 import { ProductImage } from '@/types/product';
 import Link from 'next/link';
 import { useCartStore } from '@/lib/store/cart';
+import { useRouter } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 
 interface ProductCardProps {
   id: string;
@@ -33,6 +35,8 @@ export default function ProductCard({
   const allImages = [{ url: imageUrl }, ...images];
   const addItem = useCartStore((state) => state.addItem);
   const items = useCartStore((state) => state.items);
+  const router = useRouter();
+  const { data: session } = useSession();
 
   const currentCartQuantity = items.find(item => item.id === id)?.quantity || 0;
   const isOutOfStock = stock <= currentCartQuantity;
@@ -45,6 +49,11 @@ export default function ProductCard({
     e.preventDefault();
     e.stopPropagation();
     
+    if (!session) {
+      router.push('/auth/signin');
+      return;
+    }
+
     if (isOutOfStock) return;
     
     setIsAdding(true);
@@ -56,7 +65,7 @@ export default function ProductCard({
       businessId,
       stock
     });
-    
+
     // Reset animation after 1.5 seconds
     setTimeout(() => {
       setIsAdding(false);
@@ -74,7 +83,7 @@ export default function ProductCard({
               alt={`${name} - Image ${currentImageIndex + 1}`}
               className="object-cover group-hover:scale-105 transition-transform duration-300"
               fill
-              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+              sizes="100vw, (max-width: 1200px) 50vw, 33vw"
               priority
             />
           </div>
@@ -117,7 +126,7 @@ export default function ProductCard({
           </p>
           <div className="flex items-center justify-between">
             <span className="text-xl font-bold text-primary">
-              ${price.toFixed(2)}
+              ₦{price.toFixed(2)}
             </span>
             <button 
               className={`flex items-center gap-2 ${

@@ -6,6 +6,8 @@ import Link from 'next/link';
 import { Minus, Plus, Trash2, Store } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { fetchBusinessData } from '../actions/business.action';
+import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 
 interface Business {
   id: string;
@@ -13,8 +15,22 @@ interface Business {
 }
 
 export default function Cart() {
-  const { items, removeItem, updateQuantity, getBusinessTotal } = useCartStore();
+  const { items, removeItem, updateQuantity, getBusinessTotal, setUserId } = useCartStore();
   const [businesses, setBusinesses] = useState<Map<string, Business>>(new Map());
+  const { data: session, status } = useSession();
+  const router = useRouter();
+
+  // Initialize cart with user ID
+  useEffect(() => {
+    if (status === 'loading') return;
+
+    setUserId(session?.user?.id || null);
+
+    // Redirect unauthenticated users
+    if (status === 'unauthenticated') {
+      router.push('/auth/signin');
+    }
+  }, [session, status, setUserId, router]);
 
   // Group items by business
   const businessGroups = useMemo(() => {
@@ -24,7 +40,7 @@ export default function Cart() {
       acc.set(item.businessId, group);
       return acc;
     }, new Map<string, typeof items>());
-    
+
     return Array.from(groups.entries());
   }, [items]);
 
@@ -32,14 +48,14 @@ export default function Cart() {
   useEffect(() => {
     const fetchBusinesses = async () => {
       const businessesMap = new Map<string, Business>();
-      
+
       for (const [businessId] of businessGroups) {
         const business = await fetchBusinessData(businessId);
         if (business) {
           businessesMap.set(businessId, business);
         }
       }
-      
+
       setBusinesses(businessesMap);
     };
 
@@ -48,13 +64,24 @@ export default function Cart() {
     }
   }, [businessGroups]);
 
+  // Show loading state while checking authentication
+  if (status === 'loading') {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <h1 className="text-2xl font-bold mb-4">Your Cart</h1>
+        <p className="text-gray-600">Loading...</p>
+      </div>
+    );
+  }
+
+  // Show empty cart state
   if (items.length === 0) {
     return (
       <div className="container mx-auto px-4 py-8">
         <h1 className="text-2xl font-bold mb-4">Your Cart</h1>
         <p className="text-gray-600 mb-4">Your cart is empty</p>
-        <Link 
-          href="/markets" 
+        <Link
+          href="/markets"
           className="inline-block bg-primary text-white px-6 py-2 rounded-md hover:bg-primary/90 transition-colors"
         >
           Continue Shopping
@@ -66,25 +93,25 @@ export default function Cart() {
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-2xl font-bold mb-6">Your Cart</h1>
-      
+
       <div className="grid gap-8 mb-8">
         {businessGroups.map(([businessId, businessItems]) => (
           <div key={businessId} className="bg-white rounded-lg shadow-md overflow-hidden">
             {/* Business Header */}
             <div className="bg-gray-50 p-4 flex items-center gap-2 border-b">
               <Store className="h-5 w-5 text-primary" />
-              <Link href={`/markets/${businessId}`} className="font-semibold text-lg text-secondary hover:text-primary transition-colors">
+              <Link
+                href={`/markets/${businessId}`}
+                className="font-semibold text-lg text-secondary hover:text-primary transition-colors"
+              >
                 {businesses.get(businessId)?.name || 'Loading...'}
               </Link>
             </div>
-            
+
             {/* Business Items */}
             <div className="divide-y">
               {businessItems.map((item) => (
-                <div 
-                  key={item.id} 
-                  className="p-4 flex items-center gap-4"
-                >
+                <div key={item.id} className="p-4 flex items-center gap-4">
                   <div className="relative w-24 h-24 flex-shrink-0">
                     <Image
                       src={item.imageUrl}
@@ -93,11 +120,11 @@ export default function Cart() {
                       className="object-cover rounded-md"
                     />
                   </div>
-                  
+
                   <div className="flex-grow">
                     <h3 className="font-semibold text-lg text-secondary">{item.name}</h3>
                     <p className="text-primary font-medium">${item.price.toFixed(2)}</p>
-                    
+
                     <div className="flex items-center gap-4 mt-2">
                       <div className="flex items-center gap-2">
                         <button
@@ -118,7 +145,7 @@ export default function Cart() {
                           <Plus size={16} />
                         </button>
                       </div>
-                      
+
                       <button
                         onClick={() => removeItem(item.id)}
                         className="text-red-500 hover:text-red-700 transition-colors"
@@ -130,16 +157,12 @@ export default function Cart() {
 
                     {/* Stock Warning */}
                     {item.quantity >= item.stock && (
-                      <p className="text-sm text-red-500 mt-1">
-                        Maximum stock reached
-                      </p>
+                      <p className="text-sm text-red-500 mt-1">Maximum stock reached</p>
                     )}
                   </div>
-                  
+
                   <div className="text-right">
-                    <p className="font-bold text-lg">
-                      ${(item.price * item.quantity).toFixed(2)}
-                    </p>
+                    <p className="font-bold text-lg">${(item.price * item.quantity).toFixed(2)}</p>
                   </div>
                 </div>
               ))}
@@ -155,7 +178,7 @@ export default function Cart() {
           </div>
         ))}
       </div>
-      
+
       {/* Cart Summary */}
       <div className="bg-white rounded-lg shadow-md p-6">
         <div className="space-y-4 mb-6">
@@ -172,7 +195,7 @@ export default function Cart() {
             </span>
           </div>
         </div>
-        
+
         <Link
           href="/checkout"
           className="block w-full text-center bg-primary text-white px-6 py-3 rounded-md hover:bg-primary/90 transition-colors"

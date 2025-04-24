@@ -3,6 +3,10 @@ import { prisma } from '../server/prisma';
 export async function getOrderById(id: string) {
   return prisma.order.findUnique({
     where: { id },
+    include: {
+      User: true,
+      Business: true
+    }
   });
 }
 
@@ -20,6 +24,10 @@ export async function getOrders(
     take,
     where,
     orderBy,
+    include: {
+      User: true,
+      Business: true
+    }
   });
 }
 
@@ -28,6 +36,10 @@ export async function getOrdersByUserId(userId: string) {
     where: {
       userId,
     },
+    include: {
+      User: true,
+      Business: true
+    }
   });
 }
 
@@ -36,12 +48,20 @@ export async function getOrdersByBusinessId(businessId: string) {
     where: {
       businessId,
     },
+    include: {
+      User: true,
+      Business: true
+    }
   });
 }
 
 export async function createOrder(data: any) {
   return prisma.order.create({
     data,
+    include: {
+      User: true,
+      Business: true
+    }
   });
 }
 
@@ -49,11 +69,19 @@ export async function updateOrder(id: string, data: any) {
   return prisma.order.update({
     where: { id },
     data,
+    include: {
+      User: true,
+      Business: true
+    }
   });
 }
 
 export async function deleteOrder(id: string) {
   return prisma.order.delete({
     where: { id },
+    include: {
+      User: true,
+      Business: true
+    }
   });
-} 
+}

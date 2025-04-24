@@ -1,26 +1,69 @@
 'use client';
 
-import Image from "next/image"
-import { useState } from "react"
-import { useCartStore } from "@/lib/store/cart"
-import { Check, ShoppingCart } from "lucide-react"
+import { useState } from 'react';
+import Image from 'next/image';
+import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
+import { Trash2, Edit, Store } from 'lucide-react';
+import Link from 'next/link';
+import { useCartStore } from '@/lib/store/cart';
+import { deleteProductAction } from '@/app/actions/product.action';
 
 interface ProductDetailsProps {
-  product: any;
+  product: any; // Replace with proper type
+  onDelete?: () => void;
 }
 
-export default function ProductDetails({ product }: ProductDetailsProps) {
-  const [isAdding, setIsAdding] = useState(false);
+export default function ProductDetails({ product, onDelete }: ProductDetailsProps) {
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [error, setError] = useState('');
+  const router = useRouter();
+  const { data: session } = useSession();
   const addItem = useCartStore((state) => state.addItem);
   const items = useCartStore((state) => state.items);
 
+  const isOwner = session?.user?.id === product.Business.userId;
   const currentCartQuantity = items.find(item => item.id === product.id)?.quantity || 0;
   const isOutOfStock = product.stock <= currentCartQuantity;
 
+  const handleDelete = async () => {
+    if (!confirm('Are you sure you want to delete this product?')) {
+      return;
+    }
+
+    setIsDeleting(true);
+    setError('');
+
+    try {
+      const result = await deleteProductAction(product.id);
+      
+      if (result.error) {
+        setError(result.error);
+        return;
+      }
+
+      // Call onDelete callback if provided
+      if (onDelete) {
+        onDelete();
+      } else {
+        // Otherwise, redirect to business page
+        router.push(`/markets/${product.Business.id}`);
+      }
+    } catch (err: any) {
+      setError(err.message || 'Failed to delete product');
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
   const handleAddToCart = () => {
+    if (!session) {
+      router.push('/auth/signin');
+      return;
+    }
+
     if (isOutOfStock) return;
     
-    setIsAdding(true);
     addItem({ 
       id: product.id, 
       name: product.name, 
@@ -29,98 +72,113 @@ export default function ProductDetails({ product }: ProductDetailsProps) {
       businessId: product.Business.id,
       stock: product.stock
     });
-
-    // Reset animation after 1.5 seconds
-    setTimeout(() => {
-      setIsAdding(false);
-    }, 1500);
   };
 
   return (
-    <main className="container mx-auto px-4 py-8">
-      <div className="grid md:grid-cols-2 gap-8">
-        {/* Product Images Section */}
-        <div className="space-y-4">
-          <div className="relative h-[400px] bg-card rounded-lg overflow-hidden">
-            <Image
-              src={product.imageUrl}
-              alt={product.name}
-              fill
-              className="object-contain"
-              priority
-            />
+    <div className="bg-white rounded-lg shadow-md overflow-hidden">
+      {error && (
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3">
+          {error}
+        </div>
+      )}
+
+      <div className="relative aspect-video w-full max-h-[500px]">
+        <Image
+          src={product.imageUrl}
+          alt={product.name}
+          fill
+          className="object-cover"
+          priority
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+        />
+      </div>
+
+      <div className="p-6">
+        <div className="flex justify-between items-start mb-4">
+          <h1 className="text-2xl font-bold text-secondary">{product.name}</h1>
+          <div className="text-2xl font-bold text-primary">
+            ₦{product.price.toFixed(2)}
           </div>
-          
-          {/* Additional Images */}
-          {product.images.length > 0 && (
-            <div className="grid grid-cols-4 gap-2">
-              {product.images.map((image: any) => (
-                <div key={image.id} className="relative h-24 bg-card rounded-lg overflow-hidden">
-                  <Image
-                    src={image.url}
-                    alt={`${product.name} additional view`}
-                    fill
-                    className="object-cover"
-                  />
-                </div>
-              ))}
+        </div>
+
+        <Link 
+          href={`/markets/${product.Business.id}`}
+          className="inline-flex items-center text-secondary hover:text-primary mb-4"
+        >
+          <Store className="h-4 w-4 mr-2" />
+          {product.Business.name}
+        </Link>
+
+        <p className="text-gray-600 mb-6">{product.description}</p>
+
+        <div className="flex justify-between items-center mb-6">
+          <div className="text-sm">
+            <span className="font-medium">Stock:</span>{' '}
+            <span className={product.stock > 0 ? 'text-green-600' : 'text-red-600'}>
+              {product.stock} available
+            </span>
+          </div>
+          {currentCartQuantity > 0 && (
+            <div className="text-sm text-primary">
+              {currentCartQuantity} in cart
             </div>
           )}
         </div>
 
-        {/* Product Info Section */}
-        <div className="flex flex-col gap-6">
-          <div className="space-y-2">
-            <h1 className="text-3xl font-bold text-foreground">{product.name}</h1>
-            <p className="text-2xl font-semibold text-primary">
-              ${product.price.toFixed(2)}
-            </p>
+        {/* Additional Images */}
+        {product.images && product.images.length > 0 && (
+          <div className="mb-6">
+            <h2 className="text-lg font-semibold mb-2">Additional Images</h2>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+              {product.images.map((image: any) => (
+                <div key={image.id} className="relative aspect-square w-full max-w-[150px]">
+                  <Image
+                    src={image.url}
+                    alt={`Additional view of ${product.name}`}
+                    fill
+                    className="object-cover rounded-md"
+                    sizes="(max-width: 768px) 50vw, 150px"
+                  />
+                </div>
+              ))}
+            </div>
           </div>
+        )}
 
-          {/* Business Info */}
-          <div className="py-2">
-            <p className="text-sm text-muted-foreground">Sold by</p>
-            <p className="font-medium">{product.Business.name}</p>
-          </div>
-
-          {/* Stock Status */}
-          <div className="flex items-center gap-2">
-            <div className={`w-3 h-3 rounded-full ${product.stock > 0 ? 'bg-green-500' : 'bg-red-500'}`} />
-            <span className="text-sm font-medium">
-              {product.stock > 0 ? `${product.stock} in stock` : 'Out of stock'}
-            </span>
-          </div>
-
-          {/* Description */}
-          <div className="prose prose-slate max-w-none">
-            <h2 className="text-lg font-semibold">About this product</h2>
-            <p className="text-muted-foreground whitespace-pre-wrap">{product.description}</p>
-          </div>
-
-          {/* Add to Cart Button */}
-          <button 
-            onClick={handleAddToCart}
-            disabled={!product.isAvailable || isOutOfStock || isAdding}
-            className={`w-full md:w-auto px-6 py-3 rounded-md transition-all duration-300 flex items-center justify-center gap-2
-              ${isOutOfStock ? 'bg-gray-400 cursor-not-allowed' : isAdding ? 'bg-green-500' : 'bg-primary hover:bg-primary/90'} 
-              text-white disabled:opacity-50 disabled:cursor-not-allowed`}
-          >
-            {isOutOfStock ? (
-              'Out of Stock'
-            ) : isAdding ? (
-              <>
-                <Check className="h-5 w-5" />
-                Added!
-              </>
-            ) : (
-              <>
-                <ShoppingCart className="h-5 w-5" />
-                Add to Cart
-              </>
-            )}
-          </button>
+        <div className="flex justify-end gap-4">
+          {isOwner ? (
+            <>
+              <Link
+                href={`/business/product/${product.id}/edit`}
+                className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
+              >
+                <Edit className="h-4 w-4 mr-2" />
+                Edit
+              </Link>
+              <button
+                onClick={handleDelete}
+                disabled={isDeleting}
+                className="inline-flex items-center px-4 py-2 border border-transparent rounded-md text-sm font-medium text-white bg-red-600 hover:bg-red-700 disabled:opacity-50"
+              >
+                <Trash2 className="h-4 w-4 mr-2" />
+                {isDeleting ? 'Deleting...' : 'Delete'}
+              </button>
+            </>
+          ) : (
+            <button
+              onClick={handleAddToCart}
+              disabled={!product.isAvailable || isOutOfStock}
+              className="inline-flex items-center px-6 py-3 border border-transparent rounded-md text-base font-medium text-white bg-primary hover:bg-primary/90 disabled:opacity-50"
+            >
+              {!product.isAvailable
+                ? 'Not Available'
+                : isOutOfStock
+                ? 'Out of Stock'
+                : 'Add to Cart'}
+            </button>
+          )}
         </div>
       </div>
-    </main>
+    </div>
   );
 }

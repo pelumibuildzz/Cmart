@@ -15,9 +15,11 @@ export async function getBusinessById(id: string) {
       include: {
         products: {
           include: {
-            images: true // This is likely missing
+            images: true
           }
-        }
+        },
+        category: true,
+        user: true
       }
     });
     return business;
@@ -31,7 +33,13 @@ export async function getBusinessByUserId(userId: string) {
   return prisma.business.findUnique({
     where: { userId },
     include: {
-      products: true
+      products: {
+        include: {
+          images: true
+        }
+      },
+      category: true,
+      user: true
     }
   });
 }

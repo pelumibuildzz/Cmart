@@ -34,6 +34,8 @@ export default async function MarketDetails({ params }: MarketDetailsProps) {
             price={product.price}
             imageUrl={product.imageUrl}
             images={product.images || []}
+            stock={product.stock}
+            businessId={business.id}
           />
         ))}
       </div>

@@ -1,14 +1,15 @@
 import { getProducts } from '@/lib/services/product.service';
 import { getCategories } from '@/lib/services/category.service';
 import { getUniversities } from '@/lib/services/university.service';
+import { getBusinesses } from '@/lib/services';
 import Link from 'next/link';
 import { Search, MapPin } from 'lucide-react';
-import { getBusinesses } from '@/lib/services';
+import ProductCard from '@/app/components/product-card';
 
 export default async function Home() {
   const products = await getProducts({ 
     where: { isAvailable: true },
-    take: 8
+    take: 8,
   });
   
   const categories = await getCategories({take: 4});
@@ -150,37 +151,24 @@ export default async function Home() {
         <div className="max-w-7xl mx-auto">
           <div className="flex justify-between items-center mb-8">
             <h2 className="text-3xl font-bold text-secondary">Featured Products</h2>
-            <Link href="/products" className="text-primary hover:text-primary/80 font-medium">
+            <Link href="/markets" className="text-primary hover:text-primary/80 font-medium">
               View All
             </Link>
           </div>
           
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {products.map((product) => (
-              <div key={product.id} className="group bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-300">
-                <div className="aspect-square relative overflow-hidden">
-                  {product.imageUrl && (
-                    <img 
-                      src={product.imageUrl} 
-                      alt={product.name}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                    />
-                  )}
-                </div>
-                <div className="p-4">
-                  <h3 className="font-medium text-lg mb-2 text-secondary">{product.name}</h3>
-                  <p className="text-gray-600 text-sm mb-2 line-clamp-2">{product.description}</p>
-                  <div className="flex items-center justify-between">
-                    <span className="text-primary font-bold">${product.price.toFixed(2)}</span>
-                    <Link 
-                      href={`/products/${product.id}`}
-                      className="text-sm bg-primary text-white px-4 py-2 rounded-md hover:bg-primary/90 transition-colors"
-                    >
-                      View Details
-                    </Link>
-                  </div>
-                </div>
-              </div>
+              <ProductCard
+                key={product.id}
+                id={product.id}
+                name={product.name}
+                description={product.description}
+                price={product.price}
+                imageUrl={product.imageUrl}
+                images={product.images}
+                stock={product.stock}
+                businessId={product.Business.id}
+              />
             ))}
           </div>
           

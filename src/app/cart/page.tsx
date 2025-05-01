@@ -123,7 +123,7 @@ export default function Cart() {
 
                   <div className="flex-grow">
                     <h3 className="font-semibold text-lg text-secondary">{item.name}</h3>
-                    <p className="text-primary font-medium">${item.price.toFixed(2)}</p>
+                    <p className="text-primary font-medium">₦{item.price.toFixed(2)}</p>
 
                     <div className="flex items-center gap-4 mt-2">
                       <div className="flex items-center gap-2">
@@ -162,7 +162,7 @@ export default function Cart() {
                   </div>
 
                   <div className="text-right">
-                    <p className="font-bold text-lg">${(item.price * item.quantity).toFixed(2)}</p>
+                    <p className="font-bold text-lg">₦{(item.price * item.quantity).toFixed(2)}</p>
                   </div>
                 </div>
               ))}
@@ -172,7 +172,7 @@ export default function Cart() {
             <div className="bg-gray-50 p-4 flex justify-between items-center">
               <span className="font-medium">Subtotal</span>
               <span className="font-bold text-lg">
-                ${getBusinessTotal(businessId).toFixed(2)}
+                ₦{getBusinessTotal(businessId).toFixed(2)}
               </span>
             </div>
           </div>
@@ -185,13 +185,13 @@ export default function Cart() {
           {businessGroups.map(([businessId, businessItems]) => (
             <div key={businessId} className="flex justify-between text-sm">
               <span>{businesses.get(businessId)?.name || 'Loading...'} Subtotal:</span>
-              <span>${getBusinessTotal(businessId).toFixed(2)}</span>
+              <span>₦{getBusinessTotal(businessId).toFixed(2)}</span>
             </div>
           ))}
           <div className="border-t pt-4 flex justify-between items-center">
             <span className="text-xl font-bold">Total:</span>
             <span className="text-2xl font-bold text-primary">
-              ${items.reduce((total, item) => total + item.price * item.quantity, 0).toFixed(2)}
+              ₦{items.reduce((total, item) => total + item.price * item.quantity, 0).toFixed(2)}
             </span>
           </div>
         </div>

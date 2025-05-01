@@ -16,6 +16,7 @@
     "@auth/prisma-adapter": "^2.8.0",
     "@hookform/resolvers": "^5.0.1",
     "@prisma/client": "^6.6.0",
+    "date-fns": "^4.1.0",
     "dotenv": "^16.5.0",
     "imagekit": "^6.0.0",
     "lucide-react": "^0.488.0",

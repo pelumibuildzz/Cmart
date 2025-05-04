@@ -96,6 +96,15 @@ export default function Header() {
                           Dashboard
                         </Link>
                       )}
+                      {session.user.role === 'ADMIN' && (
+                        <Link 
+                          href="/admin/dashboard" 
+                          className={`block px-4 py-2 hover:bg-gray-50 ${pathname === '/business/dashboard' ? 'text-primary' : 'text-secondary'}`}
+                          onClick={() => setIsProfileMenuOpen(false)}
+                        >
+                          Dashboard
+                        </Link>
+                      )}
                       <button 
                         onClick={() => {
                           signOut({ callbackUrl: '/' });
@@ -199,6 +208,15 @@ export default function Header() {
                   {session.user.role === 'BUSINESS' && (
                     <Link 
                       href="/business/dashboard" 
+                      className={`block hover:text-primary px-1 py-2 ${pathname === '/business/dashboard' ? 'text-primary' : 'text-secondary'}`}
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      Dashboard
+                    </Link>
+                  )}
+                  {session.user.role === 'ADMIN' && (
+                    <Link 
+                      href="/admin/dashboard" 
                       className={`block hover:text-primary px-1 py-2 ${pathname === '/business/dashboard' ? 'text-primary' : 'text-secondary'}`}
                       onClick={() => setIsMenuOpen(false)}
                     >

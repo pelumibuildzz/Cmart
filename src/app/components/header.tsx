@@ -87,6 +87,13 @@ export default function Header() {
                       >
                         Profile
                       </Link>
+                      <Link 
+                        href="/orders" 
+                        className={`block px-4 py-2 hover:bg-gray-50 ${pathname === '/orders' ? 'text-primary' : 'text-secondary'}`}
+                        onClick={() => setIsProfileMenuOpen(false)}
+                      >
+                        Orders
+                      </Link>
                       {session.user.role === 'BUSINESS' && (
                         <Link 
                           href="/business/dashboard" 
@@ -204,6 +211,13 @@ export default function Header() {
                     onClick={() => setIsMenuOpen(false)}
                   >
                     Profile
+                  </Link>
+                  <Link 
+                    href="/orders" 
+                    className={`block hover:text-primary px-1 py-2 ${pathname === '/orders' ? 'text-primary' : 'text-secondary'}`}
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    Orders
                   </Link>
                   {session.user.role === 'BUSINESS' && (
                     <Link 

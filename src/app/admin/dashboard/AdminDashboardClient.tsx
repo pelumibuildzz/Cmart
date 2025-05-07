@@ -1,0 +1,247 @@
+'use client';
+
+import { useState } from 'react';
+import { CheckCircle, XCircle, ShoppingBag, Eye } from 'lucide-react';
+import { OrderStatus, OrderStatusColors } from '@/lib/constants/order';
+import OrderDetailsModal from '@/app/components/OrderDetailsModal';
+
+interface AdminDashboardClientProps {
+  businesses: any[];
+  orders: any[];
+  verifyBusiness: (businessId: string, isVerified: boolean) => Promise<void>;
+  updateOrderStatus: (orderId: string, status: string) => Promise<void>;
+}
+
+export default function AdminDashboardClient({
+  businesses,
+  orders,
+  verifyBusiness,
+  updateOrderStatus,
+}: AdminDashboardClientProps) {
+  const [selectedOrder, setSelectedOrder] = useState<any>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const handleViewDetails = (order: any) => {
+    setSelectedOrder(order);
+    setIsModalOpen(true);
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-50 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <h1 className="text-3xl font-bold text-secondary mb-8">Admin Dashboard</h1>
+
+        {/* Businesses Section */}
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 mb-8">
+          <div className="p-6 border-b border-gray-200">
+            <h2 className="text-xl font-semibold text-secondary">Businesses</h2>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Name
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Owner
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Category
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Status
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {businesses.map((business) => (
+                  <tr key={business.id}>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm font-medium text-gray-900">{business.name}</div>
+                      <div className="text-sm text-gray-500">{business.description}</div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm text-gray-900">{business.user.name}</div>
+                      <div className="text-sm text-gray-500">{business.user.email}</div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm text-gray-900">{business.category.name}</div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                        business.isVerified
+                          ? 'bg-green-100 text-green-800'
+                          : 'bg-yellow-100 text-yellow-800'
+                      }`}>
+                        {business.isVerified ? 'Verified' : 'Pending'}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm">
+                      <form action={verifyBusiness.bind(null, business.id, !business.isVerified)}>
+                        <button
+                          type="submit"
+                          className={`inline-flex items-center px-3 py-1 rounded-md text-sm font-medium ${
+                            business.isVerified
+                              ? 'bg-red-100 text-red-700 hover:bg-red-200'
+                              : 'bg-green-100 text-green-700 hover:bg-green-200'
+                          }`}
+                        >
+                          {business.isVerified ? (
+                            <>
+                              <XCircle className="w-4 h-4 mr-1" />
+                              Unverify
+                            </>
+                          ) : (
+                            <>
+                              <CheckCircle className="w-4 h-4 mr-1" />
+                              Verify
+                            </>
+                          )}
+                        </button>
+                      </form>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {/* Orders Section */}
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+          <div className="p-6 border-b border-gray-200">
+            <div className="flex items-center">
+              <ShoppingBag className="h-5 w-5 text-primary mr-2" />
+              <h2 className="text-xl font-semibold text-secondary">Recent Orders</h2>
+            </div>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Order ID
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Customer
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Business
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Status
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Total
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {orders.map((order) => (
+                  <tr key={order.id}>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm text-gray-900">{order.id.slice(0, 8)}</div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm text-gray-900">{order.User.name}</div>
+                      <div className="text-sm text-gray-500">{order.User.email}</div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm text-gray-900">{order.Business.name}</div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                        OrderStatusColors[order.status as keyof typeof OrderStatusColors]
+                      }`}>
+                        {order.status}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm text-gray-900">₦{order.total.toFixed(2)}</div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex gap-2 flex-wrap">
+                        <button
+                          onClick={() => handleViewDetails(order)}
+                          className="inline-flex items-center px-3 py-1 rounded-md text-sm font-medium bg-gray-100 text-gray-700 hover:bg-gray-200"
+                        >
+                          <Eye className="w-4 h-4 mr-1" />
+                          View Details
+                        </button>
+                        <form className="flex gap-2 flex-wrap">
+                          {order.status !== OrderStatus.COMPLETED && (
+                            <>
+                              {order.status === OrderStatus.PENDING && (
+                                <button
+                                  type="submit"
+                                  formAction={updateOrderStatus.bind(null, order.id, OrderStatus.PACKAGING)}
+                                  className="inline-flex items-center px-3 py-1 rounded-md text-sm font-medium bg-blue-100 text-blue-700 hover:bg-blue-200"
+                                >
+                                  Start Packaging
+                                </button>
+                              )}
+                              {order.status === OrderStatus.PACKAGING && (
+                                <button
+                                  type="submit"
+                                  formAction={updateOrderStatus.bind(null, order.id, OrderStatus.DELIVERING)}
+                                  className="inline-flex items-center px-3 py-1 rounded-md text-sm font-medium bg-purple-100 text-purple-700 hover:bg-purple-200"
+                                >
+                                  Start Delivery
+                                </button>
+                              )}
+                              {order.status === OrderStatus.DELIVERING && (
+                                <button
+                                  type="submit"
+                                  formAction={updateOrderStatus.bind(null, order.id, OrderStatus.DELIVERED)}
+                                  className="inline-flex items-center px-3 py-1 rounded-md text-sm font-medium bg-indigo-100 text-indigo-700 hover:bg-indigo-200"
+                                >
+                                  Mark Delivered
+                                </button>
+                              )}
+                              {order.status === OrderStatus.DELIVERED && (
+                                <button
+                                  type="submit"
+                                  formAction={updateOrderStatus.bind(null, order.id, OrderStatus.COMPLETED)}
+                                  className="inline-flex items-center px-3 py-1 rounded-md text-sm font-medium bg-green-100 text-green-700 hover:bg-green-200"
+                                >
+                                  Complete Order
+                                </button>
+                              )}
+                            </>
+                          )}
+                          {order.status !== OrderStatus.CANCELLED && (
+                            <button
+                              type="submit"
+                              formAction={updateOrderStatus.bind(null, order.id, OrderStatus.CANCELLED)}
+                              className="inline-flex items-center px-3 py-1 rounded-md text-sm font-medium bg-red-100 text-red-700 hover:bg-red-200"
+                            >
+                              Cancel
+                            </button>
+                          )}
+                        </form>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <OrderDetailsModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        order={selectedOrder}
+        onUpdateStatus={updateOrderStatus}
+      />
+    </div>
+  );
+} 

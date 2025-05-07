@@ -21,13 +21,14 @@ enum Role {
 }
 
 model User {
-  id           String    @id @default(cuid())
-  email        String    @unique
+  id           String       @id @default(cuid())
+  email        String       @unique
   password     String
   name         String
   universityId String
-  role         Role      @default(USER)
+  role         Role         @default(USER)
   orders       Order[]
+  orderGroups  OrderGroup[]
   business     Business?
 }
 
@@ -57,6 +58,7 @@ model Product {
   categoryId  String
   Business    Business       @relation(fields: [businessId], references: [id])
   images      ProductImage[]
+  OrderItem   OrderItem[]
 }
 
 model ProductImage {
@@ -66,17 +68,40 @@ model ProductImage {
   Product   Product @relation(fields: [productId], references: [id])
 }
 
+model OrderGroup {
+  id        String   @id @default(cuid())
+  userId    String
+  total     Float
+  status    String
+  paymentId String?
+  createdAt DateTime @default(now())
+  User      User     @relation(fields: [userId], references: [id])
+  orders    Order[]
+}
+
 model Order {
-  id         String   @id @default(cuid())
-  userId     String
-  productId  String
-  businessId String
-  total      Float
-  status     String
-  paymentId  String?
-  createdAt  DateTime @default(now())
-  User       User     @relation(fields: [userId], references: [id])
-  Business   Business @relation(fields: [businessId], references: [id])
+  id           String      @id @default(cuid())
+  userId       String
+  businessId   String
+  orderGroupId String?
+  total        Float
+  status       String // PENDING, PACKAGING, DELIVERING, DELIVERED, COMPLETED, CANCELLED
+  paymentId    String?
+  createdAt    DateTime    @default(now())
+  User         User        @relation(fields: [userId], references: [id])
+  Business     Business    @relation(fields: [businessId], references: [id])
+  OrderGroup   OrderGroup? @relation(fields: [orderGroupId], references: [id])
+  OrderItems   OrderItem[]
+}
+
+model OrderItem {
+  id        String  @id @default(cuid())
+  orderId   String
+  productId String
+  quantity  Int
+  price     Float // Price at the time of purchase
+  Order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  Product   Product @relation(fields: [productId], references: [id])
 }
 
 model Category {

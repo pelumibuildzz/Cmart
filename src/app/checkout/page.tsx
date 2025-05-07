@@ -8,6 +8,8 @@ import Image from 'next/image';
 import { Store, MapPin } from 'lucide-react';
 import { fetchBusinessData } from '../actions/business.action';
 import { fetchUniversityData } from '../actions/university.action';
+import { createCheckout } from '../actions/checkout.action';
+import { toast } from 'react-hot-toast';
 
 interface Business {
   id: string;
@@ -26,6 +28,7 @@ export default function CheckoutPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const [shippingCost, setShippingCost] = useState(0);
+  const [isProcessing, setIsProcessing] = useState(false);
 
   // Group items by business
   const businessGroups = items.reduce((acc, item) => {
@@ -37,7 +40,8 @@ export default function CheckoutPage() {
 
   // Calculate totals
   const subtotal = items.reduce((total, item) => total + item.price * item.quantity, 0);
-  const tax = subtotal * 0.075; // 5% tax
+  let tax = subtotal * 0.075; // 7.5% tax
+  // if(tax > 2000) tax = 2000;
   const total = subtotal + tax + shippingCost;
 
   // Fetch business data and user's university
@@ -101,8 +105,40 @@ export default function CheckoutPage() {
   }
 
   const handleCheckout = async () => {
-    // Paystack implementation will go here
-    console.log('Proceeding to payment...');
+    try {
+      setIsProcessing(true);
+      
+      // For demo purposes - in a real app, integrate with Paystack or other payment provider
+      // and get the actual payment ID from the payment response
+      const mockPaymentId = `pay_${Date.now()}_${Math.random().toString(36).substring(2, 10)}`;
+      
+      const result = await createCheckout(
+        mockPaymentId,
+        items,
+        total,
+        tax,
+        shippingCost
+      );
+      
+      if (result.error) {
+        toast.error(result.error);
+        return;
+      }
+      
+      if (result.success) {
+        // Clear cart after successful checkout
+        useCartStore.getState().clearCart();
+        
+        // Redirect to order confirmation page
+        router.push(`/orders/${result.orderGroupId}`);
+        toast.success('Order placed successfully!');
+      }
+    } catch (error) {
+      console.error('Checkout error:', error);
+      toast.error('Something went wrong. Please try again.');
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
   return (
@@ -208,9 +244,9 @@ export default function CheckoutPage() {
             <button
               onClick={handleCheckout}
               className="w-full mt-6 bg-primary text-white py-3 px-4 rounded-md hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              disabled={!userUniversity || shippingCost === 0}
+              disabled={!userUniversity || shippingCost === 0 || isProcessing}
             >
-              Proceed to Payment
+              {isProcessing ? 'Processing...' : 'Proceed to Payment'}
             </button>
 
             <p className="text-sm text-gray-500 mt-4 text-center">

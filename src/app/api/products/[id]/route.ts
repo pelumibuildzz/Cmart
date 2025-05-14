@@ -28,7 +28,7 @@ export async function PUT(
     }
 
     // Only the business owner can update their products
-    if (session.user.role !== Role.BUSINESS || existingProduct.Business.userId !== session.user.id) {
+    if (session.user.role !== Role.BUSINESS || existingProduct.business.userId !== session.user.id) {
       return NextResponse.json(
         { message: 'You do not have permission to update this product' },
         { status: 403 }
@@ -91,7 +91,7 @@ export async function DELETE(
     }
 
     // Only the business owner can delete their products
-    if (session.user.role !== Role.BUSINESS || existingProduct.Business.userId !== session.user.id) {
+    if (session.user.role !== Role.BUSINESS || existingProduct.business.userId !== session.user.id) {
       return NextResponse.json(
         { message: 'You do not have permission to delete this product' },
         { status: 403 }

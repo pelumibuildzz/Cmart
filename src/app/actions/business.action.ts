@@ -9,10 +9,19 @@ export async function fetchBusinessData(businessId: string) {
       return null;
     }
     
-    // Only return necessary data
+    // Return business with its categories and subcategories
     return {
       id: business.id,
-      name: business.name
+      name: business.name,
+      description: business.description,
+      categories: business.categories.map(cat => ({
+        id: cat.id,
+        name: cat.name
+      })),
+      subCategories: business.subCategories.map(subCat => ({
+        id: subCat.id,
+        name: subCat.name
+      }))
     };
   } catch (error) {
     console.error('Error fetching business:', error);

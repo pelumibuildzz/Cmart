@@ -238,14 +238,14 @@ export default function ProductForm({ type, product, businessId, categories }: P
               type="number"
               name="price"
               id="price"
-              step="1000"
+              step="500"
               min="0"
               defaultValue={product?.price}
               required
               className="block w-full rounded-md border border-gray-300 pl-7 pr-3 py-2 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
             />
           </div>
-          <div>Actual Price displayed will be {}</div>
+          <div>Actual Price displayed will be </div>
         </div>
 
         <div>

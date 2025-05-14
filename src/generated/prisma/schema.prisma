@@ -1,7 +1,7 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Looking for ways to speed up your queries, or scale eas  orderId    String?   @unique // The order where the discount was used
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
@@ -30,42 +30,64 @@ model User {
   orders       Order[]
   orderGroups  OrderGroup[]
   business     Business?
+  ratings      Rating[]
+  totalOrders  Int          @default(0)
+  discountTier String       @default("NONE") // NONE, BRONZE, SILVER, GOLD
+  discounts    Discount[]
 }
 
 model Business {
-  id           String    @id @default(cuid())
-  userId       String    @unique
-  name         String
-  description  String
-  universityId String
-  categoryId   String
-  category     Category  @relation(fields: [categoryId], references: [id])
-  products     Product[]
-  orders       Order[]
-  isVerified   Boolean   @default(false)
-  user         User      @relation(fields: [userId], references: [id])
+  id            String        @id @default(cuid())
+  userId        String        @unique
+  name          String
+  description   String
+  universityId  String
+  averageRating Float         @default(0)
+  totalRatings  Int           @default(0)
+  categories    Category[]
+  subCategories SubCategory[]
+  products      Product[]
+  orders        Order[]
+  isVerified    Boolean       @default(false)
+  user          User          @relation(fields: [userId], references: [id])
+}
+
+model Rating {
+  id         String      @id @default(cuid())
+  rating     Int // 1-5 stars
+  comment    String?
+  createdAt  DateTime    @default(now())
+  userId     String
+  user       User        @relation(fields: [userId], references: [id])
+  orderId    String? // For overall order ratings
+  orderGroup OrderGroup? @relation(fields: [orderId], references: [id])
+  subOrderId String? // For business-specific ratings
+  order      Order?      @relation(fields: [subOrderId], references: [id])
 }
 
 model Product {
-  id          String         @id @default(cuid())
-  name        String
-  description String
-  imageUrl    String
-  price       Float
-  stock       Int
-  isAvailable Boolean        @default(true)
-  businessId  String
-  categoryId  String
-  Business    Business       @relation(fields: [businessId], references: [id])
-  images      ProductImage[]
-  OrderItem   OrderItem[]
+  id            String         @id @default(cuid())
+  name          String
+  description   String
+  imageUrl      String
+  basePrice     Float // Original price set by business
+  markupPercent Float          @default(0)
+  finalPrice    Float // Calculated final price after markup
+  stock         Int
+  isAvailable   Boolean        @default(true)
+  businessId    String
+  categories    Category[]
+  subCategories SubCategory[]
+  business      Business       @relation(fields: [businessId], references: [id])
+  images        ProductImage[]
+  orderItems    OrderItem[]
 }
 
 model ProductImage {
   id        String  @id @default(cuid())
   url       String // URL of the image
   productId String // Foreign key to Product
-  Product   Product @relation(fields: [productId], references: [id])
+  product   Product @relation(fields: [productId], references: [id])
 }
 
 model OrderGroup {
@@ -75,8 +97,9 @@ model OrderGroup {
   status    String
   paymentId String?
   createdAt DateTime @default(now())
-  User      User     @relation(fields: [userId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
   orders    Order[]
+  ratings   Rating[]
 }
 
 model Order {
@@ -88,10 +111,13 @@ model Order {
   status       String // PENDING, PACKAGING, DELIVERING, DELIVERED, COMPLETED, CANCELLED
   paymentId    String?
   createdAt    DateTime    @default(now())
-  User         User        @relation(fields: [userId], references: [id])
-  Business     Business    @relation(fields: [businessId], references: [id])
-  OrderGroup   OrderGroup? @relation(fields: [orderGroupId], references: [id])
-  OrderItems   OrderItem[]
+  user         User        @relation(fields: [userId], references: [id])
+  business     Business    @relation(fields: [businessId], references: [id])
+  orderGroup   OrderGroup? @relation(fields: [orderGroupId], references: [id])
+  orderItems   OrderItem[]
+  ratings      Rating[]
+  discountId   String?     @unique
+  discount     Discount?   @relation(fields: [discountId], references: [id])
 }
 
 model OrderItem {
@@ -100,18 +126,42 @@ model OrderItem {
   productId String
   quantity  Int
   price     Float // Price at the time of purchase
-  Order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  Product   Product @relation(fields: [productId], references: [id])
+  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product   Product @relation(fields: [productId], references: [id])
 }
 
 model Category {
+  id            String        @id @default(cuid())
+  name          String        @unique
+  isCustom      Boolean       @default(false)
+  businesses    Business[]
+  products      Product[]
+  subCategories SubCategory[]
+}
+
+model SubCategory {
   id         String     @id @default(cuid())
   name       String     @unique
-  isCustom   Boolean    @default(false)
+  categoryId String
+  category   Category   @relation(fields: [categoryId], references: [id])
   businesses Business[]
+  products   Product[]
 }
 
 model University {
   id   String @id @default(cuid())
   name String @unique
+}
+
+model Discount {
+  id         String    @id @default(cuid())
+  userId     String
+  percentage Float
+  isUsed     Boolean   @default(false)
+  expiresAt  DateTime?
+  createdAt  DateTime  @default(now())
+  usedAt     DateTime?
+  orderId    String?   @unique // The order where the discount was used
+  order      Order?
+  user       User      @relation(fields: [userId], references: [id])
 }

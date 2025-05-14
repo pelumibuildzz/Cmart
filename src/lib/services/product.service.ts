@@ -7,7 +7,9 @@ export async function getProductById(id: string) {
     where: { id },
     include: {
       images: true,
-      Business: true,
+      business: true,
+      categories: true,
+      subCategories: true
     },
   });
 }
@@ -28,7 +30,9 @@ export async function getProducts(
     orderBy,
     include: {
       images: true,
-      Business: true,
+      business: true,
+      categories: true,
+      subCategories: true
     },
   });
 }
@@ -44,12 +48,26 @@ export async function createProduct(data: CreateProductData) {
       throw new Error('Business not found');
     }
 
-    const category = await prisma.category.findUnique({ 
-      where: { id: data.categoryId } 
-    });
-    
-    if (!category) {
-      throw new Error('Category not found');
+    // Check if categories exist
+    if (data.categoryIds && data.categoryIds.length > 0) {
+      const categories = await prisma.category.findMany({
+        where: { id: { in: data.categoryIds } }
+      });
+      
+      if (categories.length !== data.categoryIds.length) {
+        throw new Error('One or more category IDs are invalid');
+      }
+    }
+
+    // Check if subcategories exist
+    if (data.subCategoryIds && data.subCategoryIds.length > 0) {
+      const subCategories = await prisma.subCategory.findMany({
+        where: { id: { in: data.subCategoryIds } }
+      });
+      
+      if (subCategories.length !== data.subCategoryIds.length) {
+        throw new Error('One or more subcategory IDs are invalid');
+      }
     }
 
     // Upload main image
@@ -80,18 +98,31 @@ export async function createProduct(data: CreateProductData) {
     }
 
     // Create product with main image and additional images
-    const { image, images: imageFiles, ...productData } = data;
+    const { image, images: imageFiles, categoryIds, subCategoryIds, ...productData } = data;
     return await prisma.product.create({
       data: {
         ...productData,
+        finalPrice: productData.finalPrice || 0, 
         imageUrl: mainImageUrl,
         images: {
           create: additionalImages,
         },
+        ...(categoryIds && categoryIds.length > 0 && {
+          categories: {
+            connect: categoryIds.map(id => ({ id }))
+          }
+        }),
+        ...(subCategoryIds && subCategoryIds.length > 0 && {
+          subCategories: {
+            connect: subCategoryIds.map(id => ({ id }))
+          }
+        })
       },
       include: {
         images: true,
-        Business: {
+        categories: true,
+        subCategories: true,
+        business: {
           include: {
             user: true
           }
@@ -107,7 +138,11 @@ export async function createProduct(data: CreateProductData) {
 export async function updateProduct(id: string, data: Partial<CreateProductData>) {
   const product = await prisma.product.findUnique({
     where: { id },
-    include: { images: true },
+    include: { 
+      images: true,
+      categories: true,
+      subCategories: true
+    },
   });
 
   if (!product) {
@@ -132,8 +167,24 @@ export async function updateProduct(id: string, data: Partial<CreateProductData>
     await Promise.all(deletePromises);
   }
 
-  // Update product with new data and images
-  const { images: imageFiles, ...updateData } = data;
+  // Prepare update data
+  const { images: imageFiles, categoryIds, subCategoryIds, ...updateData } = data;
+  
+  // Prepare categories update if needed
+  const categoryUpdates = categoryIds ? {
+    categories: {
+      set: categoryIds.map(id => ({ id }))
+    }
+  } : {};
+
+  // Prepare subcategories update if needed
+  const subCategoryUpdates = subCategoryIds ? {
+    subCategories: {
+      set: subCategoryIds.map(id => ({ id }))
+    }
+  } : {};
+
+  // Update product with new data, images, and category relationships
   return prisma.product.update({
     where: { id },
     data: {
@@ -144,10 +195,14 @@ export async function updateProduct(id: string, data: Partial<CreateProductData>
           create: additionalImages, // Add new images
         },
       }),
+      ...categoryUpdates,
+      ...subCategoryUpdates
     },
     include: {
       images: true,
-      Business: true,
+      business: true,
+      categories: true,
+      subCategories: true
     },
   });
 }
@@ -174,7 +229,9 @@ export async function updateProductMainImage(productId: string, newImage: File) 
     },
     include: {
       images: true,
-      Business: true,
+      business: true,
+      categories: true,
+      subCategories: true
     },
   });
 }
@@ -198,7 +255,7 @@ export async function deleteProduct(id: string) {
   ];
   await Promise.all(deletePromises);
 
-return prisma.product.delete({
+  return prisma.product.delete({
     where: { id },
   });
 }
@@ -210,6 +267,8 @@ export async function getProductsByBusinessId(businessId: string) {
     },
     include: {
       images: true,
+      categories: true,
+      subCategories: true
     },
   });
 }
@@ -239,7 +298,9 @@ export async function addProductImages(productId: string, images: File[]) {
     },
     include: {
       images: true,
-      Business: true,
+      business: true,
+      categories: true,
+      subCategories: true
     },
   });
 }
@@ -248,7 +309,7 @@ export async function removeProductImage(productId: string, imageId: string) {
   const image = await prisma.productImage.findFirst({
     where: {
       id: imageId,
-      productId: productId,
+      productId,
     },
   });
 
@@ -256,8 +317,109 @@ export async function removeProductImage(productId: string, imageId: string) {
     throw new Error('Image not found');
   }
 
-  await deleteImage(imageId);
-  return prisma.productImage.delete({
-    where: { id: imageId },
+  // Delete image from ImageKit
+  await deleteImage(image.id);
+
+  // Delete from database
+  await prisma.productImage.delete({
+    where: {
+      id: imageId,
+    },
+  });
+
+  return getProductById(productId);
+}
+
+// New helper functions for category management
+
+export async function addProductCategories(productId: string, categoryIds: string[]) {
+  return prisma.product.update({
+    where: { id: productId },
+    data: {
+      categories: {
+        connect: categoryIds.map(id => ({ id }))
+      }
+    },
+    include: {
+      categories: true,
+      subCategories: true
+    }
+  });
+}
+
+export async function removeProductCategories(productId: string, categoryIds: string[]) {
+  return prisma.product.update({
+    where: { id: productId },
+    data: {
+      categories: {
+        disconnect: categoryIds.map(id => ({ id }))
+      }
+    },
+    include: {
+      categories: true,
+      subCategories: true
+    }
+  });
+}
+
+export async function addProductSubCategories(productId: string, subCategoryIds: string[]) {
+  return prisma.product.update({
+    where: { id: productId },
+    data: {
+      subCategories: {
+        connect: subCategoryIds.map(id => ({ id }))
+      }
+    },
+    include: {
+      categories: true,
+      subCategories: true
+    }
+  });
+}
+
+export async function removeProductSubCategories(productId: string, subCategoryIds: string[]) {
+  return prisma.product.update({
+    where: { id: productId },
+    data: {
+      subCategories: {
+        disconnect: subCategoryIds.map(id => ({ id }))
+      }
+    },
+    include: {
+      categories: true,
+      subCategories: true
+    }
+  });
+}
+
+export async function getProductsByCategory(categoryId: string) {
+  return prisma.product.findMany({
+    where: {
+      categories: {
+        some: { id: categoryId }
+      }
+    },
+    include: {
+      images: true,
+      business: true,
+      categories: true,
+      subCategories: true
+    }
+  });
+}
+
+export async function getProductsBySubCategory(subCategoryId: string) {
+  return prisma.product.findMany({
+    where: {
+      subCategories: {
+        some: { id: subCategoryId }
+      }
+    },
+    include: {
+      images: true,
+      business: true,
+      categories: true,
+      subCategories: true
+    }
   });
 }

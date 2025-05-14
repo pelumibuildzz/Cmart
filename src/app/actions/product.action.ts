@@ -29,13 +29,20 @@ export async function createProductAction(formData: FormData) {
     const name = formData.get('name') as string;
     const description = formData.get('description') as string;
     const image = formData.get('image') as File;
-    const price = Number(formData.get('price'));
+    const basePrice = Number(formData.get('basePrice'));
+    const markupPercent = Number(formData.get('markupPercent') || 0);
+    const finalPrice = Number(formData.get('finalPrice')) || basePrice * (1 + markupPercent / 100);
     const stock = Number(formData.get('stock'));
-    const categoryId = formData.get('categoryId') as string;
     const isAvailable = formData.get('isAvailable') === 'true';
     const additionalImages = formData.getAll('images') as File[];
+    
+    // Handle multiple categories
+    const categoryIds = formData.getAll('categoryIds') as string[];
+    
+    // Handle multiple subcategories
+    const subCategoryIds = formData.getAll('subCategoryIds') as string[];
 
-    if (!name || !description || !image || !price || stock === undefined || !categoryId) {
+    if (!name || !description || !image || !basePrice || stock === undefined || categoryIds.length === 0) {
       return { error: 'Missing required fields' };
     }
 
@@ -43,10 +50,13 @@ export async function createProductAction(formData: FormData) {
       name,
       description,
       image,
-      price,
+      basePrice,
+      markupPercent,
+      finalPrice,
       stock,
-      businessId: business.id, // Use the business ID from the user's business
-      categoryId,
+      businessId: business.id,
+      categoryIds,
+      subCategoryIds: subCategoryIds.length > 0 ? subCategoryIds : undefined,
       isAvailable,
       images: additionalImages,
     });
@@ -74,7 +84,7 @@ export async function updateProductAction(productId: string, formData: FormData)
       return { error: 'Product not found' };
     }
 
-    if (session.user.role !== Role.BUSINESS || existingProduct.Business.userId !== session.user.id) {
+    if (session.user.role !== Role.BUSINESS || existingProduct.business.userId !== session.user.id) {
       return { error: 'You do not have permission to update this product' };
     }
 
@@ -82,11 +92,24 @@ export async function updateProductAction(productId: string, formData: FormData)
     const updateData: Partial<CreateProductData> = {
       name: formData.get('name') as string,
       description: formData.get('description') as string,
-      price: Number(formData.get('price')),
+      basePrice: Number(formData.get('basePrice')),
+      markupPercent: Number(formData.get('markupPercent') || existingProduct.markupPercent),
+      finalPrice: Number(formData.get('finalPrice')) || 
+                 (Number(formData.get('basePrice')) * (1 + (Number(formData.get('markupPercent') || existingProduct.markupPercent) / 100))),
       stock: Number(formData.get('stock')),
-      categoryId: formData.get('categoryId') as string,
       isAvailable: formData.get('isAvailable') === 'true'
     };
+
+    // Handle categories and subcategories
+    const categoryIds = formData.getAll('categoryIds') as string[];
+    if (categoryIds.length > 0) {
+      updateData.categoryIds = categoryIds;
+    }
+
+    const subCategoryIds = formData.getAll('subCategoryIds') as string[];
+    if (subCategoryIds.length > 0) {
+      updateData.subCategoryIds = subCategoryIds;
+    }
 
     // Only add image field if a new image is provided and it's a valid File
     const newMainImage = formData.get('image');
@@ -126,7 +149,7 @@ export async function deleteProductAction(productId: string) {
       return { error: 'Product not found' };
     }
 
-    if (session.user.role !== Role.BUSINESS || existingProduct.Business.userId !== session.user.id) {
+    if (session.user.role !== Role.BUSINESS || existingProduct.business.userId !== session.user.id) {
       return { error: 'You do not have permission to delete this product' };
     }
 

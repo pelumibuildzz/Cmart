@@ -4,13 +4,14 @@ export async function getOrderById(id: string) {
   return prisma.order.findUnique({
     where: { id },
     include: {
-      User: true,
-      Business: true,
-      OrderItems: {
+      user: true,
+      business: true,
+      orderItems: {
         include: {
-          Product: true
+          product: true
         }
-      }
+      },
+      discount: true
     }
   });
 }
@@ -31,13 +32,14 @@ export async function getOrders(
     where,
     orderBy,
     include: {
-      User: true,
-      Business: true,
-      OrderItems: {
+      user: true,
+      business: true,
+      orderItems: {
         include: {
-          Product: true
+          product: true
         }
       },
+      discount: true,
       ...include
     }
   });
@@ -49,13 +51,14 @@ export async function getOrdersByUserId(userId: string) {
       userId,
     },
     include: {
-      User: true,
-      Business: true,
-      OrderItems: {
+      user: true,
+      business: true,
+      orderItems: {
         include: {
-          Product: true
+          product: true
         }
-      }
+      },
+      discount: true
     }
   });
 }
@@ -66,13 +69,14 @@ export async function getOrdersByBusinessId(businessId: string) {
       businessId,
     },
     include: {
-      User: true,
-      Business: true,
-      OrderItems: {
+      user: true,
+      business: true,
+      orderItems: {
         include: {
-          Product: true
+          product: true
         }
-      }
+      },
+      discount: true
     }
   });
 }
@@ -81,13 +85,14 @@ export async function createOrder(data: any) {
   return prisma.order.create({
     data,
     include: {
-      User: true,
-      Business: true,
-      OrderItems: {
+      user: true,
+      business: true,
+      orderItems: {
         include: {
-          Product: true
+          product: true
         }
-      }
+      },
+      discount: true
     }
   });
 }
@@ -96,17 +101,19 @@ export async function createOrderGroup(data: any) {
   return prisma.orderGroup.create({
     data,
     include: {
-      User: true,
+      user: true,
       orders: {
         include: {
-          Business: true,
-          OrderItems: {
+          business: true,
+          orderItems: {
             include: {
-              Product: true
+              product: true
             }
-          }
+          },
+          discount: true
         }
-      }
+      },
+      ratings: true
     }
   });
 }
@@ -115,17 +122,19 @@ export async function getOrderGroupById(id: string) {
   return prisma.orderGroup.findUnique({
     where: { id },
     include: {
-      User: true,
+      user: true,
       orders: {
         include: {
-          Business: true,
-          OrderItems: {
+          business: true,
+          orderItems: {
             include: {
-              Product: true
+              product: true
             }
-          }
+          },
+          discount: true
         }
-      }
+      },
+      ratings: true
     }
   });
 }
@@ -138,14 +147,16 @@ export async function getOrderGroupsByUserId(userId: string) {
     include: {
       orders: {
         include: {
-          Business: true,
-          OrderItems: {
+          business: true,
+          orderItems: {
             include: {
-              Product: true
+              product: true
             }
-          }
+          },
+          discount: true
         }
-      }
+      },
+      ratings: true
     },
     orderBy: {
       createdAt: 'desc'
@@ -158,17 +169,19 @@ export async function updateOrderGroup(id: string, data: any) {
     where: { id },
     data,
     include: {
-      User: true,
+      user: true,
       orders: {
         include: {
-          Business: true,
-          OrderItems: {
+          business: true,
+          orderItems: {
             include: {
-              Product: true
+              product: true
             }
-          }
+          },
+          discount: true
         }
-      }
+      },
+      ratings: true
     }
   });
 }
@@ -178,13 +191,14 @@ export async function updateOrder(id: string, data: any) {
     where: { id },
     data,
     include: {
-      User: true,
-      Business: true,
-      OrderItems: {
+      user: true,
+      business: true,
+      orderItems: {
         include: {
-          Product: true
+          product: true
         }
-      }
+      },
+      discount: true
     }
   });
 }
@@ -193,13 +207,14 @@ export async function deleteOrder(id: string) {
   return prisma.order.delete({
     where: { id },
     include: {
-      User: true,
-      Business: true,
-      OrderItems: {
+      user: true,
+      business: true,
+      orderItems: {
         include: {
-          Product: true
+          product: true
         }
-      }
+      },
+      discount: true
     }
   });
 }

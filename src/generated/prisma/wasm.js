@@ -126,7 +126,9 @@ exports.Prisma.UserScalarFieldEnum = {
   password: 'password',
   name: 'name',
   universityId: 'universityId',
-  role: 'role'
+  role: 'role',
+  totalOrders: 'totalOrders',
+  discountTier: 'discountTier'
 };
 
 exports.Prisma.BusinessScalarFieldEnum = {
@@ -135,8 +137,19 @@ exports.Prisma.BusinessScalarFieldEnum = {
   name: 'name',
   description: 'description',
   universityId: 'universityId',
-  categoryId: 'categoryId',
+  averageRating: 'averageRating',
+  totalRatings: 'totalRatings',
   isVerified: 'isVerified'
+};
+
+exports.Prisma.RatingScalarFieldEnum = {
+  id: 'id',
+  rating: 'rating',
+  comment: 'comment',
+  createdAt: 'createdAt',
+  userId: 'userId',
+  orderId: 'orderId',
+  subOrderId: 'subOrderId'
 };
 
 exports.Prisma.ProductScalarFieldEnum = {
@@ -144,11 +157,12 @@ exports.Prisma.ProductScalarFieldEnum = {
   name: 'name',
   description: 'description',
   imageUrl: 'imageUrl',
-  price: 'price',
+  basePrice: 'basePrice',
+  markupPercent: 'markupPercent',
+  finalPrice: 'finalPrice',
   stock: 'stock',
   isAvailable: 'isAvailable',
-  businessId: 'businessId',
-  categoryId: 'categoryId'
+  businessId: 'businessId'
 };
 
 exports.Prisma.ProductImageScalarFieldEnum = {
@@ -174,7 +188,8 @@ exports.Prisma.OrderScalarFieldEnum = {
   total: 'total',
   status: 'status',
   paymentId: 'paymentId',
-  createdAt: 'createdAt'
+  createdAt: 'createdAt',
+  discountId: 'discountId'
 };
 
 exports.Prisma.OrderItemScalarFieldEnum = {
@@ -191,9 +206,26 @@ exports.Prisma.CategoryScalarFieldEnum = {
   isCustom: 'isCustom'
 };
 
+exports.Prisma.SubCategoryScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  categoryId: 'categoryId'
+};
+
 exports.Prisma.UniversityScalarFieldEnum = {
   id: 'id',
   name: 'name'
+};
+
+exports.Prisma.DiscountScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  percentage: 'percentage',
+  isUsed: 'isUsed',
+  expiresAt: 'expiresAt',
+  createdAt: 'createdAt',
+  usedAt: 'usedAt',
+  orderId: 'orderId'
 };
 
 exports.Prisma.SortOrder = {
@@ -219,13 +251,16 @@ exports.Role = exports.$Enums.Role = {
 exports.Prisma.ModelName = {
   User: 'User',
   Business: 'Business',
+  Rating: 'Rating',
   Product: 'Product',
   ProductImage: 'ProductImage',
   OrderGroup: 'OrderGroup',
   Order: 'Order',
   OrderItem: 'OrderItem',
   Category: 'Category',
-  University: 'University'
+  SubCategory: 'SubCategory',
+  University: 'University',
+  Discount: 'Discount'
 };
 
 /**

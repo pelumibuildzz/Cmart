@@ -3,6 +3,7 @@
 import { getSession } from '@/lib/auth/session';
 import { OrderStatus } from '@/lib/constants/order';
 import { createOrder, createOrderGroup } from '@/lib/services/order.service';
+import { useDiscount, incrementUserOrderCount } from '@/lib/services/discount.service';
 import { revalidatePath } from 'next/cache';
 
 interface CartItem {
@@ -26,7 +27,8 @@ export async function createCheckout(
   items: CartItem[], 
   totalAmount: number,
   taxAmount: number,
-  shippingAmount: number
+  shippingAmount: number,
+  discountId?: string
 ) {
   try {
     const session = await getSession();
@@ -73,7 +75,7 @@ export async function createCheckout(
         orderGroupId: orderGroup.id,
         total: group.subtotal,
         status: OrderStatus.PENDING,
-        OrderItems: {
+        orderItems: {
           create: group.items.map(item => ({
             productId: item.id,
             quantity: item.quantity,
@@ -84,6 +86,18 @@ export async function createCheckout(
     );
 
     const orders = await Promise.all(orderPromises);
+    
+    // If there's a discount being applied, mark it as used
+    if (discountId) {
+      // Apply discount to the first order (we could have a more sophisticated distribution)
+      const firstOrder = orders[0];
+      if (firstOrder) {
+        await useDiscount(discountId, firstOrder.id);
+      }
+    }
+
+    // Increment user's order count for loyalty program
+    await incrementUserOrderCount(userId);
     
     // Revalidate relevant paths
     revalidatePath('/orders');

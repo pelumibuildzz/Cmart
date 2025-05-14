@@ -8,10 +8,13 @@ export interface CreateProductData {
   name: string;
   description: string;
   image: File;  // Main product image
-  price: number;
+  basePrice: number;
+  markupPercent?: number;
+  finalPrice?: number;
   stock: number;
   businessId: string;
-  categoryId: string;
+  categoryIds: string[];  // Multiple categories
+  subCategoryIds?: string[]; // Optional subcategories
   isAvailable?: boolean;
   images?: File[];  // Additional product images
 }
@@ -19,4 +22,17 @@ export interface CreateProductData {
 export interface ProductImageUploadResult {
   url: string;
   fileId: string;
+}
+
+export interface Category {
+  id: string;
+  name: string;
+  isCustom?: boolean;
+}
+
+export interface SubCategory {
+  id: string;
+  name: string;
+  categoryId: string;
+  category?: Category;
 } 

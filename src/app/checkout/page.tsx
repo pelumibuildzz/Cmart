@@ -249,9 +249,9 @@ export default function CheckoutPage() {
               {isProcessing ? 'Processing...' : 'Proceed to Payment'}
             </button>
 
-            <p className="text-sm text-gray-500 mt-4 text-center">
+            {/* <p className="text-sm text-gray-500 mt-4 text-center">
               Payment will be processed securely via Paystack
-            </p>
+            </p> */}
           </div>
         </div>
       </div>

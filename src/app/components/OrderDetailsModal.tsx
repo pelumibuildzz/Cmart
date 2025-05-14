@@ -29,8 +29,8 @@ export default function OrderDetailsModal({
         <div>
           <h4 className="text-sm font-medium text-gray-500 mb-2">Customer Information</h4>
           <div className="bg-gray-50 rounded-lg p-4">
-            <p className="text-sm font-medium text-gray-900">{order.User.name}</p>
-            <p className="text-sm text-gray-500">{order.User.email}</p>
+            <p className="text-sm font-medium text-gray-900">{order.user.name}</p>
+            <p className="text-sm text-gray-500">{order.user.email}</p>
           </div>
         </div>
 
@@ -38,8 +38,8 @@ export default function OrderDetailsModal({
         <div>
           <h4 className="text-sm font-medium text-gray-500 mb-2">Business Information</h4>
           <div className="bg-gray-50 rounded-lg p-4">
-            <p className="text-sm font-medium text-gray-900">{order.Business.name}</p>
-            <p className="text-sm text-gray-500">{order.Business.description}</p>
+            <p className="text-sm font-medium text-gray-900">{order.business.name}</p>
+            <p className="text-sm text-gray-500">{order.business.description}</p>
           </div>
         </div>
 
@@ -57,10 +57,10 @@ export default function OrderDetailsModal({
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">
-                {order.OrderItems.map((item) => (
+                {order.orderItems.map((item) => (
                   <tr key={item.id}>
                     <td className="py-2">
-                      <p className="text-sm font-medium text-gray-900">{item.Product.name}</p>
+                      <p className="text-sm font-medium text-gray-900">{item.product.name}</p>
                     </td>
                     <td className="py-2">
                       <p className="text-sm text-gray-500">{item.quantity}</p>
@@ -84,6 +84,32 @@ export default function OrderDetailsModal({
           </div>
         </div>
 
+        {/* Order Group Information (if available) */}
+        {order.orderGroup && (
+          <div>
+            <h4 className="text-sm font-medium text-gray-500 mb-2">Order Group</h4>
+            <div className="bg-gray-50 rounded-lg p-4">
+              <p className="text-sm font-medium text-gray-900">ID: {order.orderGroup.id.slice(0, 8)}</p>
+              <p className="text-sm text-gray-500">Created: {formatDate(order.orderGroup.createdAt)}</p>
+              <p className="text-sm text-gray-500">Status: {order.orderGroup.status}</p>
+              <p className="text-sm text-gray-500">Total: ₦{order.orderGroup.total.toFixed(2)}</p>
+            </div>
+          </div>
+        )}
+
+        {/* Discount Information (if available) */}
+        {order.discount && (
+          <div>
+            <h4 className="text-sm font-medium text-gray-500 mb-2">Discount Applied</h4>
+            <div className="bg-gray-50 rounded-lg p-4">
+              <p className="text-sm font-medium text-gray-900">{order.discount.percentage}% off</p>
+              {order.discount.expiresAt && (
+                <p className="text-sm text-gray-500">Expires: {formatDate(order.discount.expiresAt)}</p>
+              )}
+            </div>
+          </div>
+        )}
+
         {/* Order Status */}
         <div>
           <h4 className="text-sm font-medium text-gray-500 mb-2">Order Status</h4>
@@ -104,6 +130,14 @@ export default function OrderDetailsModal({
         {/* Status Update Actions */}
         {!readOnly && onUpdateStatus && order.status !== OrderStatus.COMPLETED && (
           <div className="flex flex-wrap gap-2">
+            {order.status === OrderStatus.CANCELLED && (
+              <button
+                onClick={() => onUpdateStatus(order.id, OrderStatus.PENDING)}
+                className="inline-flex items-center px-3 py-1 rounded-md text-sm font-medium bg-blue-100 text-blue-700 hover:bg-blue-200"
+              >
+                Reactivate Order
+              </button>
+            )}
             {order.status === OrderStatus.PENDING && (
               <button
                 onClick={() => onUpdateStatus(order.id, OrderStatus.PACKAGING)}

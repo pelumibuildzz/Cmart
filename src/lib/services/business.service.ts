@@ -9,12 +9,13 @@ interface CreateBusinessData {
   subCategoryIds?: string[]; // Optional subcategories
 }
 
-export async function getBusinessById(id: string) {
+export async function getBusinessById(id: string, ownerId?: string) {
   try {
     const business = await prisma.business.findUnique({
       where: { id },
       include: {
         products: {
+          where: ownerId ? {} : { isAvailable: true }, // Only include available products if not the owner
           include: {
             images: true,
             categories: true,
@@ -57,21 +58,29 @@ export async function getBusinesses(
     take?: number;
     where?: any;
     orderBy?: any;
+    include?: any;
   } = {}
 ) {
-  const { skip, take, where, orderBy } = params;
+  const { skip, take, where, orderBy, include } = params;
+  
+  // Default includes
+  const defaultIncludes = {
+    products: true,
+    user: true,    
+    categories: true,
+    subCategories: true,
+    orders: true   
+  };
+  
+  // Merge default includes with any custom includes
+  const includeParams = include ? { ...defaultIncludes, ...include } : defaultIncludes;
+  
   return prisma.business.findMany({
     skip,
     take,
     where,
     orderBy,
-    include: {
-      products: true,
-      user: true,    
-      categories: true,
-      subCategories: true,
-      orders: true   
-    }
+    include: includeParams
   });
 }
 

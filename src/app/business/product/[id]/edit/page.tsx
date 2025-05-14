@@ -5,11 +5,16 @@ import { getProductById } from '@/lib/services/product.service';
 import { redirect } from 'next/navigation';
 import ProductForm from '@/app/components/product-form';
 
-export default async function EditProduct({
-  params: { id }
-}: {
-  params: { id: string }
-}) {
+interface Props {
+  params: {
+    id: string;
+  };
+}
+
+export default async function EditProduct({ params }: Props) {
+  // Access the id parameter after explicitly receiving it via props
+  const { id } = params;
+  
   const session = await getSession();
   
   if (!session?.user) {
@@ -31,6 +36,13 @@ export default async function EditProduct({
     redirect('/business/dashboard');
   }
 
+  // Transform the product to match what ProductForm expects
+  const transformedProduct = {
+    ...product,
+    price: product.finalPrice, // Map finalPrice to price property
+    categoryId: product.categories?.[0]?.id || '', // Get first categoryId if available
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -40,9 +52,10 @@ export default async function EditProduct({
           </div>
           <div className="p-6">
             <ProductForm 
+              type="edit"
               businessId={business.id} 
               categories={categories}
-              product={product}
+              product={transformedProduct}
             />
           </div>
         </div>

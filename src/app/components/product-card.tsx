@@ -20,6 +20,8 @@ interface ProductCardProps {
   businessId: string;
   categories?: { id: string; name: string }[];
   subCategories?: { id: string; name: string }[];
+  isAvailable?: boolean;
+  isOwner?: boolean;
 }
 
 export default function ProductCard({
@@ -33,6 +35,8 @@ export default function ProductCard({
   businessId,
   categories,
   subCategories,
+  isAvailable = true,
+  isOwner = false,
 }: ProductCardProps) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isAdding, setIsAdding] = useState(false);
@@ -43,7 +47,7 @@ export default function ProductCard({
   const { data: session } = useSession();
 
   const currentCartQuantity = items.find(item => item.id === id)?.quantity || 0;
-  const isOutOfStock = stock <= currentCartQuantity;
+  const isOutOfStock = stock <= currentCartQuantity || !isAvailable;
 
   const handleSlideChange = (index: number) => {
     setCurrentImageIndex(index);
@@ -78,14 +82,26 @@ export default function ProductCard({
 
   return (
     <Link href={`/products/${id}`} >
-      <div className="bg-white rounded-lg shadow-md overflow-hidden">
+      <div className={`bg-white rounded-lg shadow-md overflow-hidden ${!isAvailable && 'relative opacity-80'}`}>
+        {/* Unavailable Overlay for Owner */}
+        {!isAvailable && isOwner && (
+          <div className="absolute inset-0 bg-gray-900 bg-opacity-30 z-10 flex flex-col items-center justify-center">
+            <span className="px-3 py-1 bg-red-500 text-white text-sm font-medium rounded-md">
+              Unavailable
+            </span>
+            <span className="mt-2 text-white text-xs px-2 py-1 bg-black bg-opacity-50 rounded">
+              Only visible to you
+            </span>
+          </div>
+        )}
+
         {/* Product Images Slider */}
         <div className="relative aspect-square group">
           <div className="relative w-full h-full overflow-hidden">
             <Image
               src={allImages[currentImageIndex].url}
               alt={`${name} - Image ${currentImageIndex + 1}`}
-              className="object-cover group-hover:scale-105 transition-transform duration-300"
+              className={`object-cover group-hover:scale-105 transition-transform duration-300 ${!isAvailable && 'grayscale'}`}
               fill
               sizes="100vw, (max-width: 1200px) 50vw, 33vw"
               priority
@@ -93,9 +109,9 @@ export default function ProductCard({
           </div>
           
           {/* Stock Badge */}
-          {stock <= 5 && (
-            <div className="absolute top-2 right-2 bg-red-500 text-white text-xs px-2 py-1 rounded">
-              {stock === 0 ? 'Out of Stock' : `Only ${stock} left`}
+          {(stock <= 5 || !isAvailable) && (
+            <div className="absolute top-2 right-2 bg-red-500 text-white text-xs px-2 py-1 rounded z-20">
+              {!isAvailable ? 'Unavailable' : stock === 0 ? 'Out of Stock' : `Only ${stock} left`}
             </div>
           )}
           
@@ -151,7 +167,9 @@ export default function ProductCard({
               onClick={handleAddToCart}
               disabled={isOutOfStock || isAdding}
             >
-              {isOutOfStock ? (
+              {!isAvailable ? (
+                'Unavailable'
+              ) : isOutOfStock ? (
                 'Out of Stock'
               ) : isAdding ? (
                 <>

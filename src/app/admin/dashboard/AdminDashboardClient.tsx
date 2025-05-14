@@ -5,6 +5,11 @@ import { CheckCircle, XCircle, ShoppingBag, Eye } from 'lucide-react';
 import { OrderStatus, OrderStatusColors } from '@/lib/constants/order';
 import OrderDetailsModal from '@/app/components/OrderDetailsModal';
 
+interface BusinessCategory {
+  id: string;
+  name: string;
+}
+
 interface AdminDashboardClientProps {
   businesses: any[];
   orders: any[];
@@ -69,7 +74,11 @@ export default function AdminDashboardClient({
                       <div className="text-sm text-gray-500">{business.user.email}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">{business.category.name}</div>
+                      <div className="text-sm text-gray-900">
+                        {business.categories && business.categories.length > 0 
+                          ? business.categories.map((cat: BusinessCategory) => cat.name).join(', ') 
+                          : 'No categories'}
+                      </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
@@ -133,6 +142,9 @@ export default function AdminDashboardClient({
                     Business
                   </th>
                   <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Group
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Status
                   </th>
                   <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -150,11 +162,16 @@ export default function AdminDashboardClient({
                       <div className="text-sm text-gray-900">{order.id.slice(0, 8)}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">{order.User.name}</div>
-                      <div className="text-sm text-gray-500">{order.User.email}</div>
+                      <div className="text-sm text-gray-900">{order.user.name}</div>
+                      <div className="text-sm text-gray-500">{order.user.email}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">{order.Business.name}</div>
+                      <div className="text-sm text-gray-900">{order.business.name}</div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm text-gray-900">
+                        {order.orderGroup ? order.orderGroup.id.slice(0, 8) : 'N/A'}
+                      </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
@@ -223,6 +240,15 @@ export default function AdminDashboardClient({
                               className="inline-flex items-center px-3 py-1 rounded-md text-sm font-medium bg-red-100 text-red-700 hover:bg-red-200"
                             >
                               Cancel
+                            </button>
+                          )}
+                          {order.status === OrderStatus.CANCELLED && (
+                            <button
+                              type="submit"
+                              formAction={updateOrderStatus.bind(null, order.id, OrderStatus.PENDING)}
+                              className="inline-flex items-center px-3 py-1 rounded-md text-sm font-medium bg-blue-100 text-blue-700 hover:bg-blue-200"
+                            >
+                              Reactivate
                             </button>
                           )}
                         </form>

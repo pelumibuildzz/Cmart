@@ -20,13 +20,11 @@ interface Product {
   basePrice: number;
   markupPercent: number;
   finalPrice: number;
-  price: number;
   stock: number;
   isAvailable: boolean;
   businessId: string;
-  categoryId: string;
-  categoryIds?: string[];
-  subCategoryIds?: string[];
+  categories: { id: string; name: string }[];
+  subCategories: { id: string; name: string; categoryId: string }[];
   images?: ProductImage[];
 }
 
@@ -65,16 +63,20 @@ export default function ProductForm({ type, product, businessId, categories }: P
   const [mainImagePreview, setMainImagePreview] = useState<ImagePreview | null>(null);
   const [additionalImagePreviews, setAdditionalImagePreviews] = useState<ImagePreview[]>([]);
   const [basePrice, setBasePrice] = useState<number>(product?.basePrice || 0);
-  const [markupPercent, setMarkupPercent] = useState<number>(15);
+  const [markupPercent, setMarkupPercent] = useState<number>(product?.markupPercent || 15);
   const [finalPrice, setFinalPrice] = useState<number>(product?.finalPrice || 0);
-  const [selectedCategoryId, setSelectedCategoryId] = useState<string>(product?.categoryIds?.[0] || product?.categoryId || '');
+  const [selectedCategoryId, setSelectedCategoryId] = useState<string>(
+    product?.categories?.[0]?.id || ''
+  );
   const [subCategories, setSubCategories] = useState<SubCategory[]>([]);
-  const [selectedSubCategoryIds, setSelectedSubCategoryIds] = useState<string[]>(product?.subCategoryIds || []);
+  const [selectedSubCategoryIds, setSelectedSubCategoryIds] = useState<string[]>(
+    product?.subCategories?.map(sc => sc.id) || []
+  );
   const [newSubCategoryName, setNewSubCategoryName] = useState<string>('');
   const [showNewSubCategoryInput, setShowNewSubCategoryInput] = useState(false);
   const router = useRouter();
 
-  const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+  const MAX_FILE_SIZE = 1 * 1024 * 1024; // 1MB
   const MAX_ADDITIONAL_IMAGES = 5;
   const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 
@@ -103,7 +105,7 @@ export default function ProductForm({ type, product, businessId, categories }: P
       return 'Invalid file type. Only JPEG, PNG, and WebP images are allowed.';
     }
     if (file.size > MAX_FILE_SIZE) {
-      return 'File size too large. Maximum size is 5MB.';
+      return 'File size too large. Maximum size is 1MB.';
     }
     return null;
   };
@@ -228,12 +230,9 @@ export default function ProductForm({ type, product, businessId, categories }: P
     try {
       const formData = new FormData(e.currentTarget);
       
-      // Remove price field if it exists (we're using basePrice and markupPercent now)
-      formData.delete('price');
-      
-      // Set the base price and fixed markup percentage (15%)
+      // Set the base price and fixed markup percentage
       formData.set('basePrice', basePrice.toString());
-      formData.set('markupPercent', '15'); // Always set to 15% regardless of user input
+      formData.set('markupPercent', markupPercent.toString());
       formData.set('finalPrice', finalPrice.toString());
       
       // Handle category IDs
@@ -360,12 +359,12 @@ export default function ProductForm({ type, product, businessId, categories }: P
             <h3 className="text-sm font-medium text-blue-800">Price Information</h3>
             <div className="mt-2 text-sm text-blue-700">
               <p>
-                Based on your base price of <strong>₦{basePrice.toLocaleString()}</strong> and a fixed markup of <strong>15%</strong>,
+                Based on your base price of <strong>₦{basePrice.toLocaleString()}</strong> and a markup of <strong>{markupPercent}%</strong>,
                 the final price displayed to customers will be <strong>₦{finalPrice.toLocaleString()}</strong>
               </p>
               <p className="mt-1 text-xs">
-                Note: The markup percentage is fixed at 15% for all products and cannot be modified. 
-                This ensures consistent pricing across the platform.
+                Note: The standard markup percentage is typically 15% for products on the platform. 
+                For existing products, your current markup percentage is shown.
               </p>
             </div>
           </div>

@@ -12,9 +12,10 @@ import { deleteProductAction } from '@/app/actions/product.action';
 interface ProductDetailsProps {
   product: any; // Replace with proper type
   onDelete?: () => void;
+  isOwner?: boolean;
 }
 
-export default function ProductDetails({ product, onDelete }: ProductDetailsProps) {
+export default function ProductDetails({ product, onDelete, isOwner }: ProductDetailsProps) {
   const [isDeleting, setIsDeleting] = useState(false);
   const [error, setError] = useState('');
   const router = useRouter();
@@ -22,9 +23,10 @@ export default function ProductDetails({ product, onDelete }: ProductDetailsProp
   const addItem = useCartStore((state) => state.addItem);
   const items = useCartStore((state) => state.items);
 
-  const isOwner = session?.user?.id === product.business.userId;
+  // Use passed isOwner prop if available, otherwise determine from session
+  const isProductOwner = isOwner !== undefined ? isOwner : session?.user?.id === product.business.userId;
   const currentCartQuantity = items.find(item => item.id === product.id)?.quantity || 0;
-  const isOutOfStock = product.stock <= currentCartQuantity;
+  const isOutOfStock = product.stock <= currentCartQuantity || !product.isAvailable;
 
   const handleDelete = async () => {
     if (!confirm('Are you sure you want to delete this product?')) {
@@ -82,15 +84,27 @@ export default function ProductDetails({ product, onDelete }: ProductDetailsProp
         </div>
       )}
 
+      {/* Unavailable Product Banner */}
+      {!product.isAvailable && isProductOwner && (
+        <div className="bg-red-500 text-white px-4 py-3 text-center">
+          <span className="font-medium">This product is unavailable and only visible to you.</span>
+        </div>
+      )}
+
       <div className="relative aspect-video w-full max-h-[500px]">
         <Image
           src={product.imageUrl}
           alt={product.name}
           fill
-          className="object-cover"
+          className={`object-cover ${!product.isAvailable ? 'opacity-70 grayscale' : ''}`}
           priority
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
         />
+        {!product.isAvailable && (
+          <div className="absolute top-4 right-4 bg-red-500 text-white px-3 py-1 rounded-md font-medium">
+            Unavailable
+          </div>
+        )}
       </div>
 
       <div className="p-6">
@@ -172,7 +186,7 @@ export default function ProductDetails({ product, onDelete }: ProductDetailsProp
         )}
 
         <div className="flex justify-end gap-4">
-          {isOwner ? (
+          {isProductOwner ? (
             <>
               <Link
                 href={`/business/product/${product.id}/edit`}

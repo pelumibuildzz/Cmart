@@ -14,9 +14,19 @@ export default async function AdminDashboard() {
   }
 
   const [businesses, orders] = await Promise.all([
-    getBusinesses(),
+    getBusinesses({ 
+      include: { 
+        user: true, 
+        categories: true,
+        subCategories: true
+      } 
+    }),
     getOrders({ 
-      orderBy: { createdAt: 'desc' }
+      orderBy: { createdAt: 'desc' },
+      include: {
+        orderGroup: true,
+        discount: true
+      }
     })
   ]);
 

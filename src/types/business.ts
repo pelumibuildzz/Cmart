@@ -15,6 +15,10 @@ export interface User {
   id: string;
   name: string;
   email: string;
+  universityId: string;
+  role: string;
+  totalOrders: number;
+  discountTier: string;
 }
 
 export interface Business {
@@ -26,6 +30,8 @@ export interface Business {
   averageRating: number;
   totalRatings: number;
   isVerified: boolean;
+  categories: { id: string; name: string }[];
+  subCategories: { id: string; name: string; categoryId: string }[];
 }
 
 export interface OrderItem {
@@ -36,10 +42,33 @@ export interface OrderItem {
   product: Product;
 }
 
+export interface Discount {
+  id: string;
+  userId: string;
+  percentage: number;
+  isUsed: boolean;
+  expiresAt?: Date;
+  createdAt: Date;
+  usedAt?: Date;
+}
+
+export interface OrderGroup {
+  id: string;
+  userId: string;
+  total: number;
+  status: string;
+  paymentId?: string;
+  createdAt: Date;
+}
+
 export interface Order {
   id: string;
-  status: string;
+  userId: string;
+  businessId: string;
+  orderGroupId?: string;
   total: number;
+  status: string;
+  paymentId?: string;
   createdAt: Date;
   user: User;
   business: {
@@ -47,28 +76,28 @@ export interface Order {
     name: string;
     description: string;
   };
+  orderGroup?: OrderGroup;
   orderItems: OrderItem[];
+  discount?: Discount;
 }
 
 // For modal display format
-export interface OrderModalItem {
-  id: string;
-  quantity: number;
-  price: number;
-  productId: string;
-  Product: Product;
-}
-
 export interface OrderModalData {
   id: string;
-  status: string;
+  userId: string;
+  businessId: string;
+  orderGroupId?: string;
   total: number;
+  status: string;
+  paymentId?: string;
   createdAt: Date;
-  User: User;
-  Business: {
+  user: User;
+  business: {
     id: string;
     name: string;
     description: string;
   };
-  OrderItems: OrderModalItem[];
+  orderGroup?: OrderGroup;
+  orderItems: OrderItem[];
+  discount?: Discount;
 } 

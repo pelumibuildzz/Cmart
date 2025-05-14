@@ -159,12 +159,24 @@ export async function updateProduct(id: string, data: Partial<CreateProductData>
     }));
   }
 
-  // Delete old images from ImageKit
-  if (product.images.length > 0) {
-    const deletePromises = product.images.map((image) =>
-      deleteImage(image.id) // Assuming `image.id` is the ImageKit file ID
-    );
-    await Promise.all(deletePromises);
+  // Delete old images from ImageKit if we have new images to replace them
+  if (additionalImages.length > 0 && product.images.length > 0) {
+    try {
+      // Extract the file IDs from the image URLs
+      // ImageKit URLs typically look like: https://ik.imagekit.io/your_imagekit_id/filename
+      // The file ID is the part after the last slash
+      const deletePromises = product.images.map((image) => {
+        const urlParts = image.url.split('/');
+        const fileId = urlParts[urlParts.length - 1];
+        return deleteImage(fileId);
+      });
+      
+      // Use Promise.allSettled to continue even if some deletions fail
+      await Promise.allSettled(deletePromises);
+    } catch (error) {
+      console.error('Error deleting old images:', error);
+      // Continue with the update even if image deletion fails
+    }
   }
 
   // Prepare update data
@@ -246,14 +258,30 @@ export async function deleteProduct(id: string) {
     throw new Error('Product not found');
   }
 
-  // Delete all associated images from ImageKit
-  const deletePromises = [
-    // Delete main product image
-    deleteImage(product.imageUrl),
-    // Delete additional images
-    ...product.images.map(image => deleteImage(image.id))
-  ];
-  await Promise.all(deletePromises);
+  try {
+    // Extract file IDs from image URLs
+    const deletePromises = [];
+    
+    // Handle main image if it exists
+    if (product.imageUrl) {
+      const mainUrlParts = product.imageUrl.split('/');
+      const mainFileId = mainUrlParts[mainUrlParts.length - 1];
+      deletePromises.push(deleteImage(mainFileId));
+    }
+    
+    // Handle additional images
+    product.images.forEach(image => {
+      const urlParts = image.url.split('/');
+      const fileId = urlParts[urlParts.length - 1];
+      deletePromises.push(deleteImage(fileId));
+    });
+    
+    // Use Promise.allSettled to continue even if some deletions fail
+    await Promise.allSettled(deletePromises);
+  } catch (error) {
+    console.error('Error deleting images:', error);
+    // Continue with product deletion even if image deletion fails
+  }
 
   return prisma.product.delete({
     where: { id },
@@ -317,8 +345,17 @@ export async function removeProductImage(productId: string, imageId: string) {
     throw new Error('Image not found');
   }
 
-  // Delete image from ImageKit
-  await deleteImage(image.id);
+  try {
+    // Extract the file ID from the image URL
+    const urlParts = image.url.split('/');
+    const fileId = urlParts[urlParts.length - 1];
+    
+    // Delete image from ImageKit
+    await deleteImage(fileId);
+  } catch (error) {
+    console.error('Error deleting image from ImageKit:', error);
+    // Continue with database deletion even if ImageKit deletion fails
+  }
 
   // Delete from database
   await prisma.productImage.delete({

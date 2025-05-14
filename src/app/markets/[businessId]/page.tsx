@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import ProductCard from '@/app/components/product-card';
 import Link from 'next/link';
 import { Tag } from 'lucide-react';
+import { getSession } from '@/lib/auth/session';
 
 interface MarketDetailsProps {
   params: {
@@ -11,11 +12,19 @@ interface MarketDetailsProps {
 }
 
 export default async function MarketDetails({ params }: MarketDetailsProps) {
-  const business = await getBusinessById(params.businessId);
+  // Get the current user session
+  const session = await getSession();
+  const userId = session?.user?.id;
+  
+  // Pass the userId to getBusinessById - only products that are available will be shown unless viewer is owner
+  const business = await getBusinessById(params.businessId, userId);
 
   if (!business) {
     notFound();
   }
+  
+  // Check if the current user is the business owner
+  const isOwner = userId && business.userId === userId;
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -76,6 +85,8 @@ export default async function MarketDetails({ params }: MarketDetailsProps) {
             images={product.images || []}
             stock={product.stock}
             businessId={business.id}
+            isAvailable={product.isAvailable}
+            isOwner={isOwner}
           />
         ))}
       </div>

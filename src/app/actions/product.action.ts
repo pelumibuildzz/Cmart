@@ -30,8 +30,8 @@ export async function createProductAction(formData: FormData) {
     const description = formData.get('description') as string;
     const image = formData.get('image') as File;
     const basePrice = Number(formData.get('basePrice'));
-    const markupPercent = Number(formData.get('markupPercent') || 0);
-    const finalPrice = Number(formData.get('finalPrice')) || basePrice * (1 + markupPercent / 100);
+    const markupPercent = 15; // Fixed at 15% regardless of what's in the form
+    const finalPrice = basePrice * (1 + markupPercent / 100);
     const stock = Number(formData.get('stock'));
     const isAvailable = formData.get('isAvailable') === 'true';
     const additionalImages = formData.getAll('images') as File[];
@@ -89,13 +89,16 @@ export async function updateProductAction(productId: string, formData: FormData)
     }
 
     // Start with basic fields that are always included
+    const basePrice = Number(formData.get('basePrice'));
+    const markupPercent = 15; // Fixed at 15%
+    const finalPrice = basePrice * (1 + markupPercent / 100);
+    
     const updateData: Partial<CreateProductData> = {
       name: formData.get('name') as string,
       description: formData.get('description') as string,
-      basePrice: Number(formData.get('basePrice')),
-      markupPercent: Number(formData.get('markupPercent') || existingProduct.markupPercent),
-      finalPrice: Number(formData.get('finalPrice')) || 
-                 (Number(formData.get('basePrice')) * (1 + (Number(formData.get('markupPercent') || existingProduct.markupPercent) / 100))),
+      basePrice,
+      markupPercent,
+      finalPrice,
       stock: Number(formData.get('stock')),
       isAvailable: formData.get('isAvailable') === 'true'
     };

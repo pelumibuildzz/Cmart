@@ -4,8 +4,12 @@ import {
   getCategories, 
   getSubCategories, 
   getSubCategoriesByCategoryId,
-  getCategoryById
+  getCategoryById,
+  createSubCategory
 } from '@/lib/services/category.service';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth/options';
+import { Role } from '@/lib/constants';
 
 export async function fetchCategories() {
   try {
@@ -47,5 +51,36 @@ export async function fetchSubCategoriesByCategory(categoryId: string) {
     return { subCategories };
   } catch (error) {
     return { error: 'Failed to fetch subcategories for this category' };
+  }
+}
+
+export async function createSubCategoryAction(name: string, categoryId: string) {
+  try {
+    const session = await getServerSession(authOptions);
+    
+    if (!session) {
+      return { error: 'Unauthorized' };
+    }
+
+    if (session.user.role !== Role.BUSINESS && session.user.role !== Role.ADMIN) {
+      return { error: 'Only business owners and admins can create subcategories' };
+    }
+
+    // Check if the category exists
+    const category = await getCategoryById(categoryId);
+    if (!category) {
+      return { error: 'Category not found' };
+    }
+
+    // Create the subcategory
+    const subcategory = await createSubCategory({
+      name,
+      categoryId
+    });
+
+    return { success: true, subcategory };
+  } catch (error: any) {
+    console.error('Error creating subcategory:', error);
+    return { error: error.message || 'Failed to create subcategory' };
   }
 }

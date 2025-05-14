@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { createProductAction, updateProductAction } from '@/app/actions/product.action';
+import { fetchSubCategoriesByCategory, createSubCategoryAction } from '@/app/actions/category.action';
 
 interface ProductImage {
   id: string;
@@ -16,17 +17,28 @@ interface Product {
   name: string;
   description: string;
   imageUrl: string;
+  basePrice: number;
+  markupPercent: number;
+  finalPrice: number;
   price: number;
   stock: number;
   isAvailable: boolean;
   businessId: string;
   categoryId: string;
+  categoryIds?: string[];
+  subCategoryIds?: string[];
   images?: ProductImage[];
 }
 
 interface Category {
   id: string;
   name: string;
+}
+
+interface SubCategory {
+  id: string;
+  name: string;
+  categoryId: string;
 }
 
 interface ImageError {
@@ -52,11 +64,39 @@ export default function ProductForm({ type, product, businessId, categories }: P
   const [imageErrors, setImageErrors] = useState<ImageError>({});
   const [mainImagePreview, setMainImagePreview] = useState<ImagePreview | null>(null);
   const [additionalImagePreviews, setAdditionalImagePreviews] = useState<ImagePreview[]>([]);
+  const [basePrice, setBasePrice] = useState<number>(product?.basePrice || 0);
+  const [markupPercent, setMarkupPercent] = useState<number>(15);
+  const [finalPrice, setFinalPrice] = useState<number>(product?.finalPrice || 0);
+  const [selectedCategoryId, setSelectedCategoryId] = useState<string>(product?.categoryIds?.[0] || product?.categoryId || '');
+  const [subCategories, setSubCategories] = useState<SubCategory[]>([]);
+  const [selectedSubCategoryIds, setSelectedSubCategoryIds] = useState<string[]>(product?.subCategoryIds || []);
+  const [newSubCategoryName, setNewSubCategoryName] = useState<string>('');
+  const [showNewSubCategoryInput, setShowNewSubCategoryInput] = useState(false);
   const router = useRouter();
 
   const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
   const MAX_ADDITIONAL_IMAGES = 5;
   const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
+
+  useEffect(() => {
+    // Calculate final price when basePrice or markupPercent changes
+    const calculatedFinalPrice = basePrice * (1 + markupPercent / 100);
+    setFinalPrice(calculatedFinalPrice);
+  }, [basePrice, markupPercent]);
+
+  useEffect(() => {
+    // Fetch subcategories when a category is selected
+    const fetchSubCategories = async () => {
+      if (selectedCategoryId) {
+        const result = await fetchSubCategoriesByCategory(selectedCategoryId);
+        if (result.subCategories) {
+          setSubCategories(result.subCategories);
+        }
+      }
+    };
+
+    fetchSubCategories();
+  }, [selectedCategoryId]);
 
   const validateImage = (file: File): string | null => {
     if (!ALLOWED_TYPES.includes(file.type)) {
@@ -127,6 +167,51 @@ export default function ProductForm({ type, product, businessId, categories }: P
     setAdditionalImagePreviews(newPreviews);
   };
 
+  const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const categoryId = e.target.value;
+    setSelectedCategoryId(categoryId);
+    // Reset subcategories when category changes
+    setSelectedSubCategoryIds([]);
+  };
+
+  const handleSubCategoryChange = (subCategoryId: string) => {
+    setSelectedSubCategoryIds(prev => {
+      if (prev.includes(subCategoryId)) {
+        return prev.filter(id => id !== subCategoryId);
+      } else {
+        return [...prev, subCategoryId];
+      }
+    });
+  };
+
+  const handleAddNewSubCategory = async () => {
+    if (!newSubCategoryName.trim() || !selectedCategoryId) return;
+    
+    setIsSubmitting(true);
+    
+    try {
+      // Call the server action to create a new subcategory
+      const result = await createSubCategoryAction(newSubCategoryName, selectedCategoryId);
+      
+      if (result.error) {
+        setError(result.error);
+        return;
+      }
+      
+      if (result.success && result.subcategory) {
+        // Add the new subcategory to the list and select it
+        setSubCategories(prev => [...prev, result.subcategory]);
+        setSelectedSubCategoryIds(prev => [...prev, result.subcategory.id]);
+        setNewSubCategoryName('');
+        setShowNewSubCategoryInput(false);
+      }
+    } catch (err: any) {
+      setError(err.message || 'Failed to create subcategory');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   useEffect(() => {
     return () => {
       if (mainImagePreview) URL.revokeObjectURL(mainImagePreview.url);
@@ -142,6 +227,26 @@ export default function ProductForm({ type, product, businessId, categories }: P
 
     try {
       const formData = new FormData(e.currentTarget);
+      
+      // Remove price field if it exists (we're using basePrice and markupPercent now)
+      formData.delete('price');
+      
+      // Set the base price and fixed markup percentage (15%)
+      formData.set('basePrice', basePrice.toString());
+      formData.set('markupPercent', '15'); // Always set to 15% regardless of user input
+      formData.set('finalPrice', finalPrice.toString());
+      
+      // Handle category IDs
+      formData.delete('categoryIds');
+      if (selectedCategoryId) {
+        formData.append('categoryIds', selectedCategoryId);
+      }
+      
+      // Handle subcategory IDs
+      formData.delete('subCategoryIds');
+      selectedSubCategoryIds.forEach(id => {
+        formData.append('subCategoryIds', id);
+      });
       
       // Only include image field if there's a new image selected
       if (type === 'edit') {
@@ -225,10 +330,10 @@ export default function ProductForm({ type, product, businessId, categories }: P
         />
       </div>
 
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+      <div className="grid grid-cols-1 gap-6">
         <div>
-          <label htmlFor="price" className="block text-sm font-medium text-gray-700">
-            Price
+          <label htmlFor="basePrice" className="block text-sm font-medium text-gray-700">
+            Base Price
           </label>
           <div className="relative mt-1 rounded-md shadow-sm">
             <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
@@ -236,42 +341,61 @@ export default function ProductForm({ type, product, businessId, categories }: P
             </div>
             <input
               type="number"
-              name="price"
-              id="price"
-              step="500"
+              name="basePrice"
+              id="basePrice"
+              step="100"
               min="0"
-              defaultValue={product?.price}
+              value={basePrice}
+              onChange={(e) => setBasePrice(Number(e.target.value))}
               required
               className="block w-full rounded-md border border-gray-300 pl-7 pr-3 py-2 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
             />
           </div>
-          <div>Actual Price displayed will be </div>
         </div>
+      </div>
 
-        <div>
-          <label htmlFor="stock" className="block text-sm font-medium text-gray-700">
-            Stock
-          </label>
-          <input
-            type="number"
-            name="stock"
-            id="stock"
-            min="0"
-            defaultValue={product?.stock}
-            required
-            className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
-          />
+      <div className="rounded-md bg-blue-50 p-4">
+        <div className="flex">
+          <div className="ml-3">
+            <h3 className="text-sm font-medium text-blue-800">Price Information</h3>
+            <div className="mt-2 text-sm text-blue-700">
+              <p>
+                Based on your base price of <strong>₦{basePrice.toLocaleString()}</strong> and a fixed markup of <strong>15%</strong>,
+                the final price displayed to customers will be <strong>₦{finalPrice.toLocaleString()}</strong>
+              </p>
+              <p className="mt-1 text-xs">
+                Note: The markup percentage is fixed at 15% for all products and cannot be modified. 
+                This ensures consistent pricing across the platform.
+              </p>
+            </div>
+          </div>
         </div>
       </div>
 
       <div>
-        <label htmlFor="categoryId" className="block text-sm font-medium text-gray-700">
+        <label htmlFor="stock" className="block text-sm font-medium text-gray-700">
+          Stock
+        </label>
+        <input
+          type="number"
+          name="stock"
+          id="stock"
+          min="0"
+          defaultValue={product?.stock}
+          required
+          className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+        />
+      </div>
+
+      <div>
+        <label htmlFor="categoryIds" className="block text-sm font-medium text-gray-700">
           Category
         </label>
         <select
-          name="categoryId"
-          id="categoryId"
-          defaultValue={product?.categoryId}
+          name="categoryIds"
+          id="categoryIds"
+          value={selectedCategoryId}
+          onChange={handleCategoryChange}
           required
           className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
         >
@@ -283,6 +407,84 @@ export default function ProductForm({ type, product, businessId, categories }: P
           ))}
         </select>
       </div>
+
+      {selectedCategoryId && (
+        <div className="space-y-4 p-4 border border-gray-200 rounded-lg">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Subcategories for selected category
+            </label>
+            
+            <div className="space-y-2">
+              {subCategories.length > 0 ? (
+                subCategories.map(subCategory => (
+                  <div key={subCategory.id} className="flex items-center">
+                    <input
+                      type="checkbox"
+                      id={`subcat-${subCategory.id}`}
+                      checked={selectedSubCategoryIds.includes(subCategory.id)}
+                      onChange={() => handleSubCategoryChange(subCategory.id)}
+                      className="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
+                    />
+                    <label htmlFor={`subcat-${subCategory.id}`} className="ml-2 block text-sm text-gray-700">
+                      {subCategory.name}
+                    </label>
+                  </div>
+                ))
+              ) : (
+                <p className="text-sm text-gray-500">No subcategories available for this category</p>
+              )}
+            </div>
+          </div>
+          
+          <div className="pt-2 mt-2 border-t border-gray-200">
+            <p className="text-sm text-gray-700 mb-2">Don't see what you're looking for? Add a new subcategory:</p>
+            
+            {showNewSubCategoryInput ? (
+              <div className="mt-2">
+                <div className="flex items-center space-x-2">
+                  <input
+                    type="text"
+                    value={newSubCategoryName}
+                    onChange={(e) => setNewSubCategoryName(e.target.value)}
+                    placeholder="Enter new subcategory name"
+                    className="flex-1 rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleAddNewSubCategory}
+                    disabled={isSubmitting || !newSubCategoryName.trim()}
+                    className="inline-flex items-center rounded-md border border-transparent bg-primary px-3 py-2 text-sm font-medium text-white hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {isSubmitting ? 'Adding...' : 'Add'}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowNewSubCategoryInput(false);
+                      setNewSubCategoryName('');
+                    }}
+                    className="inline-flex items-center rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+                  >
+                    Cancel
+                  </button>
+                </div>
+                {error && error.includes('subcategory') && (
+                  <p className="mt-2 text-sm text-red-600">{error}</p>
+                )}
+              </div>
+            ) : (
+              <button
+                type="button"
+                onClick={() => setShowNewSubCategoryInput(true)}
+                className="inline-flex items-center text-sm font-medium text-primary hover:text-primary/80"
+              >
+                + Add new subcategory
+              </button>
+            )}
+          </div>
+        </div>
+      )}
 
       <div>
         <label htmlFor="image" className="block text-sm font-medium text-gray-700">

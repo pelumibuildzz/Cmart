@@ -137,24 +137,6 @@ export default function ProductDetails({ product, onDelete }: ProductDetailsProp
 
         <p className="text-gray-600 mb-6">{product.description}</p>
 
-        {/* Pricing Information */}
-        <div className="mb-4 bg-gray-50 p-3 rounded">
-          <div className="grid grid-cols-3 gap-2 text-sm">
-            <div>
-              <span className="block text-gray-500">Base Price</span>
-              <span className="font-medium">₦{product.basePrice.toFixed(2)}</span>
-            </div>
-            <div>
-              <span className="block text-gray-500">Markup</span>
-              <span className="font-medium">{product.markupPercent}%</span>
-            </div>
-            <div>
-              <span className="block text-gray-500">Final Price</span>
-              <span className="font-bold text-primary">₦{product.finalPrice.toFixed(2)}</span>
-            </div>
-          </div>
-        </div>
-
         <div className="flex justify-between items-center mb-6">
           <div className="text-sm">
             <span className="font-medium">Stock:</span>{' '}

@@ -77,7 +77,7 @@ export default function ProductCard({
   };
 
   return (
-    <Link href={`/products/${id}`}>
+    <Link href={`/products/${id}`} >
       <div className="bg-white rounded-lg shadow-md overflow-hidden">
         {/* Product Images Slider */}
         <div className="relative aspect-square group">
@@ -133,7 +133,7 @@ export default function ProductCard({
           <h3 className="text-lg font-semibold text-secondary mb-2">
             {name}
           </h3>
-          <p className="text-gray-600 text-sm mb-3 line-clamp-2">
+          <p className="text-gray-600 text-sm mb-3 line-clamp-2 h-[50px] overflow-auto">
             {description}
           </p>
           <div className="flex items-center justify-between">

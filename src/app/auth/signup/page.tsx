@@ -3,9 +3,9 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { University, Category } from '@/generated/prisma';
+import { University, Category, SubCategory } from '@/generated/prisma';
 import { fetchUniversities } from '@/app/actions/university.action';
-import { fetchCategories } from '@/app/actions/category.action';
+import { fetchCategories, fetchSubCategoriesByCategory, createSubCategoryAction } from '@/app/actions/category.action';
 import { Role } from '@/lib/constants';
 
 export default function SignUp() {
@@ -19,10 +19,11 @@ export default function SignUp() {
     role: Role.USER,
     businessName: '',
     businessDescription: '',
-    categoryId: '',
   });
   const [universities, setUniversities] = useState<University[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
+  const [selectedCategoryIds, setSelectedCategoryIds] = useState<string[]>([]);
+  const [selectedSubCategoryIds, setSelectedSubCategoryIds] = useState<string[]>([]);
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isFetchingData, setIsFetchingData] = useState(true);
@@ -61,7 +62,7 @@ export default function SignUp() {
     loadData();
   }, []);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
@@ -69,19 +70,36 @@ export default function SignUp() {
     }));
   };
 
+  const handleCategoryChange = (categoryId: string) => {
+    setSelectedCategoryIds(prev => {
+      if (prev.includes(categoryId)) {
+        return prev.filter(id => id !== categoryId);
+      } else {
+        return [...prev, categoryId];
+      }
+    });
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    const { name, email, password, confirmPassword, universityId, role, businessName, businessDescription, categoryId } = formData;
+    const { name, email, password, confirmPassword, universityId, role, businessName, businessDescription } = formData;
     
     if (!name || !email || !password || !confirmPassword || !universityId) {
       setError('Please fill in all required fields');
       return;
     }
 
-    if (role === Role.BUSINESS && (!businessName || !businessDescription || !categoryId)) {
-      setError('Please fill in all business details');
-      return;
+    if (role === Role.BUSINESS) {
+      if (!businessName || !businessDescription) {
+        setError('Please fill in all business details');
+        return;
+      }
+      
+      if (selectedCategoryIds.length === 0) {
+        setError('Please select at least one business category');
+        return;
+      }
     }
     
     if (password !== confirmPassword) {
@@ -107,7 +125,8 @@ export default function SignUp() {
           business: role === Role.BUSINESS ? {
             name: businessName,
             description: businessDescription,
-            categoryId,
+            categoryIds: selectedCategoryIds,
+            subCategoryIds: selectedSubCategoryIds.length > 0 ? selectedSubCategoryIds : undefined,
             universityId,
           } : undefined,
         }),
@@ -234,12 +253,12 @@ export default function SignUp() {
               <label htmlFor="businessDescription" className="block mb-1 font-medium text-secondary">
                 Business Description
               </label>
-              <input
+              <textarea
                 id="businessDescription"
                 name="businessDescription"
-                type="text"
                 value={formData.businessDescription}
                 onChange={handleChange}
+                rows={3}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/50"
                 disabled={isLoading}
                 required
@@ -247,28 +266,62 @@ export default function SignUp() {
             </div>
 
             <div>
-              <label htmlFor="categoryId" className="block mb-1 font-medium text-secondary">
-                Business Category
+              <label className="block mb-1 font-medium text-secondary">
+                Business Categories
               </label>
-              <select
-                id="categoryId"
-                name="categoryId"
-                value={formData.categoryId}
-                onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/50 bg-white"
-                disabled={isLoading || isFetchingData}
-                required
-              >
-                <option value="" disabled>
-                  {isFetchingData ? 'Loading...' : 'Select business category'}
-                </option>
+              <div className="space-y-2 border border-gray-300 rounded-md p-3">
+                <p className="text-sm text-gray-600 mb-2">
+                  Select all categories that apply to your business
+                </p>
                 {categories.map((category) => (
-                  <option key={category.id} value={category.id}>
-                    {category.name}
-                  </option>
+                  <div key={category.id} className="flex items-center">
+                    <input
+                      type="checkbox"
+                      id={`category-${category.id}`}
+                      checked={selectedCategoryIds.includes(category.id)}
+                      onChange={() => handleCategoryChange(category.id)}
+                      className="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
+                      disabled={isLoading}
+                    />
+                    <label htmlFor={`category-${category.id}`} className="ml-2 block text-sm text-gray-700">
+                      {category.name}
+                    </label>
+                  </div>
                 ))}
-              </select>
+              </div>
             </div>
+
+            {selectedCategoryIds.length > 0 && (
+              <div>
+                <label className="block mb-1 font-medium text-secondary">
+                  Subcategories
+                </label>
+                <div className="space-y-6 p-4 border border-gray-200 rounded-lg">
+                  <p className="text-sm text-gray-600">
+                    Select subcategories for each of your business categories. You can also add new subcategories if needed.
+                  </p>
+                  
+                  {categories
+                    .filter(category => selectedCategoryIds.includes(category.id))
+                    .map(category => (
+                      <div key={category.id} className="pt-4 border-t border-gray-200 first:pt-0 first:border-t-0">
+                        <div className="font-medium text-secondary mb-2">
+                          {category.name}
+                        </div>
+                        
+                        <CategorySubcategories 
+                          categoryId={category.id}
+                          isLoading={isLoading}
+                          setError={setError}
+                          setIsLoading={setIsLoading}
+                          selectedSubCategoryIds={selectedSubCategoryIds}
+                          setSelectedSubCategoryIds={setSelectedSubCategoryIds}
+                        />
+                      </div>
+                    ))}
+                </div>
+              </div>
+            )}
           </>
         )}
         
@@ -322,5 +375,157 @@ export default function SignUp() {
         </Link>
       </p>
     </main>
+  );
+}
+
+function CategorySubcategories({ 
+  categoryId, 
+  isLoading, 
+  setError, 
+  setIsLoading,
+  selectedSubCategoryIds,
+  setSelectedSubCategoryIds
+}: { 
+  categoryId: string; 
+  isLoading: boolean; 
+  setError: (error: string) => void;
+  setIsLoading: (loading: boolean) => void;
+  selectedSubCategoryIds: string[];
+  setSelectedSubCategoryIds: React.Dispatch<React.SetStateAction<string[]>>;
+}) {
+  const [categorySubcategories, setCategorySubcategories] = useState<SubCategory[]>([]);
+  const [newSubCategoryName, setNewSubCategoryName] = useState<string>('');
+  const [showNewSubCategoryInput, setShowNewSubCategoryInput] = useState(false);
+  const [isLoadingSubcategories, setIsLoadingSubcategories] = useState(false);
+
+  useEffect(() => {
+    const loadSubCategories = async () => {
+      setIsLoadingSubcategories(true);
+      try {
+        const result = await fetchSubCategoriesByCategory(categoryId);
+        if (result.subCategories) {
+          setCategorySubcategories(result.subCategories);
+        }
+      } catch (err) {
+        console.error('Error fetching subcategories:', err);
+      } finally {
+        setIsLoadingSubcategories(false);
+      }
+    };
+
+    loadSubCategories();
+  }, [categoryId]);
+
+  const handleSubCategoryChange = (subCategoryId: string) => {
+    setSelectedSubCategoryIds(prev => {
+      if (prev.includes(subCategoryId)) {
+        return prev.filter(id => id !== subCategoryId);
+      } else {
+        return [...prev, subCategoryId];
+      }
+    });
+  };
+
+  const handleAddNewSubCategory = async () => {
+    if (!newSubCategoryName.trim()) return;
+    
+    setIsLoading(true);
+    
+    try {
+      // Call the server action to create a new subcategory
+      const result = await createSubCategoryAction(newSubCategoryName, categoryId);
+      
+      if (result.error) {
+        setError(result.error);
+        return;
+      }
+      
+      if (result.success && result.subcategory) {
+        // Add the new subcategory to the list and select it
+        setCategorySubcategories(prev => [...prev, result.subcategory]);
+        setSelectedSubCategoryIds(prev => [...prev, result.subcategory.id]);
+        setNewSubCategoryName('');
+        setShowNewSubCategoryInput(false);
+      }
+    } catch (err: any) {
+      setError(err.message || 'Failed to create subcategory');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  if (isLoadingSubcategories) {
+    return <p className="text-sm text-gray-500">Loading subcategories...</p>;
+  }
+
+  return (
+    <div className="space-y-3">
+      <div className="space-y-2">
+        {categorySubcategories.length > 0 ? (
+          categorySubcategories.map(subCategory => (
+            <div key={subCategory.id} className="flex items-center">
+              <input
+                type="checkbox"
+                id={`subcat-${subCategory.id}`}
+                checked={selectedSubCategoryIds.includes(subCategory.id)}
+                onChange={() => handleSubCategoryChange(subCategory.id)}
+                className="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
+                disabled={isLoading}
+              />
+              <label htmlFor={`subcat-${subCategory.id}`} className="ml-2 block text-sm text-gray-700">
+                {subCategory.name}
+              </label>
+            </div>
+          ))
+        ) : (
+          <p className="text-sm text-gray-500">No subcategories available for this category</p>
+        )}
+      </div>
+      
+      <div>
+        {showNewSubCategoryInput ? (
+          <div className="mt-2">
+            <div className="flex items-center space-x-2">
+              <input
+                type="text"
+                value={newSubCategoryName}
+                onChange={(e) => setNewSubCategoryName(e.target.value)}
+                placeholder="Enter new subcategory name"
+                className="flex-1 rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+                disabled={isLoading}
+              />
+              <button
+                type="button"
+                onClick={handleAddNewSubCategory}
+                disabled={isLoading || !newSubCategoryName.trim()}
+                className="inline-flex items-center rounded-md border border-transparent bg-primary px-3 py-2 text-sm font-medium text-white hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isLoading ? 'Adding...' : 'Add'}
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setShowNewSubCategoryInput(false);
+                  setNewSubCategoryName('');
+                }}
+                className="inline-flex items-center rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+                disabled={isLoading}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        ) : (
+          <button
+            type="button"
+            onClick={() => setShowNewSubCategoryInput(true)}
+            className="text-sm font-medium text-primary hover:text-primary/80"
+            disabled={isLoading}
+          >
+            + Add new subcategory
+          </button>
+        )}
+      </div>
+    </div>
   );
 }

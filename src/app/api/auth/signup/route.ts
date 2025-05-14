@@ -16,7 +16,7 @@ export async function POST(request: Request) {
       );
     }
 
-    if (role === Role.BUSINESS && (!business?.name || !business?.description || !business?.categoryId)) {
+    if (role === Role.BUSINESS && (!business?.name || !business?.description || !business?.categoryIds || business.categoryIds.length === 0)) {
       return NextResponse.json(
         { message: 'Missing required business fields' },
         { status: 400 }
@@ -49,8 +49,9 @@ export async function POST(request: Request) {
           userId: user.id,
           name: business.name,
           description: business.description,
-          categoryId: business.categoryId,
           universityId: business.universityId,
+          categoryIds: business.categoryIds,  // Now passing array of category IDs
+          subCategoryIds: business.subCategoryIds,  // Optional subcategory IDs
         };
         
         // Use the business service to create the business

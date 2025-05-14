@@ -66,33 +66,6 @@ export default async function CategoryDetails({ params }: CategoryPageProps) {
           </div>
         </div>
       )}
-      
-      {/* Products for this category */}
-      {products.length > 0 && (
-        <div className="mb-12">
-          <h2 className="text-2xl font-semibold text-secondary mb-4">
-            Products in {category.name}
-          </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {products.map((product) => (
-              <ProductCard
-                key={product.id}
-                id={product.id}
-                name={product.name}
-                description={product.description}
-                price={product.finalPrice}
-                imageUrl={product.imageUrl}
-                images={product.images}
-                stock={product.stock}
-                businessId={product.business.id}
-                categories={product.categories}
-                subCategories={product.subCategories}
-              />
-            ))}
-          </div>
-        </div>
-      )}
-      
       {/* User's University Businesses */}
       {currentUser && userUniversityBusinesses.length > 0 && (
         <div className="mb-12">
@@ -122,6 +95,33 @@ export default async function CategoryDetails({ params }: CategoryPageProps) {
           </div>
         </div>
       )}
+      
+      {/* Products for this category */}
+      {products.length > 0 && (
+        <div className="mb-12">
+          <h2 className="text-2xl font-semibold text-secondary mb-4">
+            Products in {category.name}
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {products.map((product) => (
+              <ProductCard
+                key={product.id}
+                id={product.id}
+                name={product.name}
+                description={product.description}
+                price={product.finalPrice}
+                imageUrl={product.imageUrl}
+                images={product.images}
+                stock={product.stock}
+                businessId={product.business.id}
+                categories={product.categories}
+                subCategories={product.subCategories}
+              />
+            ))}
+          </div>
+        </div>
+      )}
+      
 
       {businesses.length === 0 && products.length === 0 && (
         <div className="text-center py-12">

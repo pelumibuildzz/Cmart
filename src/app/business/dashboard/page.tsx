@@ -4,17 +4,7 @@ import { getOrdersByBusinessId } from '@/lib/services/order.service';
 import { getProductsByBusinessId } from '@/lib/services/product.service';
 import { redirect } from 'next/navigation';
 import BusinessDashboardClient from './BusinessDashboardClient';
-
-interface Order {
-  id: string;
-  status: string;
-  total: number;
-  createdAt: Date;
-  User: {
-    name: string;
-    email: string;
-  };
-}
+import { Order } from '@/types/business';
 
 export default async function Dashboard() {
   const session = await getSession();

@@ -3,11 +3,12 @@
 import Modal from './ui/Modal';
 import { OrderStatus, OrderStatusColors } from '@/lib/constants/order';
 import { formatDate } from '@/lib/utils/date';
+import { OrderModalData } from '@/types/business';
 
 interface OrderDetailsModalProps {
   isOpen: boolean;
   onClose: () => void;
-  order: any; // We'll replace this with proper type when available
+  order: OrderModalData | null;
   onUpdateStatus?: (orderId: string, status: string) => Promise<void>;
   readOnly?: boolean;
 }
@@ -56,7 +57,7 @@ export default function OrderDetailsModal({
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">
-                {order.OrderItems.map((item: any) => (
+                {order.OrderItems.map((item) => (
                   <tr key={item.id}>
                     <td className="py-2">
                       <p className="text-sm font-medium text-gray-900">{item.Product.name}</p>

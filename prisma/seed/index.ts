@@ -20,7 +20,10 @@ async function main() {
   await prisma.productImage.deleteMany();
   await prisma.product.deleteMany();
   await prisma.business.deleteMany();
+  await prisma.discount.deleteMany();
+  await prisma.rating.deleteMany();
   await prisma.user.deleteMany();
+  await prisma.subCategory.deleteMany();
   await prisma.category.deleteMany();
   await prisma.university.deleteMany();
 
@@ -65,7 +68,63 @@ async function main() {
     }),
   ]);
 
-  console.log('Categories created');
+  // Create subcategories
+  const subCategories = await Promise.all([
+    // Electronics subcategories
+    prisma.subCategory.create({
+      data: {
+        name: 'Laptops',
+        categoryId: categories[0].id,
+      },
+    }),
+    prisma.subCategory.create({
+      data: {
+        name: 'Accessories',
+        categoryId: categories[0].id,
+      },
+    }),
+    // Books subcategories
+    prisma.subCategory.create({
+      data: {
+        name: 'Textbooks',
+        categoryId: categories[1].id,
+      },
+    }),
+    prisma.subCategory.create({
+      data: {
+        name: 'Fiction',
+        categoryId: categories[1].id,
+      },
+    }),
+    // Clothing subcategories
+    prisma.subCategory.create({
+      data: {
+        name: 'University Apparel',
+        categoryId: categories[2].id,
+      },
+    }),
+    prisma.subCategory.create({
+      data: {
+        name: 'Casual Wear',
+        categoryId: categories[2].id,
+      },
+    }),
+    // Food subcategories
+    prisma.subCategory.create({
+      data: {
+        name: 'Snacks',
+        categoryId: categories[3].id,
+      },
+    }),
+    prisma.subCategory.create({
+      data: {
+        name: 'Beverages',
+        categoryId: categories[3].id,
+      },
+    }),
+  ]);
+
+  console.log('Categories and subcategories created');
 
   // Create users
   const normalUser = await prisma.user.create({
@@ -75,6 +134,8 @@ async function main() {
       password: 'password123',
       universityId: university1.id,
       role: Role.USER,
+      totalOrders: 0,
+      discountTier: 'NONE',
     },
   });
 
@@ -86,13 +147,23 @@ async function main() {
       password: 'password123',
       universityId: university1.id,
       role: Role.BUSINESS,
+      totalOrders: 0,
+      discountTier: 'NONE',
       business: {
         create: {
           name: 'Campus Tech Store',
           description: 'We sell the latest tech gadgets for students',
           universityId: university1.id,
-          categoryId: categories[0].id, // Electronics
           isVerified: true,
+          categories: {
+            connect: [{ id: categories[0].id }] // Electronics
+          },
+          subCategories: {
+            connect: [
+              { id: subCategories[0].id }, // Laptops
+              { id: subCategories[1].id }  // Accessories
+            ]
+          }
         },
       },
     },
@@ -108,13 +179,23 @@ async function main() {
       password: 'password123',
       universityId: university1.id,
       role: Role.BUSINESS,
+      totalOrders: 0,
+      discountTier: 'NONE',
       business: {
         create: {
           name: 'Campus Bookstore',
           description: 'Your one-stop shop for all academic books',
           universityId: university1.id,
-          categoryId: categories[1].id, // Books
           isVerified: true,
+          categories: {
+            connect: [{ id: categories[1].id }] // Books
+          },
+          subCategories: {
+            connect: [
+              { id: subCategories[2].id }, // Textbooks
+              { id: subCategories[3].id }  // Fiction
+            ]
+          }
         },
       },
     },
@@ -130,13 +211,23 @@ async function main() {
       password: 'password123',
       universityId: university1.id,
       role: Role.BUSINESS,
+      totalOrders: 0,
+      discountTier: 'NONE',
       business: {
         create: {
           name: 'University Fashions',
           description: 'Trendy clothing for students',
           universityId: university1.id,
-          categoryId: categories[2].id, // Clothing
           isVerified: true,
+          categories: {
+            connect: [{ id: categories[2].id }] // Clothing
+          },
+          subCategories: {
+            connect: [
+              { id: subCategories[4].id }, // University Apparel
+              { id: subCategories[5].id }  // Casual Wear
+            ]
+          }
         },
       },
     },
@@ -152,6 +243,8 @@ async function main() {
       password: 'password123',
       universityId: university1.id,
       role: Role.ADMIN,
+      totalOrders: 0,
+      discountTier: 'NONE',
     },
   });
 
@@ -164,10 +257,17 @@ async function main() {
         name: 'Laptop',
         description: 'Powerful laptop for students',
         imageUrl: defaultImageUrl,
-        price: 900000,
+        basePrice: 900000,
+        markupPercent: 5,
+        finalPrice: 945000, // 900000 + 5% markup
         stock: 10,
         businessId: businessUser1.business.id,
-        categoryId: categories[0].id,
+        categories: {
+          connect: [{ id: categories[0].id }] // Electronics
+        },
+        subCategories: {
+          connect: [{ id: subCategories[0].id }] // Laptops
+        },
         images: {
           create: [
             { url: defaultImageUrl },
@@ -177,6 +277,8 @@ async function main() {
       },
       include: {
         images: true,
+        categories: true,
+        subCategories: true,
       },
     }),
     prisma.product.create({
@@ -184,10 +286,17 @@ async function main() {
         name: 'Headphones',
         description: 'Noise-cancelling headphones',
         imageUrl: defaultImageUrl,
-        price: 19000,
+        basePrice: 19000,
+        markupPercent: 10,
+        finalPrice: 20900, // 19000 + 10% markup
         stock: 20,
         businessId: businessUser1.business.id,
-        categoryId: categories[0].id,
+        categories: {
+          connect: [{ id: categories[0].id }] // Electronics
+        },
+        subCategories: {
+          connect: [{ id: subCategories[1].id }] // Accessories
+        },
         images: {
           create: [
             { url: defaultImageUrl },
@@ -197,6 +306,8 @@ async function main() {
       },
       include: {
         images: true,
+        categories: true,
+        subCategories: true,
       },
     }),
   ]);
@@ -208,10 +319,17 @@ async function main() {
         name: 'Computer Science Textbook',
         description: 'Computer Science 101 Textbook',
         imageUrl: defaultImageUrl,
-        price: 7900,
+        basePrice: 7900,
+        markupPercent: 8,
+        finalPrice: 8532, // 7900 + 8% markup
         stock: 15,
         businessId: businessUser2.business.id,
-        categoryId: categories[1].id,
+        categories: {
+          connect: [{ id: categories[1].id }] // Books
+        },
+        subCategories: {
+          connect: [{ id: subCategories[2].id }] // Textbooks
+        },
         images: {
           create: [
             { url: defaultImageUrl },
@@ -221,6 +339,8 @@ async function main() {
       },
       include: {
         images: true,
+        categories: true,
+        subCategories: true,
       },
     }),
     prisma.product.create({
@@ -228,10 +348,17 @@ async function main() {
         name: 'Engineering Mathematics',
         description: 'Comprehensive guide to engineering mathematics',
         imageUrl: defaultImageUrl,
-        price: 8500,
+        basePrice: 8500,
+        markupPercent: 7,
+        finalPrice: 9095, // 8500 + 7% markup
         stock: 12,
         businessId: businessUser2.business.id,
-        categoryId: categories[1].id,
+        categories: {
+          connect: [{ id: categories[1].id }] // Books
+        },
+        subCategories: {
+          connect: [{ id: subCategories[2].id }] // Textbooks
+        },
         images: {
           create: [
             { url: defaultImageUrl },
@@ -241,6 +368,8 @@ async function main() {
       },
       include: {
         images: true,
+        categories: true,
+        subCategories: true,
       },
     }),
   ]);
@@ -252,10 +381,17 @@ async function main() {
         name: 'University Hoodie',
         description: 'Comfortable hoodie with university logo',
         imageUrl: defaultImageUrl,
-        price: 12000,
+        basePrice: 12000,
+        markupPercent: 15,
+        finalPrice: 13800, // 12000 + 15% markup
         stock: 25,
         businessId: businessUser3.business.id,
-        categoryId: categories[2].id,
+        categories: {
+          connect: [{ id: categories[2].id }] // Clothing
+        },
+        subCategories: {
+          connect: [{ id: subCategories[4].id }] // University Apparel
+        },
         images: {
           create: [
             { url: defaultImageUrl },
@@ -265,6 +401,8 @@ async function main() {
       },
       include: {
         images: true,
+        categories: true,
+        subCategories: true,
       },
     }),
     prisma.product.create({
@@ -272,10 +410,17 @@ async function main() {
         name: 'Denim Jeans',
         description: 'Classic denim jeans for everyday wear',
         imageUrl: defaultImageUrl,
-        price: 15000,
+        basePrice: 15000,
+        markupPercent: 12,
+        finalPrice: 16800, // 15000 + 12% markup
         stock: 18,
         businessId: businessUser3.business.id,
-        categoryId: categories[2].id,
+        categories: {
+          connect: [{ id: categories[2].id }] // Clothing
+        },
+        subCategories: {
+          connect: [{ id: subCategories[5].id }] // Casual Wear
+        },
         images: {
           create: [
             { url: defaultImageUrl },
@@ -285,17 +430,31 @@ async function main() {
       },
       include: {
         images: true,
+        categories: true,
+        subCategories: true,
       },
     }),
   ]);
 
   console.log('Products created');
 
+  // Create discount for user
+  const discount = await prisma.discount.create({
+    data: {
+      userId: normalUser.id,
+      percentage: 10,
+      isUsed: false,
+      expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days from now
+    },
+  });
+
+  console.log('Discount created');
+
   // Create an order group with multiple business orders
   const orderGroup = await prisma.orderGroup.create({
     data: {
       userId: normalUser.id,
-      total: techProducts[0].price + bookProducts[0].price + fashionProducts[0].price, // Total across all businesses
+      total: techProducts[0].finalPrice + bookProducts[0].finalPrice + fashionProducts[0].finalPrice, // Total across all businesses
       status: 'PENDING',
       paymentId: 'mock_payment_' + Date.now(),
       orders: {
@@ -304,14 +463,14 @@ async function main() {
           {
             userId: normalUser.id,
             businessId: businessUser1.business.id,
-            total: techProducts[0].price,
+            total: techProducts[0].finalPrice,
             status: 'PENDING',
-            OrderItems: {
+            orderItems: {
               create: [
                 {
                   productId: techProducts[0].id,
                   quantity: 1,
-                  price: techProducts[0].price
+                  price: techProducts[0].finalPrice
                 }
               ]
             }
@@ -320,33 +479,34 @@ async function main() {
           {
             userId: normalUser.id,
             businessId: businessUser2.business.id,
-            total: bookProducts[0].price,
+            total: bookProducts[0].finalPrice,
             status: 'PENDING',
-            OrderItems: {
+            orderItems: {
               create: [
                 {
                   productId: bookProducts[0].id,
                   quantity: 1,
-                  price: bookProducts[0].price
+                  price: bookProducts[0].finalPrice
                 }
               ]
             }
           },
-          // Order from Fashion Store
+          // Order from Fashion Store - with discount applied
           {
             userId: normalUser.id,
             businessId: businessUser3.business.id,
-            total: fashionProducts[0].price,
+            total: fashionProducts[0].finalPrice * 0.9, // Apply 10% discount
             status: 'PENDING',
-            OrderItems: {
+            orderItems: {
               create: [
                 {
                   productId: fashionProducts[0].id,
                   quantity: 1,
-                  price: fashionProducts[0].price
+                  price: fashionProducts[0].finalPrice
                 }
               ]
-            }
+            },
+            discountId: discount.id
           }
         ]
       }
@@ -354,14 +514,26 @@ async function main() {
     include: {
       orders: {
         include: {
-          OrderItems: true,
-          Business: true
+          orderItems: true,
+          business: true,
+          discount: true
         }
       }
     }
   });
 
+  // Create a rating for the order
+  const rating = await prisma.rating.create({
+    data: {
+      rating: 5,
+      comment: "Great products, fast delivery!",
+      userId: normalUser.id,
+      orderId: orderGroup.id,
+    }
+  });
+
   console.log('Order Group created with orders from multiple businesses');
+  console.log('Rating created for the order');
   console.log('Seed completed successfully!');
 }
 

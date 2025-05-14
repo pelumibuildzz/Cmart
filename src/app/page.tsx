@@ -163,11 +163,13 @@ export default async function Home() {
                 id={product.id}
                 name={product.name}
                 description={product.description}
-                price={product.price}
+                price={product.finalPrice}
                 imageUrl={product.imageUrl}
                 images={product.images}
                 stock={product.stock}
-                businessId={product.Business.id}
+                businessId={product.business.id}
+                categories={product.categories}
+                subCategories={product.subCategories}
               />
             ))}
           </div>

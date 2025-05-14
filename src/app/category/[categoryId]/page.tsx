@@ -1,9 +1,10 @@
 import { getCurrentUser } from '@/lib/auth/session';
-import { getCategoryById } from '@/lib/services/category.service';
-import { getBusinesses } from '@/lib/services';
-import { MapPin } from 'lucide-react';
+import { getCategoryById, getProductsByCategoryId } from '@/lib/services/category.service';
+import { MapPin, Tag } from 'lucide-react';
 import BusinessCard from '@/app/components/business-card';
+import ProductCard from '@/app/components/product-card';
 import { notFound } from 'next/navigation';
+import Link from 'next/link';
 
 interface CategoryPageProps {
   params: {
@@ -19,11 +20,11 @@ export default async function CategoryDetails({ params }: CategoryPageProps) {
     notFound();
   }
 
-  const businesses = await getBusinesses({
-    where: {
-      categoryId: params.categoryId
-    }
-  });
+  // Get category products
+  const products = await getProductsByCategoryId(params.categoryId);
+
+  // Get businesses from the category relationship
+  const businesses = category.businesses || [];
 
   // Group businesses by university
   const businessesByUniversity = businesses.reduce((acc: { [key: string]: any[] }, business) => {
@@ -45,7 +46,52 @@ export default async function CategoryDetails({ params }: CategoryPageProps) {
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold text-secondary mb-2">{category.name}</h1>
-      <p className="text-gray-600 mb-8">Discover {category.name.toLowerCase()} businesses in your university and beyond</p>
+      <p className="text-gray-600 mb-4">Discover {category.name.toLowerCase()} businesses in your university and beyond</p>
+      
+      {/* Subcategories */}
+      {category.subCategories && category.subCategories.length > 0 && (
+        <div className="mb-8">
+          <h2 className="text-lg font-semibold text-secondary mb-2">Subcategories</h2>
+          <div className="flex flex-wrap gap-3">
+            {category.subCategories.map((subCategory) => (
+              <Link 
+                key={subCategory.id} 
+                href={`/category/${category.id}/subcategory/${subCategory.id}`}
+                className="inline-flex items-center bg-gray-100 hover:bg-gray-200 px-3 py-2 rounded-full"
+              >
+                <Tag className="h-4 w-4 mr-2 text-primary" />
+                {subCategory.name}
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
+      
+      {/* Products for this category */}
+      {products.length > 0 && (
+        <div className="mb-12">
+          <h2 className="text-2xl font-semibold text-secondary mb-4">
+            Products in {category.name}
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {products.map((product) => (
+              <ProductCard
+                key={product.id}
+                id={product.id}
+                name={product.name}
+                description={product.description}
+                price={product.finalPrice}
+                imageUrl={product.imageUrl}
+                images={product.images}
+                stock={product.stock}
+                businessId={product.business.id}
+                categories={product.categories}
+                subCategories={product.subCategories}
+              />
+            ))}
+          </div>
+        </div>
+      )}
       
       {/* User's University Businesses */}
       {currentUser && userUniversityBusinesses.length > 0 && (
@@ -77,10 +123,10 @@ export default async function CategoryDetails({ params }: CategoryPageProps) {
         </div>
       )}
 
-      {businesses.length === 0 && (
+      {businesses.length === 0 && products.length === 0 && (
         <div className="text-center py-12">
           <p className="text-gray-500 text-lg">
-            No businesses found in this category yet.
+            No content found in this category yet.
           </p>
         </div>
       )}

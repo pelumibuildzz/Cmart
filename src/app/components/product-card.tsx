@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
-import { ShoppingCart, Check } from 'lucide-react';
+import { ShoppingCart, Check, Tag } from 'lucide-react';
 import { ProductImage } from '@/types/product';
 import Link from 'next/link';
 import { useCartStore } from '@/lib/store/cart';
@@ -18,6 +18,8 @@ interface ProductCardProps {
   images: ProductImage[];
   stock: number;
   businessId: string;
+  categories?: { id: string; name: string }[];
+  subCategories?: { id: string; name: string }[];
 }
 
 export default function ProductCard({
@@ -29,6 +31,8 @@ export default function ProductCard({
   images,
   stock,
   businessId,
+  categories,
+  subCategories,
 }: ProductCardProps) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isAdding, setIsAdding] = useState(false);
@@ -92,6 +96,14 @@ export default function ProductCard({
           {stock <= 5 && (
             <div className="absolute top-2 right-2 bg-red-500 text-white text-xs px-2 py-1 rounded">
               {stock === 0 ? 'Out of Stock' : `Only ${stock} left`}
+            </div>
+          )}
+          
+          {/* Category Badge - Show first category if available */}
+          {categories && categories.length > 0 && (
+            <div className="absolute top-2 left-2 bg-gray-100 text-gray-800 text-xs px-2 py-1 rounded flex items-center">
+              <Tag className="h-3 w-3 mr-1" />
+              {categories[0].name}
             </div>
           )}
           

@@ -5,11 +5,12 @@ import Link from 'next/link';
 import { PlusCircle, Package, ShoppingBag, AlertCircle, CheckCircle, Edit, Eye } from 'lucide-react';
 import { OrderStatusColors } from '@/lib/constants/order';
 import OrderDetailsModal from '@/app/components/OrderDetailsModal';
+import { Business, Order, Product, OrderModalData, User, OrderItem } from '@/types/business';
 
 interface BusinessDashboardClientProps {
-  business: any;
-  products: any[];
-  orders: any[];
+  business: Business;
+  products: Product[];
+  orders: Order[];
 }
 
 export default function BusinessDashboardClient({
@@ -17,12 +18,34 @@ export default function BusinessDashboardClient({
   products,
   orders,
 }: BusinessDashboardClientProps) {
-  const [selectedOrder, setSelectedOrder] = useState<any>(null);
+  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const handleViewDetails = (order: any) => {
+  const handleViewDetails = (order: Order) => {
     setSelectedOrder(order);
     setIsModalOpen(true);
+  };
+
+  const convertToModalOrder = (order: Order): OrderModalData => {
+    return {
+      id: order.id,
+      status: order.status,
+      total: order.total,
+      createdAt: order.createdAt,
+      User: order.user,
+      Business: {
+        id: business.id,
+        name: business.name,
+        description: business.description
+      },
+      OrderItems: order.orderItems ? order.orderItems.map(item => ({
+        id: item.id,
+        quantity: item.quantity,
+        price: item.price,
+        productId: item.productId,
+        Product: item.product
+      })) : []
+    };
   };
 
   return (
@@ -137,7 +160,7 @@ export default function BusinessDashboardClient({
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">₦{product.price.toFixed(2)}</div>
+                      <div className="text-sm text-gray-900">₦{product.finalPrice.toFixed(2)}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm text-gray-900">{product.stock}</div>
@@ -205,8 +228,8 @@ export default function BusinessDashboardClient({
                       <div className="text-sm text-gray-900">#{order.id.slice(-6)}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">{order.User.name}</div>
-                      <div className="text-sm text-gray-500">{order.User.email}</div>
+                      <div className="text-sm text-gray-900">{order.user.name}</div>
+                      <div className="text-sm text-gray-500">{order.user.email}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
@@ -253,7 +276,7 @@ export default function BusinessDashboardClient({
       <OrderDetailsModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        order={selectedOrder}
+        order={selectedOrder ? convertToModalOrder(selectedOrder) : null}
         readOnly={true}
       />
     </div>

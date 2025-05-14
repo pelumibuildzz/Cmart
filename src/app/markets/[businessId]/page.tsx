@@ -1,6 +1,8 @@
 import { getBusinessById } from '@/lib/services/business.service';
 import { notFound } from 'next/navigation';
 import ProductCard from '@/app/components/product-card';
+import Link from 'next/link';
+import { Tag } from 'lucide-react';
 
 interface MarketDetailsProps {
   params: {
@@ -20,7 +22,45 @@ export default async function MarketDetails({ params }: MarketDetailsProps) {
       {/* Business Header */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-secondary mb-2">{business.name}</h1>
-        <p className="text-gray-600">{business.description}</p>
+        <p className="text-gray-600 mb-4">{business.description}</p>
+        
+        {/* Categories */}
+        {business.categories && business.categories.length > 0 && (
+          <div className="mb-4">
+            <h3 className="text-sm font-medium text-gray-500 mb-2">Categories</h3>
+            <div className="flex flex-wrap gap-2">
+              {business.categories.map((category) => (
+                <Link 
+                  key={category.id} 
+                  href={`/category/${category.id}`}
+                  className="inline-flex items-center text-xs bg-gray-100 hover:bg-gray-200 px-2 py-1 rounded"
+                >
+                  <Tag className="h-3 w-3 mr-1" />
+                  {category.name}
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
+        
+        {/* SubCategories */}
+        {business.subCategories && business.subCategories.length > 0 && (
+          <div>
+            <h3 className="text-sm font-medium text-gray-500 mb-2">Subcategories</h3>
+            <div className="flex flex-wrap gap-2">
+              {business.subCategories.map((subCategory) => (
+                <Link 
+                  key={subCategory.id} 
+                  href={`/category/${subCategory.categoryId}/subcategory/${subCategory.id}`}
+                  className="inline-flex items-center text-xs bg-blue-50 hover:bg-blue-100 px-2 py-1 rounded"
+                >
+                  <Tag className="h-3 w-3 mr-1" />
+                  {subCategory.name}
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Products Grid */}
@@ -31,7 +71,7 @@ export default async function MarketDetails({ params }: MarketDetailsProps) {
             id={product.id}
             name={product.name}
             description={product.description}
-            price={product.price}
+            price={product.finalPrice}
             imageUrl={product.imageUrl}
             images={product.images || []}
             stock={product.stock}

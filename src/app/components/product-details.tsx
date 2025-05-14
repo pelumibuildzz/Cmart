@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Image from 'next/image';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import { Trash2, Edit, Store } from 'lucide-react';
+import { Trash2, Edit, Store, Tag } from 'lucide-react';
 import Link from 'next/link';
 import { useCartStore } from '@/lib/store/cart';
 import { deleteProductAction } from '@/app/actions/product.action';
@@ -22,7 +22,7 @@ export default function ProductDetails({ product, onDelete }: ProductDetailsProp
   const addItem = useCartStore((state) => state.addItem);
   const items = useCartStore((state) => state.items);
 
-  const isOwner = session?.user?.id === product.Business.userId;
+  const isOwner = session?.user?.id === product.business.userId;
   const currentCartQuantity = items.find(item => item.id === product.id)?.quantity || 0;
   const isOutOfStock = product.stock <= currentCartQuantity;
 
@@ -47,7 +47,7 @@ export default function ProductDetails({ product, onDelete }: ProductDetailsProp
         onDelete();
       } else {
         // Otherwise, redirect to business page
-        router.push(`/markets/${product.Business.id}`);
+        router.push(`/markets/${product.business.id}`);
       }
     } catch (err: any) {
       setError(err.message || 'Failed to delete product');
@@ -67,9 +67,9 @@ export default function ProductDetails({ product, onDelete }: ProductDetailsProp
     addItem({ 
       id: product.id, 
       name: product.name, 
-      price: product.price, 
+      price: product.finalPrice, 
       imageUrl: product.imageUrl,
-      businessId: product.Business.id,
+      businessId: product.business.id,
       stock: product.stock
     });
   };
@@ -97,19 +97,63 @@ export default function ProductDetails({ product, onDelete }: ProductDetailsProp
         <div className="flex justify-between items-start mb-4">
           <h1 className="text-2xl font-bold text-secondary">{product.name}</h1>
           <div className="text-2xl font-bold text-primary">
-            ₦{product.price.toFixed(2)}
+            ₦{product.finalPrice.toFixed(2)}
           </div>
         </div>
 
         <Link 
-          href={`/markets/${product.Business.id}`}
+          href={`/markets/${product.business.id}`}
           className="inline-flex items-center text-secondary hover:text-primary mb-4"
         >
           <Store className="h-4 w-4 mr-2" />
-          {product.Business.name}
+          {product.business.name}
         </Link>
 
+        {/* Categories and Subcategories */}
+        {(product.categories.length > 0 || product.subCategories.length > 0) && (
+          <div className="flex flex-wrap gap-2 mb-4">
+            {product.categories.map((category: any) => (
+              <Link
+                key={category.id}
+                href={`/category/${category.id}`}
+                className="inline-flex items-center text-xs bg-gray-100 hover:bg-gray-200 px-2 py-1 rounded"
+              >
+                <Tag className="h-3 w-3 mr-1" />
+                {category.name}
+              </Link>
+            ))}
+            {product.subCategories.map((subCategory: any) => (
+              <Link
+                key={subCategory.id}
+                href={`/category/${subCategory.categoryId}/subcategory/${subCategory.id}`}
+                className="inline-flex items-center text-xs bg-blue-50 hover:bg-blue-100 px-2 py-1 rounded"
+              >
+                <Tag className="h-3 w-3 mr-1" />
+                {subCategory.name}
+              </Link>
+            ))}
+          </div>
+        )}
+
         <p className="text-gray-600 mb-6">{product.description}</p>
+
+        {/* Pricing Information */}
+        <div className="mb-4 bg-gray-50 p-3 rounded">
+          <div className="grid grid-cols-3 gap-2 text-sm">
+            <div>
+              <span className="block text-gray-500">Base Price</span>
+              <span className="font-medium">₦{product.basePrice.toFixed(2)}</span>
+            </div>
+            <div>
+              <span className="block text-gray-500">Markup</span>
+              <span className="font-medium">{product.markupPercent}%</span>
+            </div>
+            <div>
+              <span className="block text-gray-500">Final Price</span>
+              <span className="font-bold text-primary">₦{product.finalPrice.toFixed(2)}</span>
+            </div>
+          </div>
+        </div>
 
         <div className="flex justify-between items-center mb-6">
           <div className="text-sm">

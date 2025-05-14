@@ -123,6 +123,7 @@ export async function getOrderGroupById(id: string) {
     where: { id },
     include: {
       user: true,
+      shippingUniversity: true,
       orders: {
         include: {
           business: true,
@@ -145,6 +146,7 @@ export async function getOrderGroupsByUserId(userId: string) {
       userId,
     },
     include: {
+      shippingUniversity: true,
       orders: {
         include: {
           business: true,

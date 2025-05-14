@@ -457,6 +457,9 @@ async function main() {
       total: techProducts[0].finalPrice + bookProducts[0].finalPrice + fashionProducts[0].finalPrice, // Total across all businesses
       status: 'PENDING',
       paymentId: 'mock_payment_' + Date.now(),
+      shippingName: normalUser.name,
+      shippingHall: 'Main Campus Hall',
+      shippingUniversityId: university1.id,
       orders: {
         create: [
           // Order from Tech Store

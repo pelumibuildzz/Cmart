@@ -177,7 +177,10 @@ exports.Prisma.OrderGroupScalarFieldEnum = {
   total: 'total',
   status: 'status',
   paymentId: 'paymentId',
-  createdAt: 'createdAt'
+  createdAt: 'createdAt',
+  shippingName: 'shippingName',
+  shippingHall: 'shippingHall',
+  shippingUniversityId: 'shippingUniversityId'
 };
 
 exports.Prisma.OrderScalarFieldEnum = {

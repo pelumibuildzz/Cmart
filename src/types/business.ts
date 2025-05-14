@@ -59,6 +59,13 @@ export interface OrderGroup {
   status: string;
   paymentId?: string;
   createdAt: Date;
+  shippingName: string;
+  shippingHall: string;
+  shippingUniversityId: string;
+  shippingUniversity?: {
+    id: string;
+    name: string;
+  };
 }
 
 export interface Order {

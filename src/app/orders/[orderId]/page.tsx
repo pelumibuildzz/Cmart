@@ -61,6 +61,28 @@ export default async function OrderDetailsPage({ params }: OrderDetailsPageProps
               <p className="mt-1">{orderGroup.paymentId ? `Paid (ID: ${orderGroup.paymentId.slice(-6)})` : 'Pending'}</p>
             </div>
           </div>
+          
+          {/* Shipping Information */}
+          <div className="mt-6 pt-6 border-t">
+            <h3 className="text-lg font-medium mb-3 flex items-center gap-2">
+              <MapPin className="h-5 w-5 text-primary" />
+              Shipping Information
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div>
+                <h4 className="text-sm font-medium text-gray-500">Recipient</h4>
+                <p className="mt-1">{orderGroup.shippingName}</p>
+              </div>
+              <div>
+                <h4 className="text-sm font-medium text-gray-500">Hall/Building</h4>
+                <p className="mt-1">{orderGroup.shippingHall}</p>
+              </div>
+              <div>
+                <h4 className="text-sm font-medium text-gray-500">University</h4>
+                <p className="mt-1">{orderGroup.shippingUniversity?.name}</p>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
       

@@ -91,15 +91,19 @@ model ProductImage {
 }
 
 model OrderGroup {
-  id        String   @id @default(cuid())
-  userId    String
-  total     Float
-  status    String
-  paymentId String?
-  createdAt DateTime @default(now())
-  user      User     @relation(fields: [userId], references: [id])
-  orders    Order[]
-  ratings   Rating[]
+  id                   String     @id @default(cuid())
+  userId               String
+  total                Float
+  status               String
+  paymentId            String?
+  createdAt            DateTime   @default(now())
+  shippingName         String // Recipient's name for shipping
+  shippingHall         String // Hall/building for delivery
+  shippingUniversityId String // University ID for delivery
+  shippingUniversity   University @relation(fields: [shippingUniversityId], references: [id])
+  user                 User       @relation(fields: [userId], references: [id])
+  orders               Order[]
+  ratings              Rating[]
 }
 
 model Order {
@@ -149,8 +153,9 @@ model SubCategory {
 }
 
 model University {
-  id   String @id @default(cuid())
-  name String @unique
+  id                  String       @id @default(cuid())
+  name                String       @unique
+  shippingOrderGroups OrderGroup[]
 }
 
 model Discount {

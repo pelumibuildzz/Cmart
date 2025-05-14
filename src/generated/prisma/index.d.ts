@@ -2227,6 +2227,37 @@ export namespace Prisma {
 
 
   /**
+   * Count Type UniversityCountOutputType
+   */
+
+  export type UniversityCountOutputType = {
+    shippingOrderGroups: number
+  }
+
+  export type UniversityCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    shippingOrderGroups?: boolean | UniversityCountOutputTypeCountShippingOrderGroupsArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * UniversityCountOutputType without action
+   */
+  export type UniversityCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the UniversityCountOutputType
+     */
+    select?: UniversityCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * UniversityCountOutputType without action
+   */
+  export type UniversityCountOutputTypeCountShippingOrderGroupsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: OrderGroupWhereInput
+  }
+
+
+  /**
    * Models
    */
 
@@ -8243,6 +8274,9 @@ export namespace Prisma {
     status: string | null
     paymentId: string | null
     createdAt: Date | null
+    shippingName: string | null
+    shippingHall: string | null
+    shippingUniversityId: string | null
   }
 
   export type OrderGroupMaxAggregateOutputType = {
@@ -8252,6 +8286,9 @@ export namespace Prisma {
     status: string | null
     paymentId: string | null
     createdAt: Date | null
+    shippingName: string | null
+    shippingHall: string | null
+    shippingUniversityId: string | null
   }
 
   export type OrderGroupCountAggregateOutputType = {
@@ -8261,6 +8298,9 @@ export namespace Prisma {
     status: number
     paymentId: number
     createdAt: number
+    shippingName: number
+    shippingHall: number
+    shippingUniversityId: number
     _all: number
   }
 
@@ -8280,6 +8320,9 @@ export namespace Prisma {
     status?: true
     paymentId?: true
     createdAt?: true
+    shippingName?: true
+    shippingHall?: true
+    shippingUniversityId?: true
   }
 
   export type OrderGroupMaxAggregateInputType = {
@@ -8289,6 +8332,9 @@ export namespace Prisma {
     status?: true
     paymentId?: true
     createdAt?: true
+    shippingName?: true
+    shippingHall?: true
+    shippingUniversityId?: true
   }
 
   export type OrderGroupCountAggregateInputType = {
@@ -8298,6 +8344,9 @@ export namespace Prisma {
     status?: true
     paymentId?: true
     createdAt?: true
+    shippingName?: true
+    shippingHall?: true
+    shippingUniversityId?: true
     _all?: true
   }
 
@@ -8394,6 +8443,9 @@ export namespace Prisma {
     status: string
     paymentId: string | null
     createdAt: Date
+    shippingName: string
+    shippingHall: string
+    shippingUniversityId: string
     _count: OrderGroupCountAggregateOutputType | null
     _avg: OrderGroupAvgAggregateOutputType | null
     _sum: OrderGroupSumAggregateOutputType | null
@@ -8422,6 +8474,10 @@ export namespace Prisma {
     status?: boolean
     paymentId?: boolean
     createdAt?: boolean
+    shippingName?: boolean
+    shippingHall?: boolean
+    shippingUniversityId?: boolean
+    shippingUniversity?: boolean | UniversityDefaultArgs<ExtArgs>
     user?: boolean | UserDefaultArgs<ExtArgs>
     orders?: boolean | OrderGroup$ordersArgs<ExtArgs>
     ratings?: boolean | OrderGroup$ratingsArgs<ExtArgs>
@@ -8435,6 +8491,10 @@ export namespace Prisma {
     status?: boolean
     paymentId?: boolean
     createdAt?: boolean
+    shippingName?: boolean
+    shippingHall?: boolean
+    shippingUniversityId?: boolean
+    shippingUniversity?: boolean | UniversityDefaultArgs<ExtArgs>
     user?: boolean | UserDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["orderGroup"]>
 
@@ -8445,6 +8505,10 @@ export namespace Prisma {
     status?: boolean
     paymentId?: boolean
     createdAt?: boolean
+    shippingName?: boolean
+    shippingHall?: boolean
+    shippingUniversityId?: boolean
+    shippingUniversity?: boolean | UniversityDefaultArgs<ExtArgs>
     user?: boolean | UserDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["orderGroup"]>
 
@@ -8455,25 +8519,32 @@ export namespace Prisma {
     status?: boolean
     paymentId?: boolean
     createdAt?: boolean
+    shippingName?: boolean
+    shippingHall?: boolean
+    shippingUniversityId?: boolean
   }
 
-  export type OrderGroupOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "total" | "status" | "paymentId" | "createdAt", ExtArgs["result"]["orderGroup"]>
+  export type OrderGroupOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "total" | "status" | "paymentId" | "createdAt" | "shippingName" | "shippingHall" | "shippingUniversityId", ExtArgs["result"]["orderGroup"]>
   export type OrderGroupInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    shippingUniversity?: boolean | UniversityDefaultArgs<ExtArgs>
     user?: boolean | UserDefaultArgs<ExtArgs>
     orders?: boolean | OrderGroup$ordersArgs<ExtArgs>
     ratings?: boolean | OrderGroup$ratingsArgs<ExtArgs>
     _count?: boolean | OrderGroupCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type OrderGroupIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    shippingUniversity?: boolean | UniversityDefaultArgs<ExtArgs>
     user?: boolean | UserDefaultArgs<ExtArgs>
   }
   export type OrderGroupIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    shippingUniversity?: boolean | UniversityDefaultArgs<ExtArgs>
     user?: boolean | UserDefaultArgs<ExtArgs>
   }
 
   export type $OrderGroupPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "OrderGroup"
     objects: {
+      shippingUniversity: Prisma.$UniversityPayload<ExtArgs>
       user: Prisma.$UserPayload<ExtArgs>
       orders: Prisma.$OrderPayload<ExtArgs>[]
       ratings: Prisma.$RatingPayload<ExtArgs>[]
@@ -8485,6 +8556,9 @@ export namespace Prisma {
       status: string
       paymentId: string | null
       createdAt: Date
+      shippingName: string
+      shippingHall: string
+      shippingUniversityId: string
     }, ExtArgs["result"]["orderGroup"]>
     composites: {}
   }
@@ -8879,6 +8953,7 @@ export namespace Prisma {
    */
   export interface Prisma__OrderGroupClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
+    shippingUniversity<T extends UniversityDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UniversityDefaultArgs<ExtArgs>>): Prisma__UniversityClient<$Result.GetResult<Prisma.$UniversityPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     orders<T extends OrderGroup$ordersArgs<ExtArgs> = {}>(args?: Subset<T, OrderGroup$ordersArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$OrderPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     ratings<T extends OrderGroup$ratingsArgs<ExtArgs> = {}>(args?: Subset<T, OrderGroup$ratingsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$RatingPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -8917,6 +8992,9 @@ export namespace Prisma {
     readonly status: FieldRef<"OrderGroup", 'String'>
     readonly paymentId: FieldRef<"OrderGroup", 'String'>
     readonly createdAt: FieldRef<"OrderGroup", 'DateTime'>
+    readonly shippingName: FieldRef<"OrderGroup", 'String'>
+    readonly shippingHall: FieldRef<"OrderGroup", 'String'>
+    readonly shippingUniversityId: FieldRef<"OrderGroup", 'String'>
   }
     
 
@@ -14077,6 +14155,8 @@ export namespace Prisma {
   export type UniversitySelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     name?: boolean
+    shippingOrderGroups?: boolean | University$shippingOrderGroupsArgs<ExtArgs>
+    _count?: boolean | UniversityCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["university"]>
 
   export type UniversitySelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -14095,10 +14175,18 @@ export namespace Prisma {
   }
 
   export type UniversityOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name", ExtArgs["result"]["university"]>
+  export type UniversityInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    shippingOrderGroups?: boolean | University$shippingOrderGroupsArgs<ExtArgs>
+    _count?: boolean | UniversityCountOutputTypeDefaultArgs<ExtArgs>
+  }
+  export type UniversityIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
+  export type UniversityIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
 
   export type $UniversityPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "University"
-    objects: {}
+    objects: {
+      shippingOrderGroups: Prisma.$OrderGroupPayload<ExtArgs>[]
+    }
     scalars: $Extensions.GetPayloadResult<{
       id: string
       name: string
@@ -14496,6 +14584,7 @@ export namespace Prisma {
    */
   export interface Prisma__UniversityClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
+    shippingOrderGroups<T extends University$shippingOrderGroupsArgs<ExtArgs> = {}>(args?: Subset<T, University$shippingOrderGroupsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$OrderGroupPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -14544,6 +14633,10 @@ export namespace Prisma {
      */
     omit?: UniversityOmit<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UniversityInclude<ExtArgs> | null
+    /**
      * Filter, which University to fetch.
      */
     where: UniversityWhereUniqueInput
@@ -14562,6 +14655,10 @@ export namespace Prisma {
      */
     omit?: UniversityOmit<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UniversityInclude<ExtArgs> | null
+    /**
      * Filter, which University to fetch.
      */
     where: UniversityWhereUniqueInput
@@ -14579,6 +14676,10 @@ export namespace Prisma {
      * Omit specific fields from the University
      */
     omit?: UniversityOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UniversityInclude<ExtArgs> | null
     /**
      * Filter, which University to fetch.
      */
@@ -14628,6 +14729,10 @@ export namespace Prisma {
      */
     omit?: UniversityOmit<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UniversityInclude<ExtArgs> | null
+    /**
      * Filter, which University to fetch.
      */
     where?: UniversityWhereInput
@@ -14676,6 +14781,10 @@ export namespace Prisma {
      */
     omit?: UniversityOmit<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UniversityInclude<ExtArgs> | null
+    /**
      * Filter, which Universities to fetch.
      */
     where?: UniversityWhereInput
@@ -14718,6 +14827,10 @@ export namespace Prisma {
      * Omit specific fields from the University
      */
     omit?: UniversityOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UniversityInclude<ExtArgs> | null
     /**
      * The data needed to create a University.
      */
@@ -14766,6 +14879,10 @@ export namespace Prisma {
      * Omit specific fields from the University
      */
     omit?: UniversityOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UniversityInclude<ExtArgs> | null
     /**
      * The data needed to update a University.
      */
@@ -14833,6 +14950,10 @@ export namespace Prisma {
      */
     omit?: UniversityOmit<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UniversityInclude<ExtArgs> | null
+    /**
      * The filter to search for the University to update in case it exists.
      */
     where: UniversityWhereUniqueInput
@@ -14859,6 +14980,10 @@ export namespace Prisma {
      */
     omit?: UniversityOmit<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UniversityInclude<ExtArgs> | null
+    /**
      * Filter which University to delete.
      */
     where: UniversityWhereUniqueInput
@@ -14879,6 +15004,30 @@ export namespace Prisma {
   }
 
   /**
+   * University.shippingOrderGroups
+   */
+  export type University$shippingOrderGroupsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the OrderGroup
+     */
+    select?: OrderGroupSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the OrderGroup
+     */
+    omit?: OrderGroupOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: OrderGroupInclude<ExtArgs> | null
+    where?: OrderGroupWhereInput
+    orderBy?: OrderGroupOrderByWithRelationInput | OrderGroupOrderByWithRelationInput[]
+    cursor?: OrderGroupWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: OrderGroupScalarFieldEnum | OrderGroupScalarFieldEnum[]
+  }
+
+  /**
    * University without action
    */
   export type UniversityDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -14890,6 +15039,10 @@ export namespace Prisma {
      * Omit specific fields from the University
      */
     omit?: UniversityOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UniversityInclude<ExtArgs> | null
   }
 
 
@@ -16133,7 +16286,10 @@ export namespace Prisma {
     total: 'total',
     status: 'status',
     paymentId: 'paymentId',
-    createdAt: 'createdAt'
+    createdAt: 'createdAt',
+    shippingName: 'shippingName',
+    shippingHall: 'shippingHall',
+    shippingUniversityId: 'shippingUniversityId'
   };
 
   export type OrderGroupScalarFieldEnum = (typeof OrderGroupScalarFieldEnum)[keyof typeof OrderGroupScalarFieldEnum]
@@ -16704,6 +16860,10 @@ export namespace Prisma {
     status?: StringFilter<"OrderGroup"> | string
     paymentId?: StringNullableFilter<"OrderGroup"> | string | null
     createdAt?: DateTimeFilter<"OrderGroup"> | Date | string
+    shippingName?: StringFilter<"OrderGroup"> | string
+    shippingHall?: StringFilter<"OrderGroup"> | string
+    shippingUniversityId?: StringFilter<"OrderGroup"> | string
+    shippingUniversity?: XOR<UniversityScalarRelationFilter, UniversityWhereInput>
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
     orders?: OrderListRelationFilter
     ratings?: RatingListRelationFilter
@@ -16716,6 +16876,10 @@ export namespace Prisma {
     status?: SortOrder
     paymentId?: SortOrderInput | SortOrder
     createdAt?: SortOrder
+    shippingName?: SortOrder
+    shippingHall?: SortOrder
+    shippingUniversityId?: SortOrder
+    shippingUniversity?: UniversityOrderByWithRelationInput
     user?: UserOrderByWithRelationInput
     orders?: OrderOrderByRelationAggregateInput
     ratings?: RatingOrderByRelationAggregateInput
@@ -16731,6 +16895,10 @@ export namespace Prisma {
     status?: StringFilter<"OrderGroup"> | string
     paymentId?: StringNullableFilter<"OrderGroup"> | string | null
     createdAt?: DateTimeFilter<"OrderGroup"> | Date | string
+    shippingName?: StringFilter<"OrderGroup"> | string
+    shippingHall?: StringFilter<"OrderGroup"> | string
+    shippingUniversityId?: StringFilter<"OrderGroup"> | string
+    shippingUniversity?: XOR<UniversityScalarRelationFilter, UniversityWhereInput>
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
     orders?: OrderListRelationFilter
     ratings?: RatingListRelationFilter
@@ -16743,6 +16911,9 @@ export namespace Prisma {
     status?: SortOrder
     paymentId?: SortOrderInput | SortOrder
     createdAt?: SortOrder
+    shippingName?: SortOrder
+    shippingHall?: SortOrder
+    shippingUniversityId?: SortOrder
     _count?: OrderGroupCountOrderByAggregateInput
     _avg?: OrderGroupAvgOrderByAggregateInput
     _max?: OrderGroupMaxOrderByAggregateInput
@@ -16760,6 +16931,9 @@ export namespace Prisma {
     status?: StringWithAggregatesFilter<"OrderGroup"> | string
     paymentId?: StringNullableWithAggregatesFilter<"OrderGroup"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"OrderGroup"> | Date | string
+    shippingName?: StringWithAggregatesFilter<"OrderGroup"> | string
+    shippingHall?: StringWithAggregatesFilter<"OrderGroup"> | string
+    shippingUniversityId?: StringWithAggregatesFilter<"OrderGroup"> | string
   }
 
   export type OrderWhereInput = {
@@ -17022,11 +17196,13 @@ export namespace Prisma {
     NOT?: UniversityWhereInput | UniversityWhereInput[]
     id?: StringFilter<"University"> | string
     name?: StringFilter<"University"> | string
+    shippingOrderGroups?: OrderGroupListRelationFilter
   }
 
   export type UniversityOrderByWithRelationInput = {
     id?: SortOrder
     name?: SortOrder
+    shippingOrderGroups?: OrderGroupOrderByRelationAggregateInput
   }
 
   export type UniversityWhereUniqueInput = Prisma.AtLeast<{
@@ -17035,6 +17211,7 @@ export namespace Prisma {
     AND?: UniversityWhereInput | UniversityWhereInput[]
     OR?: UniversityWhereInput[]
     NOT?: UniversityWhereInput | UniversityWhereInput[]
+    shippingOrderGroups?: OrderGroupListRelationFilter
   }, "id" | "name">
 
   export type UniversityOrderByWithAggregationInput = {
@@ -17537,6 +17714,9 @@ export namespace Prisma {
     status: string
     paymentId?: string | null
     createdAt?: Date | string
+    shippingName: string
+    shippingHall: string
+    shippingUniversity: UniversityCreateNestedOneWithoutShippingOrderGroupsInput
     user: UserCreateNestedOneWithoutOrderGroupsInput
     orders?: OrderCreateNestedManyWithoutOrderGroupInput
     ratings?: RatingCreateNestedManyWithoutOrderGroupInput
@@ -17549,6 +17729,9 @@ export namespace Prisma {
     status: string
     paymentId?: string | null
     createdAt?: Date | string
+    shippingName: string
+    shippingHall: string
+    shippingUniversityId: string
     orders?: OrderUncheckedCreateNestedManyWithoutOrderGroupInput
     ratings?: RatingUncheckedCreateNestedManyWithoutOrderGroupInput
   }
@@ -17559,6 +17742,9 @@ export namespace Prisma {
     status?: StringFieldUpdateOperationsInput | string
     paymentId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    shippingName?: StringFieldUpdateOperationsInput | string
+    shippingHall?: StringFieldUpdateOperationsInput | string
+    shippingUniversity?: UniversityUpdateOneRequiredWithoutShippingOrderGroupsNestedInput
     user?: UserUpdateOneRequiredWithoutOrderGroupsNestedInput
     orders?: OrderUpdateManyWithoutOrderGroupNestedInput
     ratings?: RatingUpdateManyWithoutOrderGroupNestedInput
@@ -17571,6 +17757,9 @@ export namespace Prisma {
     status?: StringFieldUpdateOperationsInput | string
     paymentId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    shippingName?: StringFieldUpdateOperationsInput | string
+    shippingHall?: StringFieldUpdateOperationsInput | string
+    shippingUniversityId?: StringFieldUpdateOperationsInput | string
     orders?: OrderUncheckedUpdateManyWithoutOrderGroupNestedInput
     ratings?: RatingUncheckedUpdateManyWithoutOrderGroupNestedInput
   }
@@ -17582,6 +17771,9 @@ export namespace Prisma {
     status: string
     paymentId?: string | null
     createdAt?: Date | string
+    shippingName: string
+    shippingHall: string
+    shippingUniversityId: string
   }
 
   export type OrderGroupUpdateManyMutationInput = {
@@ -17590,6 +17782,8 @@ export namespace Prisma {
     status?: StringFieldUpdateOperationsInput | string
     paymentId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    shippingName?: StringFieldUpdateOperationsInput | string
+    shippingHall?: StringFieldUpdateOperationsInput | string
   }
 
   export type OrderGroupUncheckedUpdateManyInput = {
@@ -17599,6 +17793,9 @@ export namespace Prisma {
     status?: StringFieldUpdateOperationsInput | string
     paymentId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    shippingName?: StringFieldUpdateOperationsInput | string
+    shippingHall?: StringFieldUpdateOperationsInput | string
+    shippingUniversityId?: StringFieldUpdateOperationsInput | string
   }
 
   export type OrderCreateInput = {
@@ -17849,21 +18046,25 @@ export namespace Prisma {
   export type UniversityCreateInput = {
     id?: string
     name: string
+    shippingOrderGroups?: OrderGroupCreateNestedManyWithoutShippingUniversityInput
   }
 
   export type UniversityUncheckedCreateInput = {
     id?: string
     name: string
+    shippingOrderGroups?: OrderGroupUncheckedCreateNestedManyWithoutShippingUniversityInput
   }
 
   export type UniversityUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
+    shippingOrderGroups?: OrderGroupUpdateManyWithoutShippingUniversityNestedInput
   }
 
   export type UniversityUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
+    shippingOrderGroups?: OrderGroupUncheckedUpdateManyWithoutShippingUniversityNestedInput
   }
 
   export type UniversityCreateManyInput = {
@@ -18454,6 +18655,11 @@ export namespace Prisma {
     productId?: SortOrder
   }
 
+  export type UniversityScalarRelationFilter = {
+    is?: UniversityWhereInput
+    isNot?: UniversityWhereInput
+  }
+
   export type OrderGroupCountOrderByAggregateInput = {
     id?: SortOrder
     userId?: SortOrder
@@ -18461,6 +18667,9 @@ export namespace Prisma {
     status?: SortOrder
     paymentId?: SortOrder
     createdAt?: SortOrder
+    shippingName?: SortOrder
+    shippingHall?: SortOrder
+    shippingUniversityId?: SortOrder
   }
 
   export type OrderGroupAvgOrderByAggregateInput = {
@@ -18474,6 +18683,9 @@ export namespace Prisma {
     status?: SortOrder
     paymentId?: SortOrder
     createdAt?: SortOrder
+    shippingName?: SortOrder
+    shippingHall?: SortOrder
+    shippingUniversityId?: SortOrder
   }
 
   export type OrderGroupMinOrderByAggregateInput = {
@@ -18483,6 +18695,9 @@ export namespace Prisma {
     status?: SortOrder
     paymentId?: SortOrder
     createdAt?: SortOrder
+    shippingName?: SortOrder
+    shippingHall?: SortOrder
+    shippingUniversityId?: SortOrder
   }
 
   export type OrderGroupSumOrderByAggregateInput = {
@@ -19353,6 +19568,12 @@ export namespace Prisma {
     update?: XOR<XOR<ProductUpdateToOneWithWhereWithoutImagesInput, ProductUpdateWithoutImagesInput>, ProductUncheckedUpdateWithoutImagesInput>
   }
 
+  export type UniversityCreateNestedOneWithoutShippingOrderGroupsInput = {
+    create?: XOR<UniversityCreateWithoutShippingOrderGroupsInput, UniversityUncheckedCreateWithoutShippingOrderGroupsInput>
+    connectOrCreate?: UniversityCreateOrConnectWithoutShippingOrderGroupsInput
+    connect?: UniversityWhereUniqueInput
+  }
+
   export type UserCreateNestedOneWithoutOrderGroupsInput = {
     create?: XOR<UserCreateWithoutOrderGroupsInput, UserUncheckedCreateWithoutOrderGroupsInput>
     connectOrCreate?: UserCreateOrConnectWithoutOrderGroupsInput
@@ -19385,6 +19606,14 @@ export namespace Prisma {
     connectOrCreate?: RatingCreateOrConnectWithoutOrderGroupInput | RatingCreateOrConnectWithoutOrderGroupInput[]
     createMany?: RatingCreateManyOrderGroupInputEnvelope
     connect?: RatingWhereUniqueInput | RatingWhereUniqueInput[]
+  }
+
+  export type UniversityUpdateOneRequiredWithoutShippingOrderGroupsNestedInput = {
+    create?: XOR<UniversityCreateWithoutShippingOrderGroupsInput, UniversityUncheckedCreateWithoutShippingOrderGroupsInput>
+    connectOrCreate?: UniversityCreateOrConnectWithoutShippingOrderGroupsInput
+    upsert?: UniversityUpsertWithoutShippingOrderGroupsInput
+    connect?: UniversityWhereUniqueInput
+    update?: XOR<XOR<UniversityUpdateToOneWithWhereWithoutShippingOrderGroupsInput, UniversityUpdateWithoutShippingOrderGroupsInput>, UniversityUncheckedUpdateWithoutShippingOrderGroupsInput>
   }
 
   export type UserUpdateOneRequiredWithoutOrderGroupsNestedInput = {
@@ -19831,6 +20060,48 @@ export namespace Prisma {
     deleteMany?: ProductScalarWhereInput | ProductScalarWhereInput[]
   }
 
+  export type OrderGroupCreateNestedManyWithoutShippingUniversityInput = {
+    create?: XOR<OrderGroupCreateWithoutShippingUniversityInput, OrderGroupUncheckedCreateWithoutShippingUniversityInput> | OrderGroupCreateWithoutShippingUniversityInput[] | OrderGroupUncheckedCreateWithoutShippingUniversityInput[]
+    connectOrCreate?: OrderGroupCreateOrConnectWithoutShippingUniversityInput | OrderGroupCreateOrConnectWithoutShippingUniversityInput[]
+    createMany?: OrderGroupCreateManyShippingUniversityInputEnvelope
+    connect?: OrderGroupWhereUniqueInput | OrderGroupWhereUniqueInput[]
+  }
+
+  export type OrderGroupUncheckedCreateNestedManyWithoutShippingUniversityInput = {
+    create?: XOR<OrderGroupCreateWithoutShippingUniversityInput, OrderGroupUncheckedCreateWithoutShippingUniversityInput> | OrderGroupCreateWithoutShippingUniversityInput[] | OrderGroupUncheckedCreateWithoutShippingUniversityInput[]
+    connectOrCreate?: OrderGroupCreateOrConnectWithoutShippingUniversityInput | OrderGroupCreateOrConnectWithoutShippingUniversityInput[]
+    createMany?: OrderGroupCreateManyShippingUniversityInputEnvelope
+    connect?: OrderGroupWhereUniqueInput | OrderGroupWhereUniqueInput[]
+  }
+
+  export type OrderGroupUpdateManyWithoutShippingUniversityNestedInput = {
+    create?: XOR<OrderGroupCreateWithoutShippingUniversityInput, OrderGroupUncheckedCreateWithoutShippingUniversityInput> | OrderGroupCreateWithoutShippingUniversityInput[] | OrderGroupUncheckedCreateWithoutShippingUniversityInput[]
+    connectOrCreate?: OrderGroupCreateOrConnectWithoutShippingUniversityInput | OrderGroupCreateOrConnectWithoutShippingUniversityInput[]
+    upsert?: OrderGroupUpsertWithWhereUniqueWithoutShippingUniversityInput | OrderGroupUpsertWithWhereUniqueWithoutShippingUniversityInput[]
+    createMany?: OrderGroupCreateManyShippingUniversityInputEnvelope
+    set?: OrderGroupWhereUniqueInput | OrderGroupWhereUniqueInput[]
+    disconnect?: OrderGroupWhereUniqueInput | OrderGroupWhereUniqueInput[]
+    delete?: OrderGroupWhereUniqueInput | OrderGroupWhereUniqueInput[]
+    connect?: OrderGroupWhereUniqueInput | OrderGroupWhereUniqueInput[]
+    update?: OrderGroupUpdateWithWhereUniqueWithoutShippingUniversityInput | OrderGroupUpdateWithWhereUniqueWithoutShippingUniversityInput[]
+    updateMany?: OrderGroupUpdateManyWithWhereWithoutShippingUniversityInput | OrderGroupUpdateManyWithWhereWithoutShippingUniversityInput[]
+    deleteMany?: OrderGroupScalarWhereInput | OrderGroupScalarWhereInput[]
+  }
+
+  export type OrderGroupUncheckedUpdateManyWithoutShippingUniversityNestedInput = {
+    create?: XOR<OrderGroupCreateWithoutShippingUniversityInput, OrderGroupUncheckedCreateWithoutShippingUniversityInput> | OrderGroupCreateWithoutShippingUniversityInput[] | OrderGroupUncheckedCreateWithoutShippingUniversityInput[]
+    connectOrCreate?: OrderGroupCreateOrConnectWithoutShippingUniversityInput | OrderGroupCreateOrConnectWithoutShippingUniversityInput[]
+    upsert?: OrderGroupUpsertWithWhereUniqueWithoutShippingUniversityInput | OrderGroupUpsertWithWhereUniqueWithoutShippingUniversityInput[]
+    createMany?: OrderGroupCreateManyShippingUniversityInputEnvelope
+    set?: OrderGroupWhereUniqueInput | OrderGroupWhereUniqueInput[]
+    disconnect?: OrderGroupWhereUniqueInput | OrderGroupWhereUniqueInput[]
+    delete?: OrderGroupWhereUniqueInput | OrderGroupWhereUniqueInput[]
+    connect?: OrderGroupWhereUniqueInput | OrderGroupWhereUniqueInput[]
+    update?: OrderGroupUpdateWithWhereUniqueWithoutShippingUniversityInput | OrderGroupUpdateWithWhereUniqueWithoutShippingUniversityInput[]
+    updateMany?: OrderGroupUpdateManyWithWhereWithoutShippingUniversityInput | OrderGroupUpdateManyWithWhereWithoutShippingUniversityInput[]
+    deleteMany?: OrderGroupScalarWhereInput | OrderGroupScalarWhereInput[]
+  }
+
   export type OrderCreateNestedOneWithoutDiscountInput = {
     create?: XOR<OrderCreateWithoutDiscountInput, OrderUncheckedCreateWithoutDiscountInput>
     connectOrCreate?: OrderCreateOrConnectWithoutDiscountInput
@@ -20130,6 +20401,9 @@ export namespace Prisma {
     status: string
     paymentId?: string | null
     createdAt?: Date | string
+    shippingName: string
+    shippingHall: string
+    shippingUniversity: UniversityCreateNestedOneWithoutShippingOrderGroupsInput
     orders?: OrderCreateNestedManyWithoutOrderGroupInput
     ratings?: RatingCreateNestedManyWithoutOrderGroupInput
   }
@@ -20140,6 +20414,9 @@ export namespace Prisma {
     status: string
     paymentId?: string | null
     createdAt?: Date | string
+    shippingName: string
+    shippingHall: string
+    shippingUniversityId: string
     orders?: OrderUncheckedCreateNestedManyWithoutOrderGroupInput
     ratings?: RatingUncheckedCreateNestedManyWithoutOrderGroupInput
   }
@@ -20304,6 +20581,9 @@ export namespace Prisma {
     status?: StringFilter<"OrderGroup"> | string
     paymentId?: StringNullableFilter<"OrderGroup"> | string | null
     createdAt?: DateTimeFilter<"OrderGroup"> | Date | string
+    shippingName?: StringFilter<"OrderGroup"> | string
+    shippingHall?: StringFilter<"OrderGroup"> | string
+    shippingUniversityId?: StringFilter<"OrderGroup"> | string
   }
 
   export type BusinessUpsertWithoutUserInput = {
@@ -20737,6 +21017,9 @@ export namespace Prisma {
     status: string
     paymentId?: string | null
     createdAt?: Date | string
+    shippingName: string
+    shippingHall: string
+    shippingUniversity: UniversityCreateNestedOneWithoutShippingOrderGroupsInput
     user: UserCreateNestedOneWithoutOrderGroupsInput
     orders?: OrderCreateNestedManyWithoutOrderGroupInput
   }
@@ -20748,6 +21031,9 @@ export namespace Prisma {
     status: string
     paymentId?: string | null
     createdAt?: Date | string
+    shippingName: string
+    shippingHall: string
+    shippingUniversityId: string
     orders?: OrderUncheckedCreateNestedManyWithoutOrderGroupInput
   }
 
@@ -20845,6 +21131,9 @@ export namespace Prisma {
     status?: StringFieldUpdateOperationsInput | string
     paymentId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    shippingName?: StringFieldUpdateOperationsInput | string
+    shippingHall?: StringFieldUpdateOperationsInput | string
+    shippingUniversity?: UniversityUpdateOneRequiredWithoutShippingOrderGroupsNestedInput
     user?: UserUpdateOneRequiredWithoutOrderGroupsNestedInput
     orders?: OrderUpdateManyWithoutOrderGroupNestedInput
   }
@@ -20856,6 +21145,9 @@ export namespace Prisma {
     status?: StringFieldUpdateOperationsInput | string
     paymentId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    shippingName?: StringFieldUpdateOperationsInput | string
+    shippingHall?: StringFieldUpdateOperationsInput | string
+    shippingUniversityId?: StringFieldUpdateOperationsInput | string
     orders?: OrderUncheckedUpdateManyWithoutOrderGroupNestedInput
   }
 
@@ -21216,6 +21508,21 @@ export namespace Prisma {
     orderItems?: OrderItemUncheckedUpdateManyWithoutProductNestedInput
   }
 
+  export type UniversityCreateWithoutShippingOrderGroupsInput = {
+    id?: string
+    name: string
+  }
+
+  export type UniversityUncheckedCreateWithoutShippingOrderGroupsInput = {
+    id?: string
+    name: string
+  }
+
+  export type UniversityCreateOrConnectWithoutShippingOrderGroupsInput = {
+    where: UniversityWhereUniqueInput
+    create: XOR<UniversityCreateWithoutShippingOrderGroupsInput, UniversityUncheckedCreateWithoutShippingOrderGroupsInput>
+  }
+
   export type UserCreateWithoutOrderGroupsInput = {
     id?: string
     email: string
@@ -21313,6 +21620,27 @@ export namespace Prisma {
   export type RatingCreateManyOrderGroupInputEnvelope = {
     data: RatingCreateManyOrderGroupInput | RatingCreateManyOrderGroupInput[]
     skipDuplicates?: boolean
+  }
+
+  export type UniversityUpsertWithoutShippingOrderGroupsInput = {
+    update: XOR<UniversityUpdateWithoutShippingOrderGroupsInput, UniversityUncheckedUpdateWithoutShippingOrderGroupsInput>
+    create: XOR<UniversityCreateWithoutShippingOrderGroupsInput, UniversityUncheckedCreateWithoutShippingOrderGroupsInput>
+    where?: UniversityWhereInput
+  }
+
+  export type UniversityUpdateToOneWithWhereWithoutShippingOrderGroupsInput = {
+    where?: UniversityWhereInput
+    data: XOR<UniversityUpdateWithoutShippingOrderGroupsInput, UniversityUncheckedUpdateWithoutShippingOrderGroupsInput>
+  }
+
+  export type UniversityUpdateWithoutShippingOrderGroupsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type UniversityUncheckedUpdateWithoutShippingOrderGroupsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
   }
 
   export type UserUpsertWithoutOrderGroupsInput = {
@@ -21462,6 +21790,9 @@ export namespace Prisma {
     status: string
     paymentId?: string | null
     createdAt?: Date | string
+    shippingName: string
+    shippingHall: string
+    shippingUniversity: UniversityCreateNestedOneWithoutShippingOrderGroupsInput
     user: UserCreateNestedOneWithoutOrderGroupsInput
     ratings?: RatingCreateNestedManyWithoutOrderGroupInput
   }
@@ -21473,6 +21804,9 @@ export namespace Prisma {
     status: string
     paymentId?: string | null
     createdAt?: Date | string
+    shippingName: string
+    shippingHall: string
+    shippingUniversityId: string
     ratings?: RatingUncheckedCreateNestedManyWithoutOrderGroupInput
   }
 
@@ -21657,6 +21991,9 @@ export namespace Prisma {
     status?: StringFieldUpdateOperationsInput | string
     paymentId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    shippingName?: StringFieldUpdateOperationsInput | string
+    shippingHall?: StringFieldUpdateOperationsInput | string
+    shippingUniversity?: UniversityUpdateOneRequiredWithoutShippingOrderGroupsNestedInput
     user?: UserUpdateOneRequiredWithoutOrderGroupsNestedInput
     ratings?: RatingUpdateManyWithoutOrderGroupNestedInput
   }
@@ -21668,6 +22005,9 @@ export namespace Prisma {
     status?: StringFieldUpdateOperationsInput | string
     paymentId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    shippingName?: StringFieldUpdateOperationsInput | string
+    shippingHall?: StringFieldUpdateOperationsInput | string
+    shippingUniversityId?: StringFieldUpdateOperationsInput | string
     ratings?: RatingUncheckedUpdateManyWithoutOrderGroupNestedInput
   }
 
@@ -22190,6 +22530,58 @@ export namespace Prisma {
     data: XOR<ProductUpdateManyMutationInput, ProductUncheckedUpdateManyWithoutSubCategoriesInput>
   }
 
+  export type OrderGroupCreateWithoutShippingUniversityInput = {
+    id?: string
+    total: number
+    status: string
+    paymentId?: string | null
+    createdAt?: Date | string
+    shippingName: string
+    shippingHall: string
+    user: UserCreateNestedOneWithoutOrderGroupsInput
+    orders?: OrderCreateNestedManyWithoutOrderGroupInput
+    ratings?: RatingCreateNestedManyWithoutOrderGroupInput
+  }
+
+  export type OrderGroupUncheckedCreateWithoutShippingUniversityInput = {
+    id?: string
+    userId: string
+    total: number
+    status: string
+    paymentId?: string | null
+    createdAt?: Date | string
+    shippingName: string
+    shippingHall: string
+    orders?: OrderUncheckedCreateNestedManyWithoutOrderGroupInput
+    ratings?: RatingUncheckedCreateNestedManyWithoutOrderGroupInput
+  }
+
+  export type OrderGroupCreateOrConnectWithoutShippingUniversityInput = {
+    where: OrderGroupWhereUniqueInput
+    create: XOR<OrderGroupCreateWithoutShippingUniversityInput, OrderGroupUncheckedCreateWithoutShippingUniversityInput>
+  }
+
+  export type OrderGroupCreateManyShippingUniversityInputEnvelope = {
+    data: OrderGroupCreateManyShippingUniversityInput | OrderGroupCreateManyShippingUniversityInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type OrderGroupUpsertWithWhereUniqueWithoutShippingUniversityInput = {
+    where: OrderGroupWhereUniqueInput
+    update: XOR<OrderGroupUpdateWithoutShippingUniversityInput, OrderGroupUncheckedUpdateWithoutShippingUniversityInput>
+    create: XOR<OrderGroupCreateWithoutShippingUniversityInput, OrderGroupUncheckedCreateWithoutShippingUniversityInput>
+  }
+
+  export type OrderGroupUpdateWithWhereUniqueWithoutShippingUniversityInput = {
+    where: OrderGroupWhereUniqueInput
+    data: XOR<OrderGroupUpdateWithoutShippingUniversityInput, OrderGroupUncheckedUpdateWithoutShippingUniversityInput>
+  }
+
+  export type OrderGroupUpdateManyWithWhereWithoutShippingUniversityInput = {
+    where: OrderGroupScalarWhereInput
+    data: XOR<OrderGroupUpdateManyMutationInput, OrderGroupUncheckedUpdateManyWithoutShippingUniversityInput>
+  }
+
   export type OrderCreateWithoutDiscountInput = {
     id?: string
     total: number
@@ -22351,6 +22743,9 @@ export namespace Prisma {
     status: string
     paymentId?: string | null
     createdAt?: Date | string
+    shippingName: string
+    shippingHall: string
+    shippingUniversityId: string
   }
 
   export type RatingCreateManyUserInput = {
@@ -22415,6 +22810,9 @@ export namespace Prisma {
     status?: StringFieldUpdateOperationsInput | string
     paymentId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    shippingName?: StringFieldUpdateOperationsInput | string
+    shippingHall?: StringFieldUpdateOperationsInput | string
+    shippingUniversity?: UniversityUpdateOneRequiredWithoutShippingOrderGroupsNestedInput
     orders?: OrderUpdateManyWithoutOrderGroupNestedInput
     ratings?: RatingUpdateManyWithoutOrderGroupNestedInput
   }
@@ -22425,6 +22823,9 @@ export namespace Prisma {
     status?: StringFieldUpdateOperationsInput | string
     paymentId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    shippingName?: StringFieldUpdateOperationsInput | string
+    shippingHall?: StringFieldUpdateOperationsInput | string
+    shippingUniversityId?: StringFieldUpdateOperationsInput | string
     orders?: OrderUncheckedUpdateManyWithoutOrderGroupNestedInput
     ratings?: RatingUncheckedUpdateManyWithoutOrderGroupNestedInput
   }
@@ -22435,6 +22836,9 @@ export namespace Prisma {
     status?: StringFieldUpdateOperationsInput | string
     paymentId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    shippingName?: StringFieldUpdateOperationsInput | string
+    shippingHall?: StringFieldUpdateOperationsInput | string
+    shippingUniversityId?: StringFieldUpdateOperationsInput | string
   }
 
   export type RatingUpdateWithoutUserInput = {
@@ -23070,6 +23474,54 @@ export namespace Prisma {
     stock?: IntFieldUpdateOperationsInput | number
     isAvailable?: BoolFieldUpdateOperationsInput | boolean
     businessId?: StringFieldUpdateOperationsInput | string
+  }
+
+  export type OrderGroupCreateManyShippingUniversityInput = {
+    id?: string
+    userId: string
+    total: number
+    status: string
+    paymentId?: string | null
+    createdAt?: Date | string
+    shippingName: string
+    shippingHall: string
+  }
+
+  export type OrderGroupUpdateWithoutShippingUniversityInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    total?: FloatFieldUpdateOperationsInput | number
+    status?: StringFieldUpdateOperationsInput | string
+    paymentId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    shippingName?: StringFieldUpdateOperationsInput | string
+    shippingHall?: StringFieldUpdateOperationsInput | string
+    user?: UserUpdateOneRequiredWithoutOrderGroupsNestedInput
+    orders?: OrderUpdateManyWithoutOrderGroupNestedInput
+    ratings?: RatingUpdateManyWithoutOrderGroupNestedInput
+  }
+
+  export type OrderGroupUncheckedUpdateWithoutShippingUniversityInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    total?: FloatFieldUpdateOperationsInput | number
+    status?: StringFieldUpdateOperationsInput | string
+    paymentId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    shippingName?: StringFieldUpdateOperationsInput | string
+    shippingHall?: StringFieldUpdateOperationsInput | string
+    orders?: OrderUncheckedUpdateManyWithoutOrderGroupNestedInput
+    ratings?: RatingUncheckedUpdateManyWithoutOrderGroupNestedInput
+  }
+
+  export type OrderGroupUncheckedUpdateManyWithoutShippingUniversityInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    total?: FloatFieldUpdateOperationsInput | number
+    status?: StringFieldUpdateOperationsInput | string
+    paymentId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    shippingName?: StringFieldUpdateOperationsInput | string
+    shippingHall?: StringFieldUpdateOperationsInput | string
   }
 
 

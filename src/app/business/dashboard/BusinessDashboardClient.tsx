@@ -29,21 +29,23 @@ export default function BusinessDashboardClient({
   const convertToModalOrder = (order: Order): OrderModalData => {
     return {
       id: order.id,
+      userId: order.userId,
+      businessId: order.businessId,
       status: order.status,
       total: order.total,
       createdAt: order.createdAt,
-      User: order.user,
-      Business: {
+      user: order.user,
+      business: {
         id: business.id,
         name: business.name,
         description: business.description
       },
-      OrderItems: order.orderItems ? order.orderItems.map(item => ({
+      orderItems: order.orderItems ? order.orderItems.map(item => ({
         id: item.id,
         quantity: item.quantity,
         price: item.price,
         productId: item.productId,
-        Product: item.product
+        product: item.product
       })) : []
     };
   };

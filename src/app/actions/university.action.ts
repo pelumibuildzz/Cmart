@@ -2,6 +2,7 @@
 
 import { getUniversities, getUniversityById } from '@/lib/services/university.service';
 import { getUserById } from '@/lib/services/user.service';
+import { prisma } from '@/lib/server/prisma';
 
 export async function fetchUniversities() {
   try {
@@ -14,23 +15,20 @@ export async function fetchUniversities() {
 
 export async function fetchUniversityData(userId: string) {
   try {
-    // First get the user to find their university ID
-    const user = await getUserById(userId);
-    if (!user || !user.universityId) {
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { universityId: true }
+    });
+
+    if (!user) {
       return null;
     }
 
-    // Then fetch the university details
-    const university = await getUniversityById(user.universityId);
-    if (!university) {
-      return null;
-    }
+    const university = await prisma.university.findUnique({
+      where: { id: user.universityId }
+    });
 
-    // Return only necessary data
-    return {
-      id: university.id,
-      name: university.name
-    };
+    return university;
   } catch (error) {
     console.error('Error fetching university data:', error);
     return null;

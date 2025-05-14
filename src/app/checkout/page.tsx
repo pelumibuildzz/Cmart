@@ -29,6 +29,12 @@ export default function CheckoutPage() {
   const router = useRouter();
   const [shippingCost, setShippingCost] = useState(0);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [shippingInfo, setShippingInfo] = useState({
+    name: '',
+    hall: '',
+    universityId: ''
+  });
+  const [universities, setUniversities] = useState<University[]>([]);
 
   // Group items by business
   const businessGroups = items.reduce((acc, item) => {
@@ -67,10 +73,27 @@ export default function CheckoutPage() {
         const university = await fetchUniversityData(session.user.id);
         if (isMounted) {
           setUserUniversity(university);
+          // Initialize shipping info with user data
+          setShippingInfo({
+            name: session.user.name || '',
+            hall: '',
+            universityId: university?.id || ''
+          });
           // Calculate shipping cost here based on university
           const calculatedShipping = university ? 500 : 0; // Example calculation
           setShippingCost(calculatedShipping);
         }
+      }
+
+      // Fetch all universities for dropdown
+      try {
+        const response = await fetch('/api/universities');
+        const data = await response.json();
+        if (isMounted && data.universities) {
+          setUniversities(data.universities);
+        }
+      } catch (error) {
+        console.error('Error fetching universities:', error);
       }
     };
 
@@ -108,6 +131,13 @@ export default function CheckoutPage() {
     try {
       setIsProcessing(true);
       
+      // Validate shipping info
+      if (!shippingInfo.name || !shippingInfo.hall || !shippingInfo.universityId) {
+        toast.error('Please complete your shipping information');
+        setIsProcessing(false);
+        return;
+      }
+      
       // For demo purposes - in a real app, integrate with Paystack or other payment provider
       // and get the actual payment ID from the payment response
       const mockPaymentId = `pay_${Date.now()}_${Math.random().toString(36).substring(2, 10)}`;
@@ -117,7 +147,9 @@ export default function CheckoutPage() {
         items,
         total,
         tax,
-        shippingCost
+        shippingCost,
+        undefined, // discountId
+        shippingInfo
       );
       
       if (result.error) {
@@ -193,19 +225,56 @@ export default function CheckoutPage() {
           <div className="bg-white rounded-lg shadow-md p-6">
             <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
               <MapPin className="h-5 w-5 text-primary" />
-              Delivery Location
+              Delivery Information
             </h2>
-            <div className="bg-gray-50 p-4 rounded-md">
-              {userUniversity ? (
-                <div>
-                  <p className="font-medium text-secondary">{userUniversity.name}</p>
-                  <p className="text-sm text-gray-600 mt-1">
-                    Delivery will be made to your university address
-                  </p>
-                </div>
-              ) : (
-                <p className="text-gray-600">Loading delivery location...</p>
-              )}
+            
+            <div className="space-y-4">
+              <div>
+                <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
+                  Recipient Name
+                </label>
+                <input
+                  type="text"
+                  id="name"
+                  value={shippingInfo.name}
+                  onChange={(e) => setShippingInfo({...shippingInfo, name: e.target.value})}
+                  className="w-full p-2 border border-gray-300 rounded-md"
+                  placeholder="Enter recipient name"
+                />
+              </div>
+              
+              <div>
+                <label htmlFor="hall" className="block text-sm font-medium text-gray-700 mb-1">
+                  Hall/Building
+                </label>
+                <input
+                  type="text"
+                  id="hall"
+                  value={shippingInfo.hall}
+                  onChange={(e) => setShippingInfo({...shippingInfo, hall: e.target.value})}
+                  className="w-full p-2 border border-gray-300 rounded-md"
+                  placeholder="Enter hall or building name"
+                />
+              </div>
+              
+              <div>
+                <label htmlFor="university" className="block text-sm font-medium text-gray-700 mb-1">
+                  University
+                </label>
+                <select
+                  id="university"
+                  value={shippingInfo.universityId}
+                  onChange={(e) => setShippingInfo({...shippingInfo, universityId: e.target.value})}
+                  className="w-full p-2 border border-gray-300 rounded-md"
+                >
+                  <option value="">Select University</option>
+                  {universities.map((uni) => (
+                    <option key={uni.id} value={uni.id}>
+                      {uni.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
           </div>
         </div>

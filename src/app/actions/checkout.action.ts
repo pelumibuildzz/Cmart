@@ -28,7 +28,12 @@ export async function createCheckout(
   totalAmount: number,
   taxAmount: number,
   shippingAmount: number,
-  discountId?: string
+  discountId?: string,
+  shippingInfo?: {
+    name: string;
+    hall: string;
+    universityId: string;
+  }
 ) {
   try {
     const session = await getSession();
@@ -62,6 +67,9 @@ export async function createCheckout(
       total: totalAmount,
       status: OrderStatus.PENDING,
       paymentId,
+      shippingName: shippingInfo?.name || session.user.name,
+      shippingHall: shippingInfo?.hall || 'Default Hall',
+      shippingUniversityId: shippingInfo?.universityId || session.user.universityId,
       orders: {
         create: [] // We'll create orders separately
       }

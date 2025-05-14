@@ -2,7 +2,7 @@ import { PrismaAdapter } from '@auth/prisma-adapter';
 import { type NextAuthOptions } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import { prisma } from '../server/prisma';
-import { getUserByEmail } from '../services/user.service';
+import { getUserByEmail, verifyPassword } from '../services/user.service';
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
@@ -32,9 +32,8 @@ export const authOptions: NextAuthOptions = {
           return null;
         }
 
-        // In a real application, you would compare hashed passwords
-        // This is just for demonstration purposes
-        const isPasswordValid = user.password === credentials.password;
+        // Using bcrypt to verify the password with the BCRYPT_SECRET pepper
+        const isPasswordValid = await verifyPassword(credentials.password, user.password);
         
         if (!isPasswordValid) {
           return null;

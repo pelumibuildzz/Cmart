@@ -1,5 +1,6 @@
 require('dotenv').config();
 const { PrismaClient } = require('../../src/generated/prisma');
+const bcrypt = require('bcryptjs');
 
 const Role = {
   USER: 'USER',
@@ -9,6 +10,13 @@ const Role = {
 
 const prisma = new PrismaClient();
 const defaultImageUrl = process.env.IMAGEKIT_URL_ENDPOINT + "/default-image.jpg";
+
+// Helper function to hash passwords
+async function hashPassword(password) {
+  const salt = await bcrypt.genSalt(10);
+  const pepper = process.env.BCRYPT_SECRET || '';
+  return bcrypt.hash(password + pepper, salt);
+}
 
 async function main() {
   console.log('Starting seed...');
@@ -126,12 +134,12 @@ async function main() {
 
   console.log('Categories and subcategories created');
 
-  // Create users
+  // Create users with hashed passwords
   const normalUser = await prisma.user.create({
     data: {
       name: 'John Doe',
       email: 'user@example.com',
-      password: 'password123',
+      password: await hashPassword('password123'),
       universityId: university1.id,
       role: Role.USER,
       totalOrders: 0,
@@ -144,7 +152,7 @@ async function main() {
     data: {
       name: 'Jane Smith',
       email: 'business1@example.com',
-      password: 'password123',
+      password: await hashPassword('password123'),
       universityId: university1.id,
       role: Role.BUSINESS,
       totalOrders: 0,
@@ -176,7 +184,7 @@ async function main() {
     data: {
       name: 'Mike Johnson',
       email: 'business2@example.com',
-      password: 'password123',
+      password: await hashPassword('password123'),
       universityId: university1.id,
       role: Role.BUSINESS,
       totalOrders: 0,
@@ -208,7 +216,7 @@ async function main() {
     data: {
       name: 'Sarah Williams',
       email: 'business3@example.com',
-      password: 'password123',
+      password: await hashPassword('password123'),
       universityId: university1.id,
       role: Role.BUSINESS,
       totalOrders: 0,
@@ -240,7 +248,7 @@ async function main() {
     data: {
       name: 'Admin User',
       email: 'admin@example.com',
-      password: 'password123',
+      password: await hashPassword('password123'),
       universityId: university1.id,
       role: Role.ADMIN,
       totalOrders: 0,

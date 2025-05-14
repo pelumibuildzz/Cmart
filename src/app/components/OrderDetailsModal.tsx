@@ -34,6 +34,35 @@ export default function OrderDetailsModal({
           </div>
         </div>
 
+        {/* Payment Receipt (if available) */}
+        {order.status === OrderStatus.UNVERIFIED && order.paymentReceiptImageUrl && (
+          <div>
+            <h4 className="text-sm font-medium text-gray-500 mb-2">Payment Receipt</h4>
+            <div className="bg-gray-50 rounded-lg p-4">
+              <p className="text-sm text-gray-900 mb-2">
+                Payer: {order.payerAccountName || 'Not provided'}
+              </p>
+              <div className="mt-2">
+                <a 
+                  href={order.paymentReceiptImageUrl} 
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center px-3 py-1 rounded-md text-sm font-medium bg-blue-100 text-blue-700 hover:bg-blue-200"
+                >
+                  View Receipt Image
+                </a>
+                <div className="mt-3">
+                  <img 
+                    src={order.paymentReceiptImageUrl} 
+                    alt="Payment Receipt" 
+                    className="max-w-full h-auto max-h-60 rounded-md"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Business Information */}
         <div>
           <h4 className="text-sm font-medium text-gray-500 mb-2">Business Information</h4>

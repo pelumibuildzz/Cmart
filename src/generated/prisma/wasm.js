@@ -191,6 +191,8 @@ exports.Prisma.OrderScalarFieldEnum = {
   total: 'total',
   status: 'status',
   paymentId: 'paymentId',
+  paymentReceiptImageUrl: 'paymentReceiptImageUrl',
+  payerAccountName: 'payerAccountName',
   createdAt: 'createdAt',
   discountId: 'discountId'
 };

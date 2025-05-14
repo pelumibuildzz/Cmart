@@ -60,9 +60,9 @@ export default function OrdersList({ orderGroups }: OrdersListProps) {
               {orderGroup.orders.map((order: any) => (
                 <div key={order.id} className="flex items-center gap-3">
                   <Store className="h-5 w-5 text-gray-500" />
-                  <span>{order.Business.name}</span>
+                  <span>{order.business.name}</span>
                   <span className="text-sm text-gray-600 ml-auto">
-                    {order.OrderItems.length} item{order.OrderItems.length !== 1 ? 's' : ''}
+                    {order.orderItems.length} item{order.orderItems.length !== 1 ? 's' : ''}
                   </span>
                 </div>
               ))}

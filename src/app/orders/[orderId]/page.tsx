@@ -94,24 +94,24 @@ export default async function OrderDetailsPage({ params }: OrderDetailsPageProps
           <div key={order.id} className="bg-white rounded-lg shadow-md overflow-hidden">
             <div className="bg-gray-50 p-4 flex items-center border-b">
               <Store className="h-5 w-5 text-primary mr-2" />
-              <span className="font-medium">{order.Business.name}</span>
+              <span className="font-medium">{order.business.name}</span>
               <OrderStatusBadge status={order.status} className="ml-auto" />
             </div>
             
             <div className="divide-y">
-              {order.OrderItems.map((item: any) => (
+              {order.orderItems.map((item: any) => (
                 <div key={item.id} className="p-4 flex items-center">
                   <div className="relative h-16 w-16 flex-shrink-0">
                     <Image
-                      src={item.Product.imageUrl}
-                      alt={item.Product.name}
+                      src={item.product.imageUrl}
+                      alt={item.product.name}
                       fill
                       className="object-cover rounded"
                     />
                   </div>
                   
                   <div className="ml-4 flex-grow">
-                    <h3 className="font-medium">{item.Product.name}</h3>
+                    <h3 className="font-medium">{item.product.name}</h3>
                     <p className="text-sm text-gray-600">
                       {item.quantity} × ₦{item.price.toFixed(2)}
                     </p>

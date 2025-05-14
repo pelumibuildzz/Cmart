@@ -76,6 +76,8 @@ export interface Order {
   total: number;
   status: string;
   paymentId?: string;
+  paymentReceiptImageUrl?: string;
+  payerAccountName?: string;
   createdAt: Date;
   user: User;
   business: {
@@ -97,6 +99,8 @@ export interface OrderModalData {
   total: number;
   status: string;
   paymentId?: string;
+  paymentReceiptImageUrl?: string;
+  payerAccountName?: string;
   createdAt: Date;
   user: User;
   business: {

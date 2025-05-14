@@ -1,4 +1,5 @@
 export const OrderStatus = {
+  UNVERIFIED: 'UNVERIFIED',
   PENDING: 'PENDING',
   PACKAGING: 'PACKAGING',
   DELIVERING: 'DELIVERING',
@@ -10,6 +11,7 @@ export const OrderStatus = {
 export type OrderStatusType = typeof OrderStatus[keyof typeof OrderStatus];
 
 export const OrderStatusColors = {
+  [OrderStatus.UNVERIFIED]: 'bg-orange-100 text-orange-800',
   [OrderStatus.PENDING]: 'bg-yellow-100 text-yellow-800',
   [OrderStatus.PACKAGING]: 'bg-blue-100 text-blue-800',
   [OrderStatus.DELIVERING]: 'bg-purple-100 text-purple-800',

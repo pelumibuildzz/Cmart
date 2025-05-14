@@ -34,6 +34,8 @@ export default function BusinessDashboardClient({
       status: order.status,
       total: order.total,
       createdAt: order.createdAt,
+      paymentReceiptImageUrl: order.paymentReceiptImageUrl,
+      payerAccountName: order.payerAccountName,
       user: order.user,
       business: {
         id: business.id,

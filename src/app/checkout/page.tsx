@@ -10,6 +10,7 @@ import { fetchBusinessData } from '../actions/business.action';
 import { fetchUniversityData } from '../actions/university.action';
 import { createCheckout } from '../actions/checkout.action';
 import { toast } from 'react-hot-toast';
+import Link from 'next/link';
 
 interface Business {
   id: string;
@@ -46,9 +47,9 @@ export default function CheckoutPage() {
 
   // Calculate totals
   const subtotal = items.reduce((total, item) => total + item.price * item.quantity, 0);
-  let tax = subtotal * 0.075; // 7.5% tax
+  // let tax = subtotal * 0.075; // 7.5% tax
   // if(tax > 2000) tax = 2000;
-  const total = subtotal + tax + shippingCost;
+  const total = subtotal + shippingCost;
 
   // Fetch business data and user's university
   useEffect(() => {
@@ -146,7 +147,7 @@ export default function CheckoutPage() {
         mockPaymentId,
         items,
         total,
-        tax,
+        // tax,
         shippingCost,
         undefined, // discountId
         shippingInfo
@@ -290,10 +291,10 @@ export default function CheckoutPage() {
                 <span className="font-medium">₦{subtotal.toFixed(2)}</span>
               </div>
               
-              <div className="flex justify-between">
+              {/* <div className="flex justify-between">
                 <span className="text-gray-600">VAT (7.5%)</span>
                 <span className="font-medium">₦{tax.toFixed(2)}</span>
-              </div>
+              </div> */}
               
               <div className="flex justify-between">
                 <span className="text-gray-600">Shipping</span>
@@ -313,14 +314,22 @@ export default function CheckoutPage() {
             <button
               onClick={handleCheckout}
               className="w-full mt-6 bg-primary text-white py-3 px-4 rounded-md hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              disabled={!userUniversity || shippingCost === 0 || isProcessing}
+              // disabled={!userUniversity || shippingCost === 0 || isProcessing}
+              disabled={true}
             >
               {isProcessing ? 'Processing...' : 'Proceed to Payment'}
             </button>
 
-            {/* <p className="text-sm text-gray-500 mt-4 text-center">
-              Payment will be processed securely via Paystack
-            </p> */}
+            <Link 
+              href="/checkout/bank-transfer"
+              className="block w-full mt-3 text-center text-primary py-2 px-4 border border-primary rounded-md hover:bg-primary/5 transition-colors"
+            >
+              Pay with Bank Transfer
+            </Link>
+
+            <p className="text-sm text-gray-500 mt-4 text-center">
+              Secured checkout process
+            </p>
           </div>
         </div>
       </div>

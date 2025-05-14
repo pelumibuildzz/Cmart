@@ -11,6 +11,8 @@ interface OrderStatusBadgeProps {
 export default function OrderStatusBadge({ status, className }: OrderStatusBadgeProps) {
   const getStatusColor = (status: string) => {
     switch (status) {
+      case OrderStatus.UNVERIFIED:
+        return 'bg-orange-100 text-orange-800';
       case OrderStatus.PENDING:
         return 'bg-blue-100 text-blue-800';
       case OrderStatus.PACKAGING:

@@ -107,21 +107,23 @@ model OrderGroup {
 }
 
 model Order {
-  id           String      @id @default(cuid())
-  userId       String
-  businessId   String
-  orderGroupId String?
-  total        Float
-  status       String // PENDING, PACKAGING, DELIVERING, DELIVERED, COMPLETED, CANCELLED
-  paymentId    String?
-  createdAt    DateTime    @default(now())
-  user         User        @relation(fields: [userId], references: [id])
-  business     Business    @relation(fields: [businessId], references: [id])
-  orderGroup   OrderGroup? @relation(fields: [orderGroupId], references: [id])
-  orderItems   OrderItem[]
-  ratings      Rating[]
-  discountId   String?     @unique
-  discount     Discount?   @relation(fields: [discountId], references: [id])
+  id                     String      @id @default(cuid())
+  userId                 String
+  businessId             String
+  orderGroupId           String?
+  total                  Float
+  status                 String // UNVERIFIED, PENDING, PACKAGING, DELIVERING, DELIVERED, COMPLETED, CANCELLED
+  paymentId              String?
+  paymentReceiptImageUrl String?
+  payerAccountName       String?
+  createdAt              DateTime    @default(now())
+  user                   User        @relation(fields: [userId], references: [id])
+  business               Business    @relation(fields: [businessId], references: [id])
+  orderGroup             OrderGroup? @relation(fields: [orderGroupId], references: [id])
+  orderItems             OrderItem[]
+  ratings                Rating[]
+  discountId             String?     @unique
+  discount               Discount?   @relation(fields: [discountId], references: [id])
 }
 
 model OrderItem {

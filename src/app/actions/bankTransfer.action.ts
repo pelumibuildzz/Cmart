@@ -3,6 +3,7 @@
 import { getSession } from '@/lib/auth/session';
 import { OrderStatus } from '@/lib/constants/order';
 import { createOrder, createOrderGroup } from '@/lib/services/order.service';
+import { uploadImage } from '@/lib/services/imagekit.service';
 import { useDiscount, incrementUserOrderCount } from '@/lib/services/discount.service';
 import { revalidatePath } from 'next/cache';
 
@@ -22,18 +23,21 @@ interface BusinessGroup {
   subtotal: number;
 }
 
-export async function createCheckout(
-  paymentId: string, 
-  items: CartItem[], 
+interface ShippingInfo {
+  name: string;
+  hall: string;
+  universityId: string;
+}
+
+export async function processBankTransferPayment(
+  items: CartItem[],
   totalAmount: number,
   // taxAmount: number,
   shippingAmount: number,
-  discountId?: string,
-  shippingInfo?: {
-    name: string;
-    hall: string;
-    universityId: string;
-  }
+  receiptImage: File,
+  payerAccountName: string,
+  shippingInfo: ShippingInfo,
+  discountId?: string
 ) {
   try {
     const session = await getSession();
@@ -42,6 +46,25 @@ export async function createCheckout(
     }
 
     const userId = session.user.id;
+
+    // Validate receipt image
+    const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/gif'];
+    const MAX_FILE_SIZE = 3 * 1024 * 1024; // 3MB
+
+    if (!ALLOWED_TYPES.includes(receiptImage.type)) {
+      return { error: 'Invalid file type. Only JPG, PNG, and GIF images are allowed.' };
+    }
+
+    if (receiptImage.size > MAX_FILE_SIZE) {
+      return { error: 'File size too large. Maximum size is 3MB.' };
+    }
+
+    // Upload receipt image
+    const receiptImageUrl = await uploadImage(
+      receiptImage,
+      `receipt-${Date.now()}-${receiptImage.name}`,
+      'payment-receipts'
+    );
 
     // Group items by business
     const businessGroups = items.reduce((groups, item) => {
@@ -61,15 +84,14 @@ export async function createCheckout(
       return groups;
     }, [] as BusinessGroup[]);
 
-    // Create order group first
+    // Create order group
     const orderGroup = await createOrderGroup({
       userId,
       total: totalAmount,
-      status: OrderStatus.PENDING,
-      paymentId,
-      shippingName: shippingInfo?.name || session.user.name,
-      shippingHall: shippingInfo?.hall || 'Default Hall',
-      shippingUniversityId: shippingInfo?.universityId || session.user.universityId,
+      status: OrderStatus.UNVERIFIED,
+      shippingName: shippingInfo.name,
+      shippingHall: shippingInfo.hall,
+      shippingUniversityId: shippingInfo.universityId,
       orders: {
         create: [] // We'll create orders separately
       }
@@ -82,7 +104,9 @@ export async function createCheckout(
         businessId: group.businessId,
         orderGroupId: orderGroup.id,
         total: group.subtotal,
-        status: OrderStatus.PENDING,
+        status: OrderStatus.UNVERIFIED,
+        paymentReceiptImageUrl: receiptImageUrl,
+        payerAccountName,
         orderItems: {
           create: group.items.map(item => ({
             productId: item.id,
@@ -97,7 +121,7 @@ export async function createCheckout(
     
     // If there's a discount being applied, mark it as used
     if (discountId) {
-      // Apply discount to the first order (we could have a more sophisticated distribution)
+      // Apply discount to the first order
       const firstOrder = orders[0];
       if (firstOrder) {
         await useDiscount(discountId, firstOrder.id);
@@ -117,7 +141,7 @@ export async function createCheckout(
       orders 
     };
   } catch (error) {
-    console.error('Checkout error:', error);
-    return { error: 'Failed to process checkout' };
+    console.error('Bank transfer checkout error:', error);
+    return { error: 'Failed to process payment' };
   }
 } 

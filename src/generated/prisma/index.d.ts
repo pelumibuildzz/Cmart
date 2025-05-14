@@ -9485,6 +9485,8 @@ export namespace Prisma {
     total: number | null
     status: string | null
     paymentId: string | null
+    paymentReceiptImageUrl: string | null
+    payerAccountName: string | null
     createdAt: Date | null
     discountId: string | null
   }
@@ -9497,6 +9499,8 @@ export namespace Prisma {
     total: number | null
     status: string | null
     paymentId: string | null
+    paymentReceiptImageUrl: string | null
+    payerAccountName: string | null
     createdAt: Date | null
     discountId: string | null
   }
@@ -9509,6 +9513,8 @@ export namespace Prisma {
     total: number
     status: number
     paymentId: number
+    paymentReceiptImageUrl: number
+    payerAccountName: number
     createdAt: number
     discountId: number
     _all: number
@@ -9531,6 +9537,8 @@ export namespace Prisma {
     total?: true
     status?: true
     paymentId?: true
+    paymentReceiptImageUrl?: true
+    payerAccountName?: true
     createdAt?: true
     discountId?: true
   }
@@ -9543,6 +9551,8 @@ export namespace Prisma {
     total?: true
     status?: true
     paymentId?: true
+    paymentReceiptImageUrl?: true
+    payerAccountName?: true
     createdAt?: true
     discountId?: true
   }
@@ -9555,6 +9565,8 @@ export namespace Prisma {
     total?: true
     status?: true
     paymentId?: true
+    paymentReceiptImageUrl?: true
+    payerAccountName?: true
     createdAt?: true
     discountId?: true
     _all?: true
@@ -9654,6 +9666,8 @@ export namespace Prisma {
     total: number
     status: string
     paymentId: string | null
+    paymentReceiptImageUrl: string | null
+    payerAccountName: string | null
     createdAt: Date
     discountId: string | null
     _count: OrderCountAggregateOutputType | null
@@ -9685,6 +9699,8 @@ export namespace Prisma {
     total?: boolean
     status?: boolean
     paymentId?: boolean
+    paymentReceiptImageUrl?: boolean
+    payerAccountName?: boolean
     createdAt?: boolean
     discountId?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
@@ -9704,6 +9720,8 @@ export namespace Prisma {
     total?: boolean
     status?: boolean
     paymentId?: boolean
+    paymentReceiptImageUrl?: boolean
+    payerAccountName?: boolean
     createdAt?: boolean
     discountId?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
@@ -9720,6 +9738,8 @@ export namespace Prisma {
     total?: boolean
     status?: boolean
     paymentId?: boolean
+    paymentReceiptImageUrl?: boolean
+    payerAccountName?: boolean
     createdAt?: boolean
     discountId?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
@@ -9736,11 +9756,13 @@ export namespace Prisma {
     total?: boolean
     status?: boolean
     paymentId?: boolean
+    paymentReceiptImageUrl?: boolean
+    payerAccountName?: boolean
     createdAt?: boolean
     discountId?: boolean
   }
 
-  export type OrderOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "businessId" | "orderGroupId" | "total" | "status" | "paymentId" | "createdAt" | "discountId", ExtArgs["result"]["order"]>
+  export type OrderOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "businessId" | "orderGroupId" | "total" | "status" | "paymentId" | "paymentReceiptImageUrl" | "payerAccountName" | "createdAt" | "discountId", ExtArgs["result"]["order"]>
   export type OrderInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
     business?: boolean | BusinessDefaultArgs<ExtArgs>
@@ -9781,6 +9803,8 @@ export namespace Prisma {
       total: number
       status: string
       paymentId: string | null
+      paymentReceiptImageUrl: string | null
+      payerAccountName: string | null
       createdAt: Date
       discountId: string | null
     }, ExtArgs["result"]["order"]>
@@ -10219,6 +10243,8 @@ export namespace Prisma {
     readonly total: FieldRef<"Order", 'Float'>
     readonly status: FieldRef<"Order", 'String'>
     readonly paymentId: FieldRef<"Order", 'String'>
+    readonly paymentReceiptImageUrl: FieldRef<"Order", 'String'>
+    readonly payerAccountName: FieldRef<"Order", 'String'>
     readonly createdAt: FieldRef<"Order", 'DateTime'>
     readonly discountId: FieldRef<"Order", 'String'>
   }
@@ -16303,6 +16329,8 @@ export namespace Prisma {
     total: 'total',
     status: 'status',
     paymentId: 'paymentId',
+    paymentReceiptImageUrl: 'paymentReceiptImageUrl',
+    payerAccountName: 'payerAccountName',
     createdAt: 'createdAt',
     discountId: 'discountId'
   };
@@ -16947,6 +16975,8 @@ export namespace Prisma {
     total?: FloatFilter<"Order"> | number
     status?: StringFilter<"Order"> | string
     paymentId?: StringNullableFilter<"Order"> | string | null
+    paymentReceiptImageUrl?: StringNullableFilter<"Order"> | string | null
+    payerAccountName?: StringNullableFilter<"Order"> | string | null
     createdAt?: DateTimeFilter<"Order"> | Date | string
     discountId?: StringNullableFilter<"Order"> | string | null
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
@@ -16965,6 +16995,8 @@ export namespace Prisma {
     total?: SortOrder
     status?: SortOrder
     paymentId?: SortOrderInput | SortOrder
+    paymentReceiptImageUrl?: SortOrderInput | SortOrder
+    payerAccountName?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     discountId?: SortOrderInput | SortOrder
     user?: UserOrderByWithRelationInput
@@ -16987,6 +17019,8 @@ export namespace Prisma {
     total?: FloatFilter<"Order"> | number
     status?: StringFilter<"Order"> | string
     paymentId?: StringNullableFilter<"Order"> | string | null
+    paymentReceiptImageUrl?: StringNullableFilter<"Order"> | string | null
+    payerAccountName?: StringNullableFilter<"Order"> | string | null
     createdAt?: DateTimeFilter<"Order"> | Date | string
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
     business?: XOR<BusinessScalarRelationFilter, BusinessWhereInput>
@@ -17004,6 +17038,8 @@ export namespace Prisma {
     total?: SortOrder
     status?: SortOrder
     paymentId?: SortOrderInput | SortOrder
+    paymentReceiptImageUrl?: SortOrderInput | SortOrder
+    payerAccountName?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     discountId?: SortOrderInput | SortOrder
     _count?: OrderCountOrderByAggregateInput
@@ -17024,6 +17060,8 @@ export namespace Prisma {
     total?: FloatWithAggregatesFilter<"Order"> | number
     status?: StringWithAggregatesFilter<"Order"> | string
     paymentId?: StringNullableWithAggregatesFilter<"Order"> | string | null
+    paymentReceiptImageUrl?: StringNullableWithAggregatesFilter<"Order"> | string | null
+    payerAccountName?: StringNullableWithAggregatesFilter<"Order"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"Order"> | Date | string
     discountId?: StringNullableWithAggregatesFilter<"Order"> | string | null
   }
@@ -17803,6 +17841,8 @@ export namespace Prisma {
     total: number
     status: string
     paymentId?: string | null
+    paymentReceiptImageUrl?: string | null
+    payerAccountName?: string | null
     createdAt?: Date | string
     user: UserCreateNestedOneWithoutOrdersInput
     business: BusinessCreateNestedOneWithoutOrdersInput
@@ -17820,6 +17860,8 @@ export namespace Prisma {
     total: number
     status: string
     paymentId?: string | null
+    paymentReceiptImageUrl?: string | null
+    payerAccountName?: string | null
     createdAt?: Date | string
     discountId?: string | null
     orderItems?: OrderItemUncheckedCreateNestedManyWithoutOrderInput
@@ -17831,6 +17873,8 @@ export namespace Prisma {
     total?: FloatFieldUpdateOperationsInput | number
     status?: StringFieldUpdateOperationsInput | string
     paymentId?: NullableStringFieldUpdateOperationsInput | string | null
+    paymentReceiptImageUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    payerAccountName?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutOrdersNestedInput
     business?: BusinessUpdateOneRequiredWithoutOrdersNestedInput
@@ -17848,6 +17892,8 @@ export namespace Prisma {
     total?: FloatFieldUpdateOperationsInput | number
     status?: StringFieldUpdateOperationsInput | string
     paymentId?: NullableStringFieldUpdateOperationsInput | string | null
+    paymentReceiptImageUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    payerAccountName?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     discountId?: NullableStringFieldUpdateOperationsInput | string | null
     orderItems?: OrderItemUncheckedUpdateManyWithoutOrderNestedInput
@@ -17862,6 +17908,8 @@ export namespace Prisma {
     total: number
     status: string
     paymentId?: string | null
+    paymentReceiptImageUrl?: string | null
+    payerAccountName?: string | null
     createdAt?: Date | string
     discountId?: string | null
   }
@@ -17871,6 +17919,8 @@ export namespace Prisma {
     total?: FloatFieldUpdateOperationsInput | number
     status?: StringFieldUpdateOperationsInput | string
     paymentId?: NullableStringFieldUpdateOperationsInput | string | null
+    paymentReceiptImageUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    payerAccountName?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -17882,6 +17932,8 @@ export namespace Prisma {
     total?: FloatFieldUpdateOperationsInput | number
     status?: StringFieldUpdateOperationsInput | string
     paymentId?: NullableStringFieldUpdateOperationsInput | string | null
+    paymentReceiptImageUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    payerAccountName?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     discountId?: NullableStringFieldUpdateOperationsInput | string | null
   }
@@ -18717,6 +18769,8 @@ export namespace Prisma {
     total?: SortOrder
     status?: SortOrder
     paymentId?: SortOrder
+    paymentReceiptImageUrl?: SortOrder
+    payerAccountName?: SortOrder
     createdAt?: SortOrder
     discountId?: SortOrder
   }
@@ -18733,6 +18787,8 @@ export namespace Prisma {
     total?: SortOrder
     status?: SortOrder
     paymentId?: SortOrder
+    paymentReceiptImageUrl?: SortOrder
+    payerAccountName?: SortOrder
     createdAt?: SortOrder
     discountId?: SortOrder
   }
@@ -18745,6 +18801,8 @@ export namespace Prisma {
     total?: SortOrder
     status?: SortOrder
     paymentId?: SortOrder
+    paymentReceiptImageUrl?: SortOrder
+    payerAccountName?: SortOrder
     createdAt?: SortOrder
     discountId?: SortOrder
   }
@@ -20364,6 +20422,8 @@ export namespace Prisma {
     total: number
     status: string
     paymentId?: string | null
+    paymentReceiptImageUrl?: string | null
+    payerAccountName?: string | null
     createdAt?: Date | string
     business: BusinessCreateNestedOneWithoutOrdersInput
     orderGroup?: OrderGroupCreateNestedOneWithoutOrdersInput
@@ -20379,6 +20439,8 @@ export namespace Prisma {
     total: number
     status: string
     paymentId?: string | null
+    paymentReceiptImageUrl?: string | null
+    payerAccountName?: string | null
     createdAt?: Date | string
     discountId?: string | null
     orderItems?: OrderItemUncheckedCreateNestedManyWithoutOrderInput
@@ -20551,6 +20613,8 @@ export namespace Prisma {
     total?: FloatFilter<"Order"> | number
     status?: StringFilter<"Order"> | string
     paymentId?: StringNullableFilter<"Order"> | string | null
+    paymentReceiptImageUrl?: StringNullableFilter<"Order"> | string | null
+    payerAccountName?: StringNullableFilter<"Order"> | string | null
     createdAt?: DateTimeFilter<"Order"> | Date | string
     discountId?: StringNullableFilter<"Order"> | string | null
   }
@@ -20771,6 +20835,8 @@ export namespace Prisma {
     total: number
     status: string
     paymentId?: string | null
+    paymentReceiptImageUrl?: string | null
+    payerAccountName?: string | null
     createdAt?: Date | string
     user: UserCreateNestedOneWithoutOrdersInput
     orderGroup?: OrderGroupCreateNestedOneWithoutOrdersInput
@@ -20786,6 +20852,8 @@ export namespace Prisma {
     total: number
     status: string
     paymentId?: string | null
+    paymentReceiptImageUrl?: string | null
+    payerAccountName?: string | null
     createdAt?: Date | string
     discountId?: string | null
     orderItems?: OrderItemUncheckedCreateNestedManyWithoutOrderInput
@@ -21047,6 +21115,8 @@ export namespace Prisma {
     total: number
     status: string
     paymentId?: string | null
+    paymentReceiptImageUrl?: string | null
+    payerAccountName?: string | null
     createdAt?: Date | string
     user: UserCreateNestedOneWithoutOrdersInput
     business: BusinessCreateNestedOneWithoutOrdersInput
@@ -21063,6 +21133,8 @@ export namespace Prisma {
     total: number
     status: string
     paymentId?: string | null
+    paymentReceiptImageUrl?: string | null
+    payerAccountName?: string | null
     createdAt?: Date | string
     discountId?: string | null
     orderItems?: OrderItemUncheckedCreateNestedManyWithoutOrderInput
@@ -21167,6 +21239,8 @@ export namespace Prisma {
     total?: FloatFieldUpdateOperationsInput | number
     status?: StringFieldUpdateOperationsInput | string
     paymentId?: NullableStringFieldUpdateOperationsInput | string | null
+    paymentReceiptImageUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    payerAccountName?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutOrdersNestedInput
     business?: BusinessUpdateOneRequiredWithoutOrdersNestedInput
@@ -21183,6 +21257,8 @@ export namespace Prisma {
     total?: FloatFieldUpdateOperationsInput | number
     status?: StringFieldUpdateOperationsInput | string
     paymentId?: NullableStringFieldUpdateOperationsInput | string | null
+    paymentReceiptImageUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    payerAccountName?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     discountId?: NullableStringFieldUpdateOperationsInput | string | null
     orderItems?: OrderItemUncheckedUpdateManyWithoutOrderNestedInput
@@ -21563,6 +21639,8 @@ export namespace Prisma {
     total: number
     status: string
     paymentId?: string | null
+    paymentReceiptImageUrl?: string | null
+    payerAccountName?: string | null
     createdAt?: Date | string
     user: UserCreateNestedOneWithoutOrdersInput
     business: BusinessCreateNestedOneWithoutOrdersInput
@@ -21578,6 +21656,8 @@ export namespace Prisma {
     total: number
     status: string
     paymentId?: string | null
+    paymentReceiptImageUrl?: string | null
+    payerAccountName?: string | null
     createdAt?: Date | string
     discountId?: string | null
     orderItems?: OrderItemUncheckedCreateNestedManyWithoutOrderInput
@@ -22081,6 +22161,8 @@ export namespace Prisma {
     total: number
     status: string
     paymentId?: string | null
+    paymentReceiptImageUrl?: string | null
+    payerAccountName?: string | null
     createdAt?: Date | string
     user: UserCreateNestedOneWithoutOrdersInput
     business: BusinessCreateNestedOneWithoutOrdersInput
@@ -22097,6 +22179,8 @@ export namespace Prisma {
     total: number
     status: string
     paymentId?: string | null
+    paymentReceiptImageUrl?: string | null
+    payerAccountName?: string | null
     createdAt?: Date | string
     discountId?: string | null
     ratings?: RatingUncheckedCreateNestedManyWithoutOrderInput
@@ -22160,6 +22244,8 @@ export namespace Prisma {
     total?: FloatFieldUpdateOperationsInput | number
     status?: StringFieldUpdateOperationsInput | string
     paymentId?: NullableStringFieldUpdateOperationsInput | string | null
+    paymentReceiptImageUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    payerAccountName?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutOrdersNestedInput
     business?: BusinessUpdateOneRequiredWithoutOrdersNestedInput
@@ -22176,6 +22262,8 @@ export namespace Prisma {
     total?: FloatFieldUpdateOperationsInput | number
     status?: StringFieldUpdateOperationsInput | string
     paymentId?: NullableStringFieldUpdateOperationsInput | string | null
+    paymentReceiptImageUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    payerAccountName?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     discountId?: NullableStringFieldUpdateOperationsInput | string | null
     ratings?: RatingUncheckedUpdateManyWithoutOrderNestedInput
@@ -22587,6 +22675,8 @@ export namespace Prisma {
     total: number
     status: string
     paymentId?: string | null
+    paymentReceiptImageUrl?: string | null
+    payerAccountName?: string | null
     createdAt?: Date | string
     user: UserCreateNestedOneWithoutOrdersInput
     business: BusinessCreateNestedOneWithoutOrdersInput
@@ -22603,6 +22693,8 @@ export namespace Prisma {
     total: number
     status: string
     paymentId?: string | null
+    paymentReceiptImageUrl?: string | null
+    payerAccountName?: string | null
     createdAt?: Date | string
     orderItems?: OrderItemUncheckedCreateNestedManyWithoutOrderInput
     ratings?: RatingUncheckedCreateNestedManyWithoutOrderInput
@@ -22664,6 +22756,8 @@ export namespace Prisma {
     total?: FloatFieldUpdateOperationsInput | number
     status?: StringFieldUpdateOperationsInput | string
     paymentId?: NullableStringFieldUpdateOperationsInput | string | null
+    paymentReceiptImageUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    payerAccountName?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutOrdersNestedInput
     business?: BusinessUpdateOneRequiredWithoutOrdersNestedInput
@@ -22680,6 +22774,8 @@ export namespace Prisma {
     total?: FloatFieldUpdateOperationsInput | number
     status?: StringFieldUpdateOperationsInput | string
     paymentId?: NullableStringFieldUpdateOperationsInput | string | null
+    paymentReceiptImageUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    payerAccountName?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     orderItems?: OrderItemUncheckedUpdateManyWithoutOrderNestedInput
     ratings?: RatingUncheckedUpdateManyWithoutOrderNestedInput
@@ -22733,6 +22829,8 @@ export namespace Prisma {
     total: number
     status: string
     paymentId?: string | null
+    paymentReceiptImageUrl?: string | null
+    payerAccountName?: string | null
     createdAt?: Date | string
     discountId?: string | null
   }
@@ -22772,6 +22870,8 @@ export namespace Prisma {
     total?: FloatFieldUpdateOperationsInput | number
     status?: StringFieldUpdateOperationsInput | string
     paymentId?: NullableStringFieldUpdateOperationsInput | string | null
+    paymentReceiptImageUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    payerAccountName?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     business?: BusinessUpdateOneRequiredWithoutOrdersNestedInput
     orderGroup?: OrderGroupUpdateOneWithoutOrdersNestedInput
@@ -22787,6 +22887,8 @@ export namespace Prisma {
     total?: FloatFieldUpdateOperationsInput | number
     status?: StringFieldUpdateOperationsInput | string
     paymentId?: NullableStringFieldUpdateOperationsInput | string | null
+    paymentReceiptImageUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    payerAccountName?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     discountId?: NullableStringFieldUpdateOperationsInput | string | null
     orderItems?: OrderItemUncheckedUpdateManyWithoutOrderNestedInput
@@ -22800,6 +22902,8 @@ export namespace Prisma {
     total?: FloatFieldUpdateOperationsInput | number
     status?: StringFieldUpdateOperationsInput | string
     paymentId?: NullableStringFieldUpdateOperationsInput | string | null
+    paymentReceiptImageUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    payerAccountName?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     discountId?: NullableStringFieldUpdateOperationsInput | string | null
   }
@@ -22919,6 +23023,8 @@ export namespace Prisma {
     total: number
     status: string
     paymentId?: string | null
+    paymentReceiptImageUrl?: string | null
+    payerAccountName?: string | null
     createdAt?: Date | string
     discountId?: string | null
   }
@@ -23014,6 +23120,8 @@ export namespace Prisma {
     total?: FloatFieldUpdateOperationsInput | number
     status?: StringFieldUpdateOperationsInput | string
     paymentId?: NullableStringFieldUpdateOperationsInput | string | null
+    paymentReceiptImageUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    payerAccountName?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutOrdersNestedInput
     orderGroup?: OrderGroupUpdateOneWithoutOrdersNestedInput
@@ -23029,6 +23137,8 @@ export namespace Prisma {
     total?: FloatFieldUpdateOperationsInput | number
     status?: StringFieldUpdateOperationsInput | string
     paymentId?: NullableStringFieldUpdateOperationsInput | string | null
+    paymentReceiptImageUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    payerAccountName?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     discountId?: NullableStringFieldUpdateOperationsInput | string | null
     orderItems?: OrderItemUncheckedUpdateManyWithoutOrderNestedInput
@@ -23042,6 +23152,8 @@ export namespace Prisma {
     total?: FloatFieldUpdateOperationsInput | number
     status?: StringFieldUpdateOperationsInput | string
     paymentId?: NullableStringFieldUpdateOperationsInput | string | null
+    paymentReceiptImageUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    payerAccountName?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     discountId?: NullableStringFieldUpdateOperationsInput | string | null
   }
@@ -23143,6 +23255,8 @@ export namespace Prisma {
     total: number
     status: string
     paymentId?: string | null
+    paymentReceiptImageUrl?: string | null
+    payerAccountName?: string | null
     createdAt?: Date | string
     discountId?: string | null
   }
@@ -23161,6 +23275,8 @@ export namespace Prisma {
     total?: FloatFieldUpdateOperationsInput | number
     status?: StringFieldUpdateOperationsInput | string
     paymentId?: NullableStringFieldUpdateOperationsInput | string | null
+    paymentReceiptImageUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    payerAccountName?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutOrdersNestedInput
     business?: BusinessUpdateOneRequiredWithoutOrdersNestedInput
@@ -23176,6 +23292,8 @@ export namespace Prisma {
     total?: FloatFieldUpdateOperationsInput | number
     status?: StringFieldUpdateOperationsInput | string
     paymentId?: NullableStringFieldUpdateOperationsInput | string | null
+    paymentReceiptImageUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    payerAccountName?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     discountId?: NullableStringFieldUpdateOperationsInput | string | null
     orderItems?: OrderItemUncheckedUpdateManyWithoutOrderNestedInput
@@ -23189,6 +23307,8 @@ export namespace Prisma {
     total?: FloatFieldUpdateOperationsInput | number
     status?: StringFieldUpdateOperationsInput | string
     paymentId?: NullableStringFieldUpdateOperationsInput | string | null
+    paymentReceiptImageUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    payerAccountName?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     discountId?: NullableStringFieldUpdateOperationsInput | string | null
   }

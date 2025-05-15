@@ -60,7 +60,8 @@ export default async function MarketDetails({ params }: MarketDetailsProps) {
               {business.subCategories.map((subCategory) => (
                 <Link 
                   key={subCategory.id} 
-                  href={`/category/${subCategory.categoryId}/subcategory/${subCategory.id}`}
+                  // href={`/category/${subCategory.categoryId}/subcategory/${subCategory.id}`}
+                  href={`/category/${subCategory.categoryId}`}
                   className="inline-flex items-center text-xs bg-blue-50 hover:bg-blue-100 px-2 py-1 rounded"
                 >
                   <Tag className="h-3 w-3 mr-1" />

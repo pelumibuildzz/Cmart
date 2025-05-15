@@ -59,6 +59,10 @@ export const useCartStore = create<CartStore>()(
               ),
             };
           }
+          //temporary Limitation
+          if (state && state.items.length == 2){
+            return state;
+          }         
           return { 
             items: [...state.items, { ...item, quantity: 1 }]
           };

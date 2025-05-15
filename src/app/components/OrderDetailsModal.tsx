@@ -3,6 +3,7 @@
 import Modal from './ui/Modal';
 import { OrderStatus, OrderStatusColors } from '@/lib/constants/order';
 import { formatDate } from '@/lib/utils/date';
+import { formatPrice } from '@/lib/utils/format';
 import { OrderModalData } from '@/types/business';
 
 interface OrderDetailsModalProps {
@@ -95,10 +96,10 @@ export default function OrderDetailsModal({
                       <p className="text-sm text-gray-500">{item.quantity}</p>
                     </td>
                     <td className="py-2">
-                      <p className="text-sm text-gray-500">₦{item.price.toFixed(2)}</p>
+                      <p className="text-sm text-gray-500">{formatPrice(item.price)}</p>
                     </td>
                     <td className="py-2">
-                      <p className="text-sm text-gray-500">₦{(item.price * item.quantity).toFixed(2)}</p>
+                      <p className="text-sm text-gray-500">{formatPrice(item.price * item.quantity)}</p>
                     </td>
                   </tr>
                 ))}
@@ -106,7 +107,7 @@ export default function OrderDetailsModal({
               <tfoot>
                 <tr>
                   <td colSpan={3} className="pt-4 text-right text-sm font-medium text-gray-500">Total:</td>
-                  <td className="pt-4 text-sm font-medium text-gray-900">₦{order.total.toFixed(2)}</td>
+                  <td className="pt-4 text-sm font-medium text-gray-900">{formatPrice(order.total)}</td>
                 </tr>
               </tfoot>
             </table>
@@ -121,7 +122,7 @@ export default function OrderDetailsModal({
               <p className="text-sm font-medium text-gray-900">ID: {order.orderGroup.id.slice(0, 8)}</p>
               <p className="text-sm text-gray-500">Created: {formatDate(order.orderGroup.createdAt)}</p>
               <p className="text-sm text-gray-500">Status: {order.orderGroup.status}</p>
-              <p className="text-sm text-gray-500">Total: ₦{order.orderGroup.total.toFixed(2)}</p>
+              <p className="text-sm text-gray-500">Total: {formatPrice(order.orderGroup.total)}</p>
             </div>
           </div>
         )}

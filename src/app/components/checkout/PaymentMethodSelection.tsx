@@ -20,24 +20,24 @@ interface PaymentMethodSelectionProps {
 const BANK_ACCOUNTS: BankAccount[] = [
   {
     id: 'bank-1',
-    bankName: 'First Bank',
-    accountName: 'C-Mart Ltd',
-    accountNumber: '1234567890',
-    bankLogo: '/images/banks/firstbank.png',
+    bankName: 'Moniepoint MFB',
+    accountName: 'SOMTOCHUKWU EDWIN-IKU',
+    accountNumber: '9071976196',
+    bankLogo: '/banks/moniepoint.jpeg',
   },
   {
     id: 'bank-2',
-    bankName: 'GTBank',
-    accountName: 'C-Mart Ltd',
-    accountNumber: '0987654321',
-    bankLogo: '/images/banks/gtbank.png',
+    bankName: 'Nombank Mfb',
+    accountName: 'SOMTOCHUKWU EDWIN-IKU',
+    accountNumber: '1466933912',
+    bankLogo: '/banks/nombank.png',
   },
   {
     id: 'bank-3',
-    bankName: 'Zenith Bank',
-    accountName: 'C-Mart Ltd',
-    accountNumber: '5678901234',
-    bankLogo: '/images/banks/zenithbank.png',
+    bankName: 'Kuda Mfb',
+    accountName: 'SOMTOCHUKWU EDWIN-IKU',
+    accountNumber: '3002523540',
+    bankLogo: '/banks/kuda.svg',
   },
 ];
 
@@ -100,6 +100,14 @@ export default function PaymentMethodSelection({
                     <div className="w-3 h-3 rounded-full bg-primary"></div>
                   )}
                 </div>
+                
+                {bank.bankLogo && (
+                  <img 
+                    src={bank.bankLogo} 
+                    alt={`${bank.bankName} logo`}
+                    className="w-8 h-8 object-contain mr-3"
+                  />
+                )}
                 
                 <div className="flex-grow">
                   <h3 className="font-medium text-gray-900">{bank.bankName}</h3>

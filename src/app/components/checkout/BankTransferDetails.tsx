@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { Copy, CheckCircle, CameraIcon, ArrowRight } from 'lucide-react';
+import { formatPrice } from '@/lib/utils/format';
 
 interface BankAccount {
   id: string;
@@ -122,7 +123,7 @@ export default function BankTransferDetails({
         <div className="flex items-center justify-between">
           <span className="text-sm text-gray-600">Amount to Transfer</span>
           <div className="flex items-center">
-            <span className="font-semibold text-lg text-primary">₦{amount.toFixed(2)}</span>
+            <span className="font-semibold text-lg text-primary">{formatPrice(amount)}</span>
             <button
               type="button"
               className="ml-2 text-primary p-1 hover:bg-primary/10 rounded-full transition-colors"

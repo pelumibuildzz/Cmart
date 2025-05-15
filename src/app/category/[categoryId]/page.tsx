@@ -56,7 +56,8 @@ export default async function CategoryDetails({ params }: CategoryPageProps) {
             {category.subCategories.map((subCategory) => (
               <Link 
                 key={subCategory.id} 
-                href={`/category/${category.id}/subcategory/${subCategory.id}`}
+                // href={`/category/${category.id}/subcategory/${subCategory.id}`}
+                href={`/category/${category.id}`}
                 className="inline-flex items-center bg-gray-100 hover:bg-gray-200 px-3 py-2 rounded-full"
               >
                 <Tag className="h-4 w-4 mr-2 text-primary" />

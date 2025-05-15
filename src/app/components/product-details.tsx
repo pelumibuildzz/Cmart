@@ -8,6 +8,7 @@ import { Trash2, Edit, Store, Tag } from 'lucide-react';
 import Link from 'next/link';
 import { useCartStore } from '@/lib/store/cart';
 import { deleteProductAction } from '@/app/actions/product.action';
+import { formatPrice } from '@/lib/utils/format';
 
 interface ProductDetailsProps {
   product: any; // Replace with proper type
@@ -74,6 +75,16 @@ export default function ProductDetails({ product, onDelete, isOwner }: ProductDe
       businessId: product.business.id,
       stock: product.stock
     });
+
+    let count = 0;
+    if(items.map((i) => {
+      if (i.id == product.id){
+        count = count + 1
+      }
+    }))
+    if(count == 0 && items.length == 2){
+      alert("Just a heads up! We're currently limiting carts to 2 items. Thanks for understanding! 😊")
+    }
   };
 
   return (
@@ -111,7 +122,7 @@ export default function ProductDetails({ product, onDelete, isOwner }: ProductDe
         <div className="flex justify-between items-start mb-4">
           <h1 className="text-2xl font-bold text-secondary">{product.name}</h1>
           <div className="text-2xl font-bold text-primary">
-            ₦{product.finalPrice.toFixed(2)}
+            {formatPrice(product.finalPrice)}
           </div>
         </div>
 
@@ -139,7 +150,8 @@ export default function ProductDetails({ product, onDelete, isOwner }: ProductDe
             {product.subCategories.map((subCategory: any) => (
               <Link
                 key={subCategory.id}
-                href={`/category/${subCategory.categoryId}/subcategory/${subCategory.id}`}
+                // href={`/category/${subCategory.categoryId}/subcategory/${subCategory.id}`}
+                href={`/category/${subCategory.categoryId}`}
                 className="inline-flex items-center text-xs bg-blue-50 hover:bg-blue-100 px-2 py-1 rounded"
               >
                 <Tag className="h-3 w-3 mr-1" />

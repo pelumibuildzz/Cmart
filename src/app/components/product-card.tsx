@@ -8,6 +8,7 @@ import Link from 'next/link';
 import { useCartStore } from '@/lib/store/cart';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
+import { formatPrice } from '@/lib/utils/format';
 
 interface ProductCardProps {
   id: string;
@@ -73,11 +74,21 @@ export default function ProductCard({
       businessId,
       stock
     });
+    let count = 0;
+    if(items.map((i) => {
+      if (i.id == id){
+        count = count + 1
+      }
+    }))
+    if(count == 0 && items.length == 2){
+      alert("Just a heads up! We're currently limiting carts to 2 items. Thanks for understanding! 😊")
+      setIsAdding(false)
+    }
 
     // Reset animation after 1.5 seconds
     setTimeout(() => {
       setIsAdding(false);
-    }, 1500);
+    }, 1000);
   };
 
   return (
@@ -154,7 +165,7 @@ export default function ProductCard({
           </p>
           <div className="flex items-center justify-between">
             <span className="text-xl font-bold text-primary">
-              ₦{price.toFixed(2)}
+              {formatPrice(price)}
             </span>
             <button 
               className={`flex items-center gap-2 ${

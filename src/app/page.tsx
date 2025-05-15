@@ -3,8 +3,9 @@ import { getCategories } from '@/lib/services/category.service';
 import { getUniversities } from '@/lib/services/university.service';
 import { getBusinesses } from '@/lib/services';
 import Link from 'next/link';
-import { Search, MapPin } from 'lucide-react';
+import { Search } from 'lucide-react';
 import ProductCard from '@/app/components/product-card';
+import SearchBar from '@/app/components/search-bar';
 
 export default async function Home() {
   const products = await getProducts({ 
@@ -41,44 +42,9 @@ export default async function Home() {
             Your one-stop marketplace for university commerce. Find everything you need within your campus community.
           </p>
 
-          {/* Search Section */}
+          {/* Updated Search Section */}
           <div className="w-full max-w-4xl bg-white rounded-lg shadow-lg p-2">
-            <div className="flex flex-col md:flex-row gap-2">
-              {/* University Select */}
-              <div className="flex-1 relative">
-                <div className="absolute left-3 top-1/2 -translate-y-1/2">
-                  <MapPin className="h-5 w-5 text-secondary" />
-                </div>
-                <select 
-                  className="w-full pl-10 pr-4 py-3 rounded-md border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary"
-                  defaultValue=""
-                >
-                  <option value="" disabled>Select University</option>
-                  {universities.map((uni) => (
-                    <option key={uni.id} value={uni.id}>{uni.name}</option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Category Select */}
-              <div className="flex-1">
-                <select 
-                  className="w-full px-4 py-3 rounded-md border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary"
-                  defaultValue=""
-                >
-                  <option value="" disabled>Select Category</option>
-                  {categories.map((category) => (
-                    <option key={category.id} value={category.id}>{category.name}</option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Search Button */}
-              <button className="w-full md:w-auto px-8 py-3 bg-primary text-white rounded-md hover:bg-primary/90 transition-colors flex items-center justify-center gap-2">
-                <Search className="h-5 w-5" />
-                <span>Search</span>
-              </button>
-            </div>
+            <SearchBar />
           </div>
         </div>
       </div>
@@ -140,7 +106,7 @@ export default async function Home() {
           
           {markets.length === 0 && (
             <p className="text-center py-8 text-gray-500">
-              No products available yet.
+              No Markets available yet. Check back Tommorrow
             </p>
           )}
         </div>

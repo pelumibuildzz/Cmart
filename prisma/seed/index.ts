@@ -1,20 +1,20 @@
 require('dotenv').config();
-const { PrismaClient } = require('../../src/generated/prisma');
-const bcrypt = require('bcryptjs');
+// const { PrismaClient } = require('../../src/generated/prisma');
+// const bcrypt = require('bcryptjs');
 
-const Role = {
-  USER: 'USER',
-  BUSINESS: 'BUSINESS',
-  ADMIN: 'ADMIN'
-};
+// const Role = {
+//   USER: 'USER',
+//   BUSINESS: 'BUSINESS',
+//   ADMIN: 'ADMIN'
+// };
 
-const prisma = new PrismaClient();
+// const prisma = new PrismaClient();
 const defaultImageUrl = process.env.IMAGEKIT_URL_ENDPOINT + "/default-image.jpg";
 
 // Helper function to hash passwords
 async function hashPassword(password) {
   const salt = await bcrypt.genSalt(10);
-  const pepper = process.env.BCRYPT_SECRET || '';
+  const pepper = process.env.BCRYPT_SECRET;
   return bcrypt.hash(password + pepper, salt);
 }
 

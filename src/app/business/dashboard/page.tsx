@@ -15,8 +15,9 @@ export default async function Dashboard() {
 
   const business = await getBusinessByUserId(session.user.id);
   
+  
   if (!business) {
-    redirect('/business/create');
+    redirect('/');
   }
 
   const products = await getProductsByBusinessId(business.id);

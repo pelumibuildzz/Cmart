@@ -3,7 +3,19 @@ import { getToken } from 'next-auth/jwt';
 import { NextRequest } from 'next/server';
 
 export async function middleware(request: NextRequest) {
-  const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET });
+  // More robust error handling for token verification
+  let token;
+  try {
+    token = await getToken({ 
+      req: request, 
+      secret: process.env.NEXTAUTH_SECRET,
+      secureCookie: process.env.NODE_ENV === 'production',
+    });
+  } catch (error) {
+    console.error('Token verification error:', error);
+    token = null;
+  }
+
   const pathname = request.nextUrl.pathname;
 
   // Define protected routes

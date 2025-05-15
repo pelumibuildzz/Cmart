@@ -6,7 +6,7 @@ import { Role } from '@/lib/constants';
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: { id: string } }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -19,7 +19,7 @@ export async function PUT(
     }
 
     // Check if the product exists and belongs to the user's business
-    const existingProduct = await getProductById(params.id);
+    const existingProduct = await getProductById(context.params.id);
     if (!existingProduct) {
       return NextResponse.json(
         { message: 'Product not found' },
@@ -56,7 +56,7 @@ export async function PUT(
       updateData.images = newImages as File[];
     }
 
-    const updatedProduct = await updateProduct(params.id, updateData);
+    const updatedProduct = await updateProduct(context.params.id, updateData);
     return NextResponse.json(updatedProduct);
   } catch (error) {
     console.error('Error updating product:', error);
@@ -69,7 +69,7 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: { id: string } }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -82,7 +82,7 @@ export async function DELETE(
     }
 
     // Check if the product exists and belongs to the user's business
-    const existingProduct = await getProductById(params.id);
+    const existingProduct = await getProductById(context.params.id);
     if (!existingProduct) {
       return NextResponse.json(
         { message: 'Product not found' },
@@ -98,7 +98,7 @@ export async function DELETE(
       );
     }
 
-    await deleteProduct(params.id);
+    await deleteProduct(context.params.id);
     return NextResponse.json(
       { message: 'Product deleted successfully' },
       { status: 200 }

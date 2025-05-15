@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
     const name = formData.get('name') as string;
     const description = formData.get('description') as string;
     const image = formData.get('image') as File;
-    const price = Number(formData.get('price'));
+    const basePrice = Number(formData.get('price'));
     const stock = Number(formData.get('stock'));
     const businessId = formData.get('businessId') as string;
     const categoryId = formData.get('categoryId') as string;
@@ -38,10 +38,10 @@ export async function POST(request: NextRequest) {
       name,
       description,
       image,
-      price,
+      basePrice,
       stock,
       businessId,
-      categoryId,
+      categoryIds: [categoryId],
       isAvailable,
       images: additionalImages,
     });

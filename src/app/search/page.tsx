@@ -4,13 +4,19 @@ import { getCategories } from '@/lib/services/category.service';
 import ProductCard from '@/app/components/product-card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/app/components/ui/tabs';
 import Link from 'next/link';
+import SearchBar from '@/app/components/search-bar';
+import { getCurrentUser } from '@/lib/auth/session';
 
 export default async function SearchPage({
   searchParams,
 }: {
-  searchParams: { query: string };
+  searchParams: Promise<{ query: string }>;
 }) {
-  const query = searchParams.query || '';
+  const {query} = await searchParams || '';
+  
+  // Get current user to check university preference
+  const currentUser = await getCurrentUser();
+  const userUniversityId = currentUser?.universityId;
 
   // Fetch products, businesses, and categories that match the search query
   const products = await getProducts({
@@ -38,8 +44,40 @@ export default async function SearchPage({
     },
   });
 
+  // Sort products by university - prioritize user's university
+  const sortedProducts = [...products].sort((a, b) => {
+    if (userUniversityId) {
+      // If user's university matches product's business university, prioritize it
+      if (a.business.universityId === userUniversityId && b.business.universityId !== userUniversityId) {
+        return -1;
+      }
+      if (a.business.universityId !== userUniversityId && b.business.universityId === userUniversityId) {
+        return 1;
+      }
+    }
+    // Otherwise, sort by name
+    return a.name.localeCompare(b.name);
+  });
+
+  // Sort businesses by university - prioritize user's university
+  const sortedBusinesses = [...businesses].sort((a, b) => {
+    if (userUniversityId) {
+      if (a.universityId === userUniversityId && b.universityId !== userUniversityId) {
+        return -1;
+      }
+      if (a.universityId !== userUniversityId && b.universityId === userUniversityId) {
+        return 1;
+      }
+    }
+    return a.name.localeCompare(b.name);
+  });
+
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
+      <div className="mb-6">
+        <SearchBar />
+      </div>
+
       <h1 className="text-3xl font-bold text-secondary mb-6">
         Search Results for "{query}"
       </h1>
@@ -60,7 +98,7 @@ export default async function SearchPage({
         <TabsContent value="products">
           {products.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {products.map((product) => (
+              {sortedProducts.map((product) => (
                 <ProductCard
                   key={product.id}
                   id={product.id}
@@ -86,7 +124,7 @@ export default async function SearchPage({
         <TabsContent value="businesses">
           {businesses.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {businesses.map((business) => (
+              {sortedBusinesses.map((business) => (
                 <Link
                   key={business.id}
                   href={`/markets/${business.id}`}
@@ -103,6 +141,11 @@ export default async function SearchPage({
                   </div>
                   <h3 className="text-xl font-semibold text-secondary mb-2">{business.name}</h3>
                   <p className="text-gray-600 line-clamp-2">{business.description}</p>
+                  {userUniversityId && business.universityId === userUniversityId && (
+                    <span className="inline-block mt-2 px-2 py-1 bg-primary/10 text-primary text-sm rounded-full">
+                      Your University
+                    </span>
+                  )}
                 </Link>
               ))}
             </div>

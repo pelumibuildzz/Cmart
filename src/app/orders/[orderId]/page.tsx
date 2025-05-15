@@ -13,7 +13,7 @@ interface OrderDetailsPageProps {
   };
 }
 
-export default async function OrderDetailsPage({ params }: OrderDetailsPageProps) {
+export default async function OrderDetailsPage({ params }: { params: Promise<{ orderId: string }>}) {
   const session = await getSession();
   
   if (!session?.user) {
@@ -21,7 +21,7 @@ export default async function OrderDetailsPage({ params }: OrderDetailsPageProps
   }
 
   // Ensure orderId is a string
-  const orderId = params.orderId;
+  const { orderId } = await params;
   
   const orderGroup = await getOrderGroupById(orderId);
   

@@ -3,16 +3,12 @@ import { prisma } from "@/lib/server/prisma"
 import ProductDetails from "@/app/components/product-details"
 import { getSession } from "@/lib/auth/session"
 
-interface ProductPageProps {
-  params: {
-    productId: string
-  }
-}
-
-export default async function ProductPage({ params: { productId } }: ProductPageProps) {
+  
+export default async function ProductPage({ params }: { params: Promise<{ productId: string }>} ) {
   // Get current user
   const session = await getSession();
   const userId = session?.user?.id;
+  const { productId } = await params;
   
   const product = await prisma.product.findUnique({
     where: { id: productId },

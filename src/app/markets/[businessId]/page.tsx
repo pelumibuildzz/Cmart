@@ -5,19 +5,15 @@ import Link from 'next/link';
 import { Tag } from 'lucide-react';
 import { getSession } from '@/lib/auth/session';
 
-interface MarketDetailsProps {
-  params: {
-    businessId: string;
-  };
-}
 
-export default async function MarketDetails({ params }: MarketDetailsProps) {
+export default async function MarketDetails({ params }: {params: Promise<{ businessId: string }>}) {
   // Get the current user session
+  const { businessId } = await params;
   const session = await getSession();
   const userId = session?.user?.id;
   
   // Pass the userId to getBusinessById - only products that are available will be shown unless viewer is owner
-  const business = await getBusinessById(params.businessId, userId);
+  const business = await getBusinessById(businessId, userId);
 
   if (!business) {
     notFound();

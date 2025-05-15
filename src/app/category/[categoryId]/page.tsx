@@ -6,22 +6,18 @@ import ProductCard from '@/app/components/product-card';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 
-interface CategoryPageProps {
-  params: {
-    categoryId: string;
-  };
-}
 
-export default async function CategoryDetails({ params }: CategoryPageProps) {
+export default async function CategoryDetails({ params }: { params: Promise<{ categoryId: string }> }) {
+  const { categoryId } = await params;
   const currentUser = await getCurrentUser();
-  const category = await getCategoryById(params.categoryId);
+  const category = await getCategoryById(categoryId);
   
   if (!category) {
     notFound();
   }
 
   // Get category products
-  const products = await getProductsByCategoryId(params.categoryId);
+  const products = await getProductsByCategoryId(categoryId);
 
   // Get businesses from the category relationship
   const businesses = category.businesses || [];

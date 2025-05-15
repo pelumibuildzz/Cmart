@@ -22,6 +22,14 @@ export async function POST(request: Request) {
         { status: 400 }
       );
     }
+
+    // Additional validation for bank details if it's a business
+    if (role === Role.BUSINESS && (!business?.bankName || !business?.accountNumber)) {
+      return NextResponse.json(
+        { message: 'Bank name and account number are required for business accounts' },
+        { status: 400 }
+      );
+    }
     
     // Check if user with email already exists
     const existingUser = await getUserByEmail(email);
@@ -49,6 +57,8 @@ export async function POST(request: Request) {
           userId: user.id,
           name: business.name,
           description: business.description,
+          bankName: business.bankName,
+          accountNumber: business.accountNumber,
           universityId: business.universityId,
           categoryIds: business.categoryIds,  // Now passing array of category IDs
           subCategoryIds: business.subCategoryIds,  // Optional subcategory IDs

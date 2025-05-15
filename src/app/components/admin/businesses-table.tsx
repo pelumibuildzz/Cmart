@@ -25,6 +25,9 @@ export default function BusinessesTable({ businesses, onVerifyBusiness }: Busine
                 Category
               </th>
               <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Bank Details
+              </th>
+              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Status
               </th>
               <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -44,7 +47,15 @@ export default function BusinessesTable({ businesses, onVerifyBusiness }: Busine
                   <div className="text-sm text-gray-500">{business.user.email}</div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm text-gray-900">{business.category.name}</div>
+                  <div className="text-sm text-gray-900">
+                    {business.categories && business.categories.length > 0 
+                      ? business.categories.map((cat: { name: string }) => cat.name).join(', ') 
+                      : (business.category ? business.category.name : 'No category')}
+                  </div>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <div className="text-sm text-gray-900">{business.bankName || 'Not provided'}</div>
+                  <div className="text-sm text-gray-500">{business.accountNumber || 'Not provided'}</div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${

@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { University, Category, SubCategory } from '@/generated/prisma';
+import { University, Category, SubCategory } from '@prisma/client';
 import { fetchUniversities } from '@/app/actions/university.action';
 import { fetchCategories, fetchSubCategoriesByCategory, createSubCategoryAction } from '@/app/actions/category.action';
 import { Role } from '@/lib/constants';
@@ -19,6 +19,8 @@ export default function SignUp() {
     role: Role.USER,
     businessName: '',
     businessDescription: '',
+    bankName: '',
+    accountNumber: '',
   });
   const [universities, setUniversities] = useState<University[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
@@ -83,7 +85,7 @@ export default function SignUp() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    const { name, email, password, confirmPassword, universityId, role, businessName, businessDescription } = formData;
+    const { name, email, password, confirmPassword, universityId, role, businessName, businessDescription, bankName, accountNumber } = formData;
     
     if (!name || !email || !password || !confirmPassword || !universityId) {
       setError('Please fill in all required fields');
@@ -125,6 +127,8 @@ export default function SignUp() {
           business: role === Role.BUSINESS ? {
             name: businessName,
             description: businessDescription,
+            bankName,
+            accountNumber,
             categoryIds: selectedCategoryIds,
             subCategoryIds: selectedSubCategoryIds.length > 0 ? selectedSubCategoryIds : undefined,
             universityId,
@@ -261,6 +265,40 @@ export default function SignUp() {
                 rows={3}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/50"
                 disabled={isLoading}
+                required
+              />
+            </div>
+
+            <div>
+              <label htmlFor="bankName" className="block mb-1 font-medium text-secondary">
+                Bank Name
+              </label>
+              <input
+                id="bankName"
+                name="bankName"
+                type="text"
+                value={formData.bankName}
+                onChange={handleChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/50"
+                disabled={isLoading}
+                placeholder="Enter your bank name"
+                required
+              />
+            </div>
+
+            <div>
+              <label htmlFor="accountNumber" className="block mb-1 font-medium text-secondary">
+                Account Number
+              </label>
+              <input
+                id="accountNumber"
+                name="accountNumber"
+                type="text"
+                value={formData.accountNumber}
+                onChange={handleChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/50"
+                disabled={isLoading}
+                placeholder="Enter your account number"
                 required
               />
             </div>
@@ -432,8 +470,8 @@ function CategorySubcategories({
     setIsLoading(true);
     
     try {
-      // Call the server action to create a new subcategory
-      const result = await createSubCategoryAction(newSubCategoryName, categoryId);
+      // Call the server action to create a new subcategory with signupMode=true
+      const result = await createSubCategoryAction(newSubCategoryName, categoryId, true);
       
       if (result.error) {
         setError(result.error);

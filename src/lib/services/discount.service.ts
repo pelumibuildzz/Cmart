@@ -41,7 +41,7 @@ export async function createDiscount(data: {
   });
 }
 
-export async function useDiscount(id: string, orderId: string) {
+export async function utilizeDiscount(id: string, orderId: string) {
   return prisma.discount.update({
     where: { id },
     data: {

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Copy, CheckCircle, CameraIcon, ArrowRight } from 'lucide-react';
+import { Copy, CheckCircle, ArrowRight } from 'lucide-react';
 import { formatPrice } from '@/lib/utils/format';
 
 interface BankAccount {

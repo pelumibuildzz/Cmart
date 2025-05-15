@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, PrismaPromise } from '@prisma/client';
 import { DiscountTier, DISCOUNT_RULES } from '../types/discount';
 import { updateUserDiscountTier as updateTier } from '../lib/services/discount.service';
 import { prisma } from '../lib/server/prisma';
@@ -29,21 +29,29 @@ export async function updateUserDiscountTier(
   if (newTier !== user.discountTier) {
     const percentage = DISCOUNT_RULES[newTier].percentage;
     
-    await prisma.$transaction([
+    // Create transaction items with proper typing
+    const transactionItems: PrismaPromise<any>[] = [
       // Update user's tier
       prisma.user.update({
         where: { id: userId },
         data: { discountTier: newTier }
-      }),
-      // Create new discount if eligible
-      percentage > 0 ? prisma.discount.create({
-        data: {
-          userId,
-          percentage,
-          expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) // 30 days
-        }
-      }) : undefined
-    ].filter(Boolean));
+      })
+    ];
+    
+    // Add discount creation to transaction if eligible
+    if (percentage > 0) {
+      transactionItems.push(
+        prisma.discount.create({
+          data: {
+            userId,
+            percentage,
+            expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) // 30 days
+          }
+        })
+      );
+    }
+    
+    await prisma.$transaction(transactionItems);
   }
 }
 

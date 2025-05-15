@@ -3,7 +3,7 @@ import { getOrdersByUserId } from '@/lib/services/order.service';
 import { redirect } from 'next/navigation';
 import { formatDistanceToNow } from 'date-fns';
 import Link from 'next/link';
-import { Package, School, Settings } from 'lucide-react';
+import { Package, School } from 'lucide-react';
 import { getUniversityById } from '@/lib/services';
 
 export default async function ProfilePage() {
@@ -80,7 +80,7 @@ export default async function ProfilePage() {
                         <div className="text-sm text-gray-900">#{order.id.slice(-6)}</div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-900">{order.Business.name}</div>
+                        <div className="text-sm text-gray-900">{order.business.name}</div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${

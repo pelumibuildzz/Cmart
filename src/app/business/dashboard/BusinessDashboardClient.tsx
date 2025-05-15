@@ -2,10 +2,11 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { PlusCircle, Package, ShoppingBag, AlertCircle, CheckCircle, Edit, Eye } from 'lucide-react';
 import { OrderStatusColors } from '@/lib/constants/order';
 import OrderDetailsModal from '@/app/components/OrderDetailsModal';
-import { Business, Order, Product, OrderModalData, User, OrderItem } from '@/types/business';
+import { Business, Order, Product, OrderModalData } from '@/types/business';
 
 interface BusinessDashboardClientProps {
   business: Business;
@@ -152,10 +153,12 @@ export default function BusinessDashboardClient({
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
                         <div className="h-10 w-10 flex-shrink-0">
-                          <img 
+                          <Image 
                             className="h-10 w-10 rounded-md object-cover" 
                             src={product.imageUrl} 
                             alt={product.name} 
+                            width={40}
+                            height={40}
                           />
                         </div>
                         <div className="ml-4">

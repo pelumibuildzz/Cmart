@@ -3,7 +3,7 @@
 import { getSession } from '@/lib/auth/session';
 import { OrderStatus } from '@/lib/constants/order';
 import { createOrder, createOrderGroup } from '@/lib/services/order.service';
-import { useDiscount, incrementUserOrderCount } from '@/lib/services/discount.service';
+import { utilizeDiscount, incrementUserOrderCount } from '@/lib/services/discount.service';
 import { revalidatePath } from 'next/cache';
 
 interface CartItem {
@@ -100,7 +100,7 @@ export async function createCheckout(
       // Apply discount to the first order (we could have a more sophisticated distribution)
       const firstOrder = orders[0];
       if (firstOrder) {
-        await useDiscount(discountId, firstOrder.id);
+        await utilizeDiscount(discountId, firstOrder.id);
       }
     }
 

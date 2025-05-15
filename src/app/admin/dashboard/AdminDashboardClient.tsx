@@ -2,19 +2,35 @@
 
 import { useState } from 'react';
 import { CheckCircle, XCircle, ShoppingBag, Eye } from 'lucide-react';
-import { OrderStatus, OrderStatusColors } from '@/lib/constants/order';
+import { OrderStatus, OrderStatusColors, OrderStatusType } from '@/lib/constants/order';
 import OrderDetailsModal from '@/app/components/OrderDetailsModal';
+import { Order, User } from '@/types/business';
 
 interface BusinessCategory {
   id: string;
   name: string;
 }
 
+// Extended Business interface that includes user information
+interface AdminBusiness {
+  id: string;
+  userId: string;
+  name: string;
+  description: string;
+  universityId: string;
+  averageRating: number;
+  totalRatings: number;
+  isVerified: boolean;
+  categories: BusinessCategory[];
+  subCategories: { id: string; name: string; categoryId: string }[];
+  user: User;
+}
+
 interface AdminDashboardClientProps {
-  businesses: any[];
-  orders: any[];
+  businesses: AdminBusiness[];
+  orders: Order[];
   verifyBusiness: (businessId: string, isVerified: boolean) => Promise<void>;
-  updateOrderStatus: (orderId: string, status: string) => Promise<void>;
+  updateOrderStatus: (orderId: string, status: OrderStatusType) => Promise<void>;
 }
 
 export default function AdminDashboardClient({
@@ -23,10 +39,10 @@ export default function AdminDashboardClient({
   verifyBusiness,
   updateOrderStatus,
 }: AdminDashboardClientProps) {
-  const [selectedOrder, setSelectedOrder] = useState<any>(null);
+  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const handleViewDetails = (order: any) => {
+  const handleViewDetails = (order: Order) => {
     setSelectedOrder(order);
     setIsModalOpen(true);
   };
@@ -363,7 +379,7 @@ export default function AdminDashboardClient({
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         order={selectedOrder}
-        onUpdateStatus={updateOrderStatus}
+        onUpdateStatus={(orderId, status) => updateOrderStatus(orderId, status as OrderStatusType)}
       />
     </div>
   );

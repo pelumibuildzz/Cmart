@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { University } from '@/types/business';
+import { useState } from 'react';
+import { University } from '@/types/university';
 
 interface ShippingInfoFormProps {
   initialData?: {

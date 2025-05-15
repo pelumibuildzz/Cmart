@@ -54,16 +54,19 @@ export async function fetchSubCategoriesByCategory(categoryId: string) {
   }
 }
 
-export async function createSubCategoryAction(name: string, categoryId: string) {
+export async function createSubCategoryAction(name: string, categoryId: string, signupMode: boolean = false) {
   try {
-    const session = await getServerSession(authOptions);
-    
-    if (!session) {
-      return { error: 'Unauthorized' };
-    }
+    // Skip authentication check if in signup mode
+    if (!signupMode) {
+      const session = await getServerSession(authOptions);
+      
+      if (!session) {
+        return { error: 'Unauthorized' };
+      }
 
-    if (session.user.role !== Role.BUSINESS && session.user.role !== Role.ADMIN) {
-      return { error: 'Only business owners and admins can create subcategories' };
+      if (session.user.role !== Role.BUSINESS && session.user.role !== Role.ADMIN) {
+        return { error: 'Only business owners and admins can create subcategories' };
+      }
     }
 
     // Check if the category exists

@@ -4,14 +4,9 @@ import { redirect, notFound } from 'next/navigation';
 import { format } from 'date-fns';
 import Image from 'next/image';
 import Link from 'next/link';
-import { ArrowLeft, ShoppingBag, Store, Truck, MapPin } from 'lucide-react';
+import { ArrowLeft, Store, MapPin } from 'lucide-react';
 import OrderStatusBadge from '@/app/components/OrderStatusBadge';
 
-interface OrderDetailsPageProps {
-  params: {
-    orderId: string;
-  };
-}
 
 export default async function OrderDetailsPage({ params }: { params: Promise<{ orderId: string }>}) {
   const session = await getSession();

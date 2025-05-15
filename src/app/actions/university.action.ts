@@ -1,7 +1,6 @@
 'use server';
 
-import { getUniversities, getUniversityById } from '@/lib/services/university.service';
-import { getUserById } from '@/lib/services/user.service';
+import { getUniversities } from '@/lib/services/university.service';
 import { prisma } from '@/lib/server/prisma';
 
 export async function fetchUniversities() {

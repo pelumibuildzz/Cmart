@@ -98,7 +98,7 @@ export async function createProduct(data: CreateProductData) {
     }
 
     // Create product with main image and additional images
-    const { image, images: imageFiles, categoryIds, subCategoryIds, ...productData } = data;
+    const { categoryIds, subCategoryIds, ...productData } = data;
     return await prisma.product.create({
       data: {
         ...productData,
@@ -180,7 +180,7 @@ export async function updateProduct(id: string, data: Partial<CreateProductData>
   }
 
   // Prepare update data
-  const { images: imageFiles, categoryIds, subCategoryIds, ...updateData } = data;
+  const { images, categoryIds, subCategoryIds, ...updateData } = data;
   
   // Prepare categories update if needed
   const categoryUpdates = categoryIds ? {

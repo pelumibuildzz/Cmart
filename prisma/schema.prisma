@@ -6,7 +6,6 @@
 
 generator client {
   provider = "prisma-client-js"
-  output   = "../src/generated/prisma"
 }
 
 datasource db {
@@ -42,6 +41,8 @@ model Business {
   name          String
   description   String
   universityId  String
+  bankName      String? // Bank name for receiving payments
+  accountNumber String? // Account number for receiving payments
   averageRating Float         @default(0)
   totalRatings  Int           @default(0)
   categories    Category[]

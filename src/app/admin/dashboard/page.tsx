@@ -3,8 +3,30 @@ import { getBusinesses, updateBusiness } from '@/lib/services/business.service';
 import { getOrders, updateOrder } from '@/lib/services/order.service';
 import { redirect } from 'next/navigation';
 import { Role } from '@/lib/constants';
+import { OrderStatus, OrderStatusType } from '@/lib/constants/order';
 import { revalidatePath } from 'next/cache';
 import AdminDashboardClient from './AdminDashboardClient';
+import { Order, User } from '@/types/business';
+
+// Define the AdminBusiness type to match what's expected in AdminDashboardClient
+interface BusinessCategory {
+  id: string;
+  name: string;
+}
+
+interface AdminBusiness {
+  id: string;
+  userId: string;
+  name: string;
+  description: string;
+  universityId: string;
+  averageRating: number;
+  totalRatings: number;
+  isVerified: boolean;
+  categories: BusinessCategory[];
+  subCategories: { id: string; name: string; categoryId: string }[];
+  user: User;
+}
 
 export default async function AdminDashboard() {
   const session = await getSession();
@@ -13,7 +35,7 @@ export default async function AdminDashboard() {
     redirect('/auth/signin');
   }
 
-  const [businesses, orders] = await Promise.all([
+  const [businessesData, ordersData] = await Promise.all([
     getBusinesses({ 
       include: { 
         user: true, 
@@ -24,11 +46,22 @@ export default async function AdminDashboard() {
     getOrders({ 
       orderBy: { createdAt: 'desc' },
       include: {
+        user: true,
+        business: true,
+        orderItems: {
+          include: {
+            product: true
+          }
+        },
         orderGroup: true,
         discount: true
       }
     })
   ]);
+
+  // Type cast the data to match the expected types
+  const businesses = businessesData as unknown as AdminBusiness[];
+  const orders = ordersData as unknown as Order[];
 
   async function verifyBusiness(businessId: string, isVerified: boolean) {
     'use server';
@@ -36,7 +69,7 @@ export default async function AdminDashboard() {
     revalidatePath('/admin/dashboard');
   }
 
-  async function updateOrderStatus(orderId: string, status: string) {
+  async function updateOrderStatus(orderId: string, status: OrderStatusType) {
     'use server';
     await updateOrder(orderId, { status });
     revalidatePath('/admin/dashboard');

@@ -1,6 +1,7 @@
 'use client';
 
 import Modal from './ui/Modal';
+import Image from 'next/image';
 import { OrderStatus, OrderStatusColors } from '@/lib/constants/order';
 import { formatDate } from '@/lib/utils/date';
 import { formatPrice } from '@/lib/utils/format';
@@ -53,10 +54,12 @@ export default function OrderDetailsModal({
                   View Receipt Image
                 </a>
                 <div className="mt-3">
-                  <img 
+                  <Image 
                     src={order.paymentReceiptImageUrl} 
                     alt="Payment Receipt" 
                     className="max-w-full h-auto max-h-60 rounded-md"
+                    width={300}
+                    height={300}
                   />
                 </div>
               </div>

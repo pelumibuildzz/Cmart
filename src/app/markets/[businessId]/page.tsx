@@ -83,7 +83,7 @@ export default async function MarketDetails({ params }: {params: Promise<{ busin
             stock={product.stock}
             businessId={business.id}
             isAvailable={product.isAvailable}
-            isOwner={isOwner}
+            isOwner={Boolean(isOwner)}
           />
         ))}
       </div>

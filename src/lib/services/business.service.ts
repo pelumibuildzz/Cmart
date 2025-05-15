@@ -5,7 +5,9 @@ interface CreateBusinessData {
   name: string;
   description: string;
   universityId: string;
-  categoryIds: string[];  // Now accepts multiple categories
+  bankName?: string;       // Optional bank name 
+  accountNumber?: string;  // Optional account number
+  categoryIds: string[];   // Now accepts multiple categories
   subCategoryIds?: string[]; // Optional subcategories
 }
 
@@ -116,6 +118,8 @@ export async function createBusiness(data: CreateBusinessData) {
       description: data.description,
       universityId: data.universityId,
       userId: data.userId,
+      bankName: data.bankName,
+      accountNumber: data.accountNumber,
       isVerified: false,
       categories: {
         connect: data.categoryIds.map(id => ({ id }))

@@ -59,7 +59,7 @@ export default function ReceiptUploadForm({
       }
       
       // Clear error if validation passes
-      const { receiptImage, ...restErrors } = errors;
+      const { ...restErrors } = errors;
       setErrors(restErrors);
       
       // Set file and preview

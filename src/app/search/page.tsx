@@ -4,6 +4,7 @@ import { getCategories } from '@/lib/services/category.service';
 import ProductCard from '@/app/components/product-card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/app/components/ui/tabs';
 import Link from 'next/link';
+import Image from 'next/image';
 import SearchBar from '@/app/components/search-bar';
 import { getCurrentUser } from '@/lib/auth/session';
 
@@ -132,10 +133,12 @@ export default async function SearchPage({
                 >
                   <div className="aspect-video w-full bg-gray-200 mb-4 rounded-md overflow-hidden">
                     {typeof business.logo === 'string' && business.logo && (
-                      <img 
+                      <Image 
                         src={business.logo} 
                         alt={business.name} 
                         className="w-full h-full object-cover"
+                        width={500}
+                        height={300}
                       />
                     )}
                   </div>

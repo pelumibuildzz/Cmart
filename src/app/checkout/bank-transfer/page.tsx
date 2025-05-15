@@ -11,7 +11,7 @@ import PaymentMethodSelection from '@/app/components/checkout/PaymentMethodSelec
 import BankTransferDetails from '@/app/components/checkout/BankTransferDetails';
 import ReceiptUploadForm from '@/app/components/checkout/ReceiptUploadForm';
 import OrderConfirmation from '@/app/components/checkout/OrderConfirmation';
-import { University } from '@/generated/prisma';
+import { University } from '@prisma/client';
 import { useSession } from 'next-auth/react';
 
 enum CheckoutStep {

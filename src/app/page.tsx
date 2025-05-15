@@ -1,9 +1,7 @@
 import { getProducts } from '@/lib/services/product.service';
 import { getCategories } from '@/lib/services/category.service';
-import { getUniversities } from '@/lib/services/university.service';
 import { getBusinesses } from '@/lib/services';
 import Link from 'next/link';
-import { Search } from 'lucide-react';
 import ProductCard from '@/app/components/product-card';
 import SearchBar from '@/app/components/search-bar';
 
@@ -14,7 +12,6 @@ export default async function Home() {
   });
   
   const categories = await getCategories({take: 4});
-  const universities = await getUniversities({take: 4});
   const markets = await getBusinesses({ take: 4});
 
   return (
@@ -25,7 +22,7 @@ export default async function Home() {
         <div 
           className="absolute inset-0 bg-cover bg-center"
           style={{
-            backgroundImage: 'url("/hero-bg.jpg")', // You'll need to add this image
+            backgroundImage: 'url("/hero2.jpg")',
             backgroundPosition: 'center',
           }}
         >

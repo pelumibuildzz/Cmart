@@ -4,13 +4,12 @@ import { getCategories } from '@/lib/services/category.service';
 import { getProductById } from '@/lib/services/product.service';
 import { redirect } from 'next/navigation';
 import ProductForm from '@/app/components/product-form';
-import { use } from "react";
 
 
 
 export default async function EditProduct({ params }: { params : Promise<{ id: string }>}) {
   // Access the id parameter after explicitly receiving it via props
-  const { id } = use(params);
+  const { id } = await params;
   
   const session = await getSession();
   

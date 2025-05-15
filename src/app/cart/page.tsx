@@ -182,7 +182,7 @@ export default function Cart() {
       {/* Cart Summary */}
       <div className="bg-white rounded-lg shadow-md p-6">
         <div className="space-y-4 mb-6">
-          {businessGroups.map(([businessId, businessItems]) => (
+          {businessGroups.map(([businessId]) => (
             <div key={businessId} className="flex justify-between text-sm">
               <span>{businesses.get(businessId)?.name || 'Loading...'} Subtotal:</span>
               <span>₦{getBusinessTotal(businessId).toFixed(2)}</span>

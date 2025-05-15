@@ -1,11 +1,11 @@
 'use client';
 
 import { signIn } from 'next-auth/react';
-import { useState, useEffect } from 'react';
+import { useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 
-export default function SignIn() {
+function SignInForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [email, setEmail] = useState('');
@@ -105,5 +105,22 @@ export default function SignIn() {
         </Link>
       </p>
     </main>
+  );
+}
+
+export default function SignIn() {
+  return (
+    <Suspense fallback={
+      <main className="container mx-auto px-4 py-8 max-w-md">
+        <h1 className="text-3xl font-bold mb-6 text-center">Sign In</h1>
+        <div className="animate-pulse">
+          <div className="h-10 bg-gray-200 rounded mb-4"></div>
+          <div className="h-10 bg-gray-200 rounded mb-4"></div>
+          <div className="h-10 bg-gray-200 rounded"></div>
+        </div>
+      </main>
+    }>
+      <SignInForm />
+    </Suspense>
   );
 } 

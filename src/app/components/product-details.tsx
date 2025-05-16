@@ -121,22 +121,22 @@ export default function ProductDetails({ product, onDelete, isOwner }: ProductDe
         </div>
       )}
 
-      <div className="p-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+      <div className="p-4 md:p-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8">
           {/* Left Column - Image Gallery */}
           <div className="w-full">
-            <div className="relative aspect-square w-full mb-4">
+            <div className="relative aspect-square w-full mb-3">
               <Image
                 src={allImages[currentImageIndex].url}
                 alt={product.name}
                 fill
-                className={`object-contain ${!product.isAvailable ? 'opacity-70 grayscale' : ''}`}
+                className={`object-contain rounded-md ${!product.isAvailable ? 'opacity-70 grayscale' : ''}`}
                 priority
                 sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
               />
               
               {!product.isAvailable && (
-                <div className="absolute top-4 right-4 bg-red-500 text-white px-3 py-1 rounded-md font-medium">
+                <div className="absolute top-3 right-3 bg-red-500 text-white px-3 py-1 rounded-md font-medium text-sm">
                   Unavailable
                 </div>
               )}
@@ -145,17 +145,17 @@ export default function ProductDetails({ product, onDelete, isOwner }: ProductDe
                 <>
                   <button 
                     onClick={prevImage}
-                    className="absolute left-2 top-1/2 -mt-4 bg-white/80 rounded-full p-2 shadow-md hover:bg-white"
+                    className="absolute left-2 top-1/2 -mt-5 bg-white/90 rounded-full p-2 shadow-md hover:bg-white transition-colors"
                     aria-label="Previous image"
                   >
-                    <ChevronLeft className="h-5 w-5" />
+                    <ChevronLeft className="h-5 w-5 text-gray-800" />
                   </button>
                   <button 
                     onClick={nextImage}
-                    className="absolute right-2 top-1/2 -mt-4 bg-white/80 rounded-full p-2 shadow-md hover:bg-white"
+                    className="absolute right-2 top-1/2 -mt-5 bg-white/90 rounded-full p-2 shadow-md hover:bg-white transition-colors"
                     aria-label="Next image"
                   >
-                    <ChevronRight className="h-5 w-5" />
+                    <ChevronRight className="h-5 w-5 text-gray-800" />
                   </button>
                 </>
               )}
@@ -163,13 +163,13 @@ export default function ProductDetails({ product, onDelete, isOwner }: ProductDe
             
             {/* Thumbnails */}
             {allImages.length > 1 && (
-              <div className="grid grid-cols-5 gap-2">
+              <div className="grid grid-cols-5 gap-1.5">
                 {allImages.map((image, index) => (
                   <button
                     key={image.id}
                     onClick={() => setCurrentImageIndex(index)}
-                    className={`relative aspect-square w-full border-2 rounded-md overflow-hidden ${
-                      index === currentImageIndex ? 'border-primary' : 'border-transparent'
+                    className={`relative aspect-square w-full border-2 rounded-md overflow-hidden transition-all ${
+                      index === currentImageIndex ? 'border-primary scale-95 shadow-sm' : 'border-transparent hover:border-gray-200'
                     }`}
                   >
                     <Image
@@ -187,42 +187,54 @@ export default function ProductDetails({ product, onDelete, isOwner }: ProductDe
           
           {/* Right Column - Product Information */}
           <div className="flex flex-col">
-            <h1 className="text-2xl font-bold text-secondary mb-2">{product.name}</h1>
-            
-            <div className="text-2xl font-bold text-primary mb-4">
-              {formatPrice(product.finalPrice)}
-            </div>
-            
-            <Link 
-              href={`/markets/${product.business.id}`}
-              className="inline-flex items-center text-secondary hover:text-primary mb-4"
-            >
-              <Store className="h-4 w-4 mr-2" />
-              {product.business.name}
-            </Link>
-
-            <div className="flex justify-between items-center mb-6">
-              <div className="text-sm">
-                <span className="font-medium">Stock:</span>{' '}
-                <span className={product.stock > 0 ? 'text-green-600' : 'text-red-600'}>
-                  {product.stock} available
-                </span>
+            <div className="mb-4">
+              <div className="flex items-center justify-between">
+                <h1 className="text-2xl font-bold text-secondary mb-1">{product.name}</h1>
               </div>
-              {currentCartQuantity > 0 && (
-                <div className="text-sm text-primary">
-                  {currentCartQuantity} in cart
+              
+              <div className="flex flex-wrap items-center gap-4 mb-3">
+                <span className="text-2xl font-bold text-primary">
+                  {formatPrice(product.finalPrice)}
+                </span>
+                
+                <div className="flex items-center text-sm">
+                  <span className={`inline-flex items-center ${product.stock > 0 ? 'text-green-600' : 'text-red-600'}`}>
+                    {product.stock > 0 ? (
+                      <span className="bg-green-100 text-green-800 text-xs font-medium px-2 py-0.5 rounded-full">
+                        In Stock ({product.stock})
+                      </span>
+                    ) : (
+                      <span className="bg-red-100 text-red-800 text-xs font-medium px-2 py-0.5 rounded-full">
+                        Out of Stock
+                      </span>
+                    )}
+                  </span>
+                  
+                  {currentCartQuantity > 0 && (
+                    <span className="bg-primary/10 text-primary text-xs font-medium ml-2 px-2 py-0.5 rounded-full">
+                      {currentCartQuantity} in cart
+                    </span>
+                  )}
                 </div>
-              )}
+              </div>
+              
+              <Link 
+                href={`/markets/${product.business.id}`}
+                className="inline-flex items-center text-secondary hover:text-primary mb-4 text-sm"
+              >
+                <Store className="h-4 w-4 mr-1.5" />
+                {product.business.name}
+              </Link>
             </div>
 
             {/* Categories and Subcategories */}
             {(product.categories.length > 0 || product.subCategories.length > 0) && (
-              <div className="flex flex-wrap gap-2 mb-4">
+              <div className="flex flex-wrap gap-1.5 mb-4">
                 {product.categories.map((category: any) => (
                   <Link
                     key={category.id}
                     href={`/category/${category.id}`}
-                    className="inline-flex items-center text-xs bg-gray-100 hover:bg-gray-200 px-2 py-1 rounded"
+                    className="inline-flex items-center text-xs bg-gray-100 hover:bg-gray-200 px-2 py-1 rounded-full"
                   >
                     <Tag className="h-3 w-3 mr-1" />
                     {category.name}
@@ -232,7 +244,7 @@ export default function ProductDetails({ product, onDelete, isOwner }: ProductDe
                   <Link
                     key={subCategory.id}
                     href={`/category/${subCategory.categoryId}`}
-                    className="inline-flex items-center text-xs bg-blue-50 hover:bg-blue-100 px-2 py-1 rounded"
+                    className="inline-flex items-center text-xs bg-blue-50 hover:bg-blue-100 px-2 py-1 rounded-full"
                   >
                     <Tag className="h-3 w-3 mr-1" />
                     {subCategory.name}
@@ -241,13 +253,20 @@ export default function ProductDetails({ product, onDelete, isOwner }: ProductDe
               </div>
             )}
 
+            {/* Product Description - Summary */}
+            <div className="mb-6">
+              <p className="text-gray-600 line-clamp-3 text-sm">
+                {product.description}
+              </p>
+            </div>
+
             {/* Action Buttons */}
-            <div className="mt-auto">
+            <div className="">
               {isProductOwner ? (
-                <div className="flex gap-4">
+                <div className="flex gap-3">
                   <Link
                     href={`/business/product/${product.id}/edit`}
-                    className="flex-1 inline-flex items-center justify-center px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
+                    className="flex-1 inline-flex items-center justify-center px-4 py-2.5 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors"
                   >
                     <Edit className="h-4 w-4 mr-2" />
                     Edit
@@ -255,7 +274,7 @@ export default function ProductDetails({ product, onDelete, isOwner }: ProductDe
                   <button
                     onClick={handleDelete}
                     disabled={isDeleting}
-                    className="flex-1 inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-md text-sm font-medium text-white bg-red-600 hover:bg-red-700 disabled:opacity-50"
+                    className="flex-1 inline-flex items-center justify-center px-4 py-2.5 border border-transparent rounded-md text-sm font-medium text-white bg-red-600 hover:bg-red-700 disabled:opacity-50 transition-colors"
                   >
                     <Trash2 className="h-4 w-4 mr-2" />
                     {isDeleting ? 'Deleting...' : 'Delete'}
@@ -265,7 +284,7 @@ export default function ProductDetails({ product, onDelete, isOwner }: ProductDe
                 <button
                   onClick={handleAddToCart}
                   disabled={!product.isAvailable || isOutOfStock}
-                  className="w-full inline-flex items-center justify-center px-6 py-3 border border-transparent rounded-md text-base font-medium text-white bg-primary hover:bg-primary/90 disabled:opacity-50"
+                  className="w-full inline-flex items-center justify-center px-6 py-3 border border-transparent rounded-md text-base font-medium text-white bg-primary hover:bg-primary/90 disabled:opacity-50 shadow-sm transition-colors"
                 >
                   {!product.isAvailable
                     ? 'Not Available'
@@ -278,10 +297,12 @@ export default function ProductDetails({ product, onDelete, isOwner }: ProductDe
           </div>
         </div>
         
-        {/* Description Section - Below Both Columns */}
-        <div className="mt-10 pt-8 border-t border-gray-200">
-          <h2 className="text-xl font-semibold mb-4">Product Description</h2>
-          <p className="text-gray-600 whitespace-pre-line">{product.description}</p>
+        {/* Full Description Section - Below Both Columns */}
+        <div className="mt-8 pt-6 border-t border-gray-200">
+          <h2 className="text-lg font-semibold mb-3">Product Description</h2>
+          <div className="text-gray-600 prose prose-sm max-w-none">
+            <p className="whitespace-pre-line">{product.description}</p>
+          </div>
         </div>
       </div>
     </div>

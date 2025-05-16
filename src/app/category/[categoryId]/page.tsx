@@ -19,8 +19,8 @@ export default async function CategoryDetails({ params }: { params: Promise<{ ca
   // Get category products
   const products = await getProductsByCategoryId(categoryId);
 
-  // Get businesses from the category relationship
-  const businesses = category.businesses || [];
+  // Get businesses from the category relationship and filter out unverified businesses
+  const businesses = (category.businesses || []).filter(business => business.isVerified);
 
   // Group businesses by university
   const businessesByUniversity = businesses.reduce((acc: { [key: string]: any[] }, business) => {

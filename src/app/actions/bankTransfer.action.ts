@@ -5,6 +5,7 @@ import { OrderStatus } from '@/lib/constants/order';
 import { createOrder, createOrderGroup } from '@/lib/services/order.service';
 import { uploadImage } from '@/lib/services/imagekit.service';
 import { utilizeDiscount,  incrementUserOrderCount } from '@/lib/services/discount.service';
+import { updateProductStock } from '@/lib/services/product.service';
 import { revalidatePath } from 'next/cache';
 
 interface CartItem {
@@ -49,14 +50,14 @@ export async function processBankTransferPayment(
 
     // Validate receipt image
     const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/gif'];
-    const MAX_FILE_SIZE = 3 * 1024 * 1024; // 3MB
+    const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 
     if (!ALLOWED_TYPES.includes(receiptImage.type)) {
       return { error: 'Invalid file type. Only JPG, PNG, and GIF images are allowed.' };
     }
 
     if (receiptImage.size > MAX_FILE_SIZE) {
-      return { error: 'File size too large. Maximum size is 3MB.' };
+      return { error: 'File size too large. Maximum size is 10MB.' };
     }
 
     // Upload receipt image
@@ -118,6 +119,13 @@ export async function processBankTransferPayment(
     );
 
     const orders = await Promise.all(orderPromises);
+    
+    // Update product stock for each ordered item
+    const stockUpdatePromises = items.map(item => 
+      updateProductStock(item.id, item.quantity)
+    );
+    
+    await Promise.all(stockUpdatePromises);
     
     // If there's a discount being applied, mark it as used
     if (discountId) {

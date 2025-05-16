@@ -478,3 +478,14 @@ export async function getProductsBySubCategory(subCategoryId: string) {
     }
   });
 }
+
+export async function updateProductStock(productId: string, quantity: number) {
+  return prisma.product.update({
+    where: { id: productId },
+    data: {
+      stock: {
+        decrement: quantity
+      }
+    }
+  });
+}

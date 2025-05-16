@@ -4,6 +4,7 @@ import { getSession } from '@/lib/auth/session';
 import { OrderStatus } from '@/lib/constants/order';
 import { createOrder, createOrderGroup } from '@/lib/services/order.service';
 import { utilizeDiscount, incrementUserOrderCount } from '@/lib/services/discount.service';
+import { updateProductStock } from '@/lib/services/product.service';
 import { revalidatePath } from 'next/cache';
 
 interface CartItem {
@@ -94,6 +95,13 @@ export async function createCheckout(
     );
 
     const orders = await Promise.all(orderPromises);
+    
+    // Update product stock for each ordered item
+    const stockUpdatePromises = items.map(item => 
+      updateProductStock(item.id, item.quantity)
+    );
+    
+    await Promise.all(stockUpdatePromises);
     
     // If there's a discount being applied, mark it as used
     if (discountId) {

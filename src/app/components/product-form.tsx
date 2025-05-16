@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { createProductAction, updateProductAction } from '@/app/actions/product.action';
 import { fetchSubCategoriesByCategory, createSubCategoryAction } from '@/app/actions/category.action';
+import imageCompression from 'browser-image-compression';
 
 interface ProductImage {
   id: string;
@@ -58,6 +59,7 @@ interface ProductFormProps {
 
 export default function ProductForm({ type, product, businessId, categories }: ProductFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isCompressing, setIsCompressing] = useState(false);
   const [error, setError] = useState('');
   const [imageErrors, setImageErrors] = useState<ImageError>({});
   const [mainImagePreview, setMainImagePreview] = useState<ImagePreview | null>(null);
@@ -76,9 +78,17 @@ export default function ProductForm({ type, product, businessId, categories }: P
   const [showNewSubCategoryInput, setShowNewSubCategoryInput] = useState(false);
   const router = useRouter();
 
-  const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+  const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
   const MAX_ADDITIONAL_IMAGES = 6;
   const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
+  
+  // Image compression options
+  const compressionOptions = {
+    maxSizeMB: 1,             // Max 1MB file size after compression
+    maxWidthOrHeight: 1920,   // Resize to max 1920px width/height
+    useWebWorker: true,       // Use Web Worker for better performance
+    initialQuality: 0.8,      // Initial compression quality
+  };
 
   useEffect(() => {
     // Calculate final price when basePrice or markupPercent changes
@@ -105,9 +115,18 @@ export default function ProductForm({ type, product, businessId, categories }: P
       return 'Invalid file type. Only JPEG, PNG, and WebP images are allowed.';
     }
     if (file.size > MAX_FILE_SIZE) {
-      return 'File size too large. Maximum size is 1MB.';
+      return 'File size too large. Maximum size is 5MB.';
     }
     return null;
+  };
+
+  const compressImage = async (file: File): Promise<File> => {
+    try {
+      return await imageCompression(file, compressionOptions);
+    } catch (error) {
+      console.error('Error compressing image:', error);
+      return file; // Return original file if compression fails
+    }
   };
 
   const handleMainImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -224,6 +243,7 @@ export default function ProductForm({ type, product, businessId, categories }: P
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsSubmitting(true);
+    setIsCompressing(true);
     setError('');
     setImageErrors({});
 
@@ -247,11 +267,13 @@ export default function ProductForm({ type, product, businessId, categories }: P
         formData.append('subCategoryIds', id);
       });
       
-      // Only include image field if there's a new image selected
-      if (type === 'edit') {
-        if (!mainImagePreview) {
-          formData.delete('image');
-        }
+      // Compress and set the main image if available
+      if (mainImagePreview?.file) {
+        const compressedMainImage = await compressImage(mainImagePreview.file);
+        formData.set('image', compressedMainImage);
+      } else if (type === 'edit') {
+        // Only include image field if there's a new image selected
+        formData.delete('image');
         // Remove empty file inputs to prevent empty object serialization
         const imageInput = e.currentTarget.querySelector('input[name="image"]') as HTMLInputElement;
         if (imageInput && !imageInput.files?.length) {
@@ -259,11 +281,32 @@ export default function ProductForm({ type, product, businessId, categories }: P
         }
       }
 
-      // Only include additional images if new ones are selected
-      const imagesInput = e.currentTarget.querySelector('input[name="images"]') as HTMLInputElement;
-      if (!imagesInput?.files?.length) {
+      // Compress and set additional images if available
+      if (additionalImagePreviews.length > 0) {
+        // Remove existing 'images' entries from the FormData
         formData.delete('images');
+        
+        // Process each image
+        const compressPromises = additionalImagePreviews.map(preview => 
+          compressImage(preview.file)
+        );
+        
+        // Wait for all images to be compressed
+        const compressedImages = await Promise.all(compressPromises);
+        
+        // Add each compressed image to the FormData
+        compressedImages.forEach(file => {
+          formData.append('images', file);
+        });
+      } else {
+        // Only include additional images if new ones are selected
+        const imagesInput = e.currentTarget.querySelector('input[name="images"]') as HTMLInputElement;
+        if (!imagesInput?.files?.length) {
+          formData.delete('images');
+        }
       }
+
+      setIsCompressing(false);
 
       const result = type === 'create' 
         ? await createProductAction(formData)
@@ -290,6 +333,7 @@ export default function ProductForm({ type, product, businessId, categories }: P
       setError(err.message || 'Something went wrong');
     } finally {
       setIsSubmitting(false);
+      setIsCompressing(false);
     }
   };
 
@@ -498,6 +542,9 @@ export default function ProductForm({ type, product, businessId, categories }: P
           onChange={handleMainImageChange}
           className="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-primary file:text-white hover:file:bg-primary/90"
         />
+        <p className="mt-1 text-xs text-gray-500">
+          Images will be automatically compressed to ensure fast uploads. Max size: 5MB. Supported formats: JPEG, PNG, WebP.
+        </p>
         {imageErrors.main && (
           <p className="mt-2 text-sm text-red-600">{imageErrors.main}</p>
         )}
@@ -609,7 +656,10 @@ export default function ProductForm({ type, product, businessId, categories }: P
           disabled={isSubmitting}
           className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {isSubmitting ? 'Saving...' : type === 'create' ? 'Create Product' : 'Update Product'}
+          {isSubmitting ? 
+            (isCompressing ? 'Compressing Images...' : 'Saving...') : 
+            (type === 'create' ? 'Create Product' : 'Update Product')
+          }
         </button>
       </div>
     </form>

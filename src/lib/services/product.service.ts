@@ -83,9 +83,22 @@ export async function createProduct(data: CreateProductData) {
     // Upload main image
     let mainImageUrl: string;
     try {
+      // Extract only necessary properties from the image File object
+      // to avoid serialization issues with function properties
+      const safeImage = {
+        name: data.image.name,
+        size: data.image.size,
+        type: data.image.type,
+        lastModified: data.image.lastModified,
+        arrayBuffer: data.image.arrayBuffer.bind(data.image),
+        slice: data.image.slice.bind(data.image),
+        stream: data.image.stream?.bind(data.image),
+        text: data.image.text?.bind(data.image),
+      };
+      
       mainImageUrl = await uploadImage(
-        data.image, 
-        `${Date.now()}-${data.image.name}`,
+        safeImage as File, 
+        `${Date.now()}-${safeImage.name}`,
         'products'
       );
     } catch (error) {
@@ -97,7 +110,19 @@ export async function createProduct(data: CreateProductData) {
     let additionalImages: { url: string }[] = [];
     if (data.images && data.images.length > 0) {
       try {
-        const uploadedImages = await uploadMultipleImages(data.images);
+        // Create safe versions of each image to avoid serialization issues
+        const safeImages = data.images.map(img => ({
+          name: img.name,
+          size: img.size,
+          type: img.type,
+          lastModified: img.lastModified,
+          arrayBuffer: img.arrayBuffer.bind(img),
+          slice: img.slice.bind(img),
+          stream: img.stream?.bind(img),
+          text: img.text?.bind(img),
+        }));
+        
+        const uploadedImages = await uploadMultipleImages(safeImages as File[]);
         additionalImages = uploadedImages.map(url => ({
           url,
         }));
@@ -108,7 +133,9 @@ export async function createProduct(data: CreateProductData) {
     }
 
     // Create product with main image and additional images
-    const { categoryIds, subCategoryIds, ...productData } = data;
+    // Extract only serializable data and avoid including any functions
+    const { categoryIds, subCategoryIds, image, images, ...productData } = data;
+    
     return await prisma.product.create({
       data: {
         ...productData,
@@ -162,11 +189,28 @@ export async function updateProduct(id: string, data: Partial<CreateProductData>
   // Handle additional image uploads if present
   let additionalImages: ProductImage[] = [];
   if (data.images && data.images.length > 0) {
-    // Upload new images
-    const uploadedImages = await uploadMultipleImages(data.images);
-    additionalImages = uploadedImages.map((url) => ({
-      url, // Map the uploaded image URLs correctly
-    }));
+    try {
+      // Create safe versions of each image to avoid serialization issues
+      const safeImages = data.images.map(img => ({
+        name: img.name,
+        size: img.size,
+        type: img.type,
+        lastModified: img.lastModified,
+        arrayBuffer: img.arrayBuffer.bind(img),
+        slice: img.slice.bind(img),
+        stream: img.stream?.bind(img),
+        text: img.text?.bind(img),
+      }));
+      
+      // Upload new images
+      const uploadedImages = await uploadMultipleImages(safeImages as File[]);
+      additionalImages = uploadedImages.map((url) => ({
+        url, // Map the uploaded image URLs correctly
+      }));
+    } catch (error) {
+      console.error('Error uploading additional images:', error);
+      // Continue with the update even if image uploads fail
+    }
   }
 
   // Delete old images from ImageKit if we have new images to replace them
@@ -189,8 +233,35 @@ export async function updateProduct(id: string, data: Partial<CreateProductData>
     }
   }
 
-  // Prepare update data
-  const { images, categoryIds, subCategoryIds, ...updateData } = data;
+  // Handle main image update if present
+  let mainImageUrl;
+  if (data.image) {
+    try {
+      // Create a safe image object to avoid serialization issues
+      const safeImage = {
+        name: data.image.name,
+        size: data.image.size,
+        type: data.image.type,
+        lastModified: data.image.lastModified,
+        arrayBuffer: data.image.arrayBuffer.bind(data.image),
+        slice: data.image.slice.bind(data.image),
+        stream: data.image.stream?.bind(data.image),
+        text: data.image.text?.bind(data.image),
+      };
+      
+      mainImageUrl = await uploadImage(
+        safeImage as File,
+        `${Date.now()}-${safeImage.name}`,
+        'products'
+      );
+    } catch (error) {
+      console.error('Error uploading main image:', error);
+      // Continue with the update even if main image upload fails
+    }
+  }
+
+  // Prepare update data - remove all non-serializable elements
+  const { images, image, categoryIds, subCategoryIds, ...updateData } = data;
   
   // Prepare categories update if needed
   const categoryUpdates = categoryIds ? {
@@ -211,6 +282,7 @@ export async function updateProduct(id: string, data: Partial<CreateProductData>
     where: { id },
     data: {
       ...updateData,
+      ...(mainImageUrl && { imageUrl: mainImageUrl }),
       ...(additionalImages.length > 0 && {
         images: {
           deleteMany: {}, // Clear old images from the database
@@ -238,9 +310,21 @@ export async function updateProductMainImage(productId: string, newImage: File) 
     throw new Error('Product not found');
   }
 
+  // Create a safe image object to avoid serialization issues
+  const safeImage = {
+    name: newImage.name,
+    size: newImage.size,
+    type: newImage.type,
+    lastModified: newImage.lastModified,
+    arrayBuffer: newImage.arrayBuffer.bind(newImage),
+    slice: newImage.slice.bind(newImage),
+    stream: newImage.stream?.bind(newImage),
+    text: newImage.text?.bind(newImage),
+  };
+
   const newImageUrl = await uploadImage(
-    newImage,
-    `${Date.now()}-${newImage.name}`,
+    safeImage as File,
+    `${Date.now()}-${safeImage.name}`,
     'products'
   );
 
@@ -321,7 +405,19 @@ export async function addProductImages(productId: string, images: File[]) {
     throw new Error('Product not found');
   }
 
-  const uploadedImages = await uploadMultipleImages(images);
+  // Create safe versions of each image to avoid serialization issues
+  const safeImages = images.map(img => ({
+    name: img.name,
+    size: img.size,
+    type: img.type,
+    lastModified: img.lastModified,
+    arrayBuffer: img.arrayBuffer.bind(img),
+    slice: img.slice.bind(img),
+    stream: img.stream?.bind(img),
+    text: img.text?.bind(img),
+  }));
+
+  const uploadedImages = await uploadMultipleImages(safeImages as File[]);
   const imageData = uploadedImages.map(url => ({
     url,
     productId,

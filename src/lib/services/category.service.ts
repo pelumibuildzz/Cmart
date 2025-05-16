@@ -197,6 +197,10 @@ export async function getProductsByCategoryId(categoryId: string) {
     where: {
       categories: {
         some: { id: categoryId }
+      },
+      isAvailable: true,
+      business: {
+        isVerified: true
       }
     },
     include: {

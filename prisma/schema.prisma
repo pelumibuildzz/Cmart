@@ -11,6 +11,10 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+  // Adding connection pooling configuration
+  // Adjust these values based on your needs
+  // connection_limit sets the max number of connections in the pool
+  // pool_timeout sets the timeout in seconds for getting a connection from the pool
 }
 
 enum Role {

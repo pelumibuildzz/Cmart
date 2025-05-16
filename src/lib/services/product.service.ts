@@ -23,10 +23,20 @@ export async function getProducts(
   } = {}
 ) {
   const { skip, take, where, orderBy } = params;
+  
+  // Create a base where condition that includes filtering for verified businesses
+  // but allows explicit overrides if provided in the where parameter
+  const baseWhere = {
+    business: {
+      isVerified: true
+    },
+    ...where
+  };
+  
   return prisma.product.findMany({
     skip,
     take,
-    where,
+    where: baseWhere,
     orderBy,
     include: {
       images: true,
@@ -434,6 +444,10 @@ export async function getProductsByCategory(categoryId: string) {
     where: {
       categories: {
         some: { id: categoryId }
+      },
+      isAvailable: true,
+      business: {
+        isVerified: true
       }
     },
     include: {
@@ -450,6 +464,10 @@ export async function getProductsBySubCategory(subCategoryId: string) {
     where: {
       subCategories: {
         some: { id: subCategoryId }
+      },
+      isAvailable: true,
+      business: {
+        isVerified: true
       }
     },
     include: {

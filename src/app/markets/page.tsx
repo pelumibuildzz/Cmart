@@ -7,7 +7,9 @@ import BusinessCard from '../components/business-card';
 export default async function Markets() {
   const currentUser = await getCurrentUser();
   const universities = await getUniversities();
-  const businesses = await getBusinesses();
+  const businesses = await getBusinesses({
+    where: { isVerified: true }
+  });
 
   // Group businesses by university
   const businessesByUniversity = businesses.reduce((acc: { [key: string]: any[] }, business) => {

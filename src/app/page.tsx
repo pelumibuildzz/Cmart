@@ -1,18 +1,12 @@
-import { getProducts } from '@/lib/services/product.service';
 import { getCategories } from '@/lib/services/category.service';
-import { getBusinesses } from '@/lib/services';
 import Link from 'next/link';
-import ProductCard from '@/app/components/product-card';
 import SearchBar from '@/app/components/search-bar';
+import { Suspense } from 'react';
+import FeaturedMarkets from './components/featured-markets';
+import FeaturedProducts from './components/featured-products';
 
 export default async function Home() {
-  const products = await getProducts({ 
-    where: { isAvailable: true },
-    take: 8,
-  });
-  
   const categories = await getCategories({take: 4});
-  const markets = await getBusinesses({ take: 4});
 
   return (
     <div className="flex flex-col min-h-screen bg-white">
@@ -76,74 +70,15 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* Featured Markets */}
-      <section className="py-16 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex justify-between items-center mb-8">
-            <h2 className="text-3xl font-bold text-secondary">Featured Markets</h2>
-            <Link href="/markets" className="text-primary hover:text-primary/80 font-medium">
-              View All
-            </Link>
-          </div>
-          
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            {markets.map((business) => (
-              <Link 
-                key={business.id} 
-                href={`/markets/${business.id}`}
-                className="group relative overflow-hidden rounded-lg bg-white shadow-md hover:shadow-lg transition-shadow duration-300"
-              >
-                <div className="aspect-square w-full bg-gray-200" />
-                <div className="absolute inset-0 flex items-center justify-center bg-secondary/60 group-hover:bg-secondary/70 transition-colors">
-                  <span className="text-white text-lg font-medium">{business.name}</span>
-                </div>
-              </Link>
-            ))}
-          </div>
-          
-          {markets.length === 0 && (
-            <p className="text-center py-8 text-gray-500">
-              No Markets available yet. Check back Tommorrow
-            </p>
-          )}
-        </div>
-      </section>
+      {/* Featured Markets - Now rendered dynamically */}
+      <Suspense fallback={<div className="py-16 px-4 text-center">Loading featured markets...</div>}>
+        <FeaturedMarkets />
+      </Suspense>
       
-      {/* Featured Products */}
-      <section className="py-16 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex justify-between items-center mb-8">
-            <h2 className="text-3xl font-bold text-secondary">Featured Products</h2>
-            <Link href="/markets" className="text-primary hover:text-primary/80 font-medium">
-              View All
-            </Link>
-          </div>
-          
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {products.map((product) => (
-              <ProductCard
-                key={product.id}
-                id={product.id}
-                name={product.name}
-                description={product.description}
-                price={product.finalPrice}
-                imageUrl={product.imageUrl}
-                images={product.images}
-                stock={product.stock}
-                businessId={product.business.id}
-                categories={product.categories}
-                subCategories={product.subCategories}
-              />
-            ))}
-          </div>
-          
-          {products.length === 0 && (
-            <p className="text-center py-8 text-gray-500">
-              No products available yet.
-            </p>
-          )}
-        </div>
-      </section>
+      {/* Featured Products - Now rendered dynamically */}
+      <Suspense fallback={<div className="py-16 px-4 text-center">Loading featured products...</div>}>
+        <FeaturedProducts />
+      </Suspense>
     </div>
   );
 }

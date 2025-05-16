@@ -36,6 +36,7 @@ export default async function SearchPage({
         { name: { contains: query, mode: 'insensitive' } },
         { description: { contains: query, mode: 'insensitive' } },
       ],
+      isVerified: true,
     },
   });
 

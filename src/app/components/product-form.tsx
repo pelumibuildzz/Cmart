@@ -76,8 +76,8 @@ export default function ProductForm({ type, product, businessId, categories }: P
   const [showNewSubCategoryInput, setShowNewSubCategoryInput] = useState(false);
   const router = useRouter();
 
-  const MAX_FILE_SIZE = 1 * 1024 * 1024; // 1MB
-  const MAX_ADDITIONAL_IMAGES = 5;
+  const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+  const MAX_ADDITIONAL_IMAGES = 6;
   const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 
   useEffect(() => {

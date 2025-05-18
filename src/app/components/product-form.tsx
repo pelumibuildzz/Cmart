@@ -275,8 +275,8 @@ export default function ProductForm({ type, product, businessId, categories }: P
         // Only include image field if there's a new image selected
         formData.delete('image');
         // Remove empty file inputs to prevent empty object serialization
-        const imageInput = e.currentTarget.querySelector('input[name="image"]') as HTMLInputElement;
-        if (imageInput && !imageInput.files?.length) {
+        const imageInput = e.currentTarget.querySelector('input[name="image"]');
+        if (imageInput && (imageInput as HTMLInputElement)?.files?.length === 0) {
           formData.delete('image');
         }
       }
@@ -299,11 +299,7 @@ export default function ProductForm({ type, product, businessId, categories }: P
           formData.append('images', file);
         });
       } else {
-        // Only include additional images if new ones are selected
-        const imagesInput = e.currentTarget.querySelector('input[name="images"]') as HTMLInputElement;
-        if (!imagesInput?.files?.length) {
-          formData.delete('images');
-        }
+        formData.delete('images');
       }
 
       setIsCompressing(false);
@@ -330,7 +326,7 @@ export default function ProductForm({ type, product, businessId, categories }: P
         router.push(`/products/${product!.id}`);
       }
     } catch (err: any) {
-      setError(err.message || 'Something went wrong');
+      setError('Something went wrong');
     } finally {
       setIsSubmitting(false);
       setIsCompressing(false);

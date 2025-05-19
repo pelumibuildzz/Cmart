@@ -5,6 +5,8 @@ import { Suspense } from 'react';
 import FeaturedMarkets from './components/featured-markets';
 import FeaturedProducts from './components/featured-products';
 
+export const dynamic = 'force-dynamic';
+
 export default async function Home() {
   const categories = await getCategories({take: 4});
 

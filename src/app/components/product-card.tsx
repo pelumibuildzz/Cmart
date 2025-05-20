@@ -1,10 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
-import { ShoppingCart, Check, Tag } from 'lucide-react';
+import { ShoppingCart, Check, Tag, ChevronLeft, ChevronRight } from 'lucide-react';
 import { ProductImage } from '@/types/product';
 import Link from 'next/link';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useCartStore } from '@/lib/store/cart';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
@@ -38,9 +39,9 @@ export default function ProductCard({
   subCategories,
   isAvailable = true,
   isOwner = false,
-}: ProductCardProps) {
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+}: ProductCardProps) {  const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isAdding, setIsAdding] = useState(false);
+  const slideshowIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const allImages = [{ url: imageUrl }, ...images];
   const addItem = useCartStore((state) => state.addItem);
   const items = useCartStore((state) => state.items);
@@ -48,10 +49,45 @@ export default function ProductCard({
   const { data: session } = useSession();
 
   const currentCartQuantity = items.find(item => item.id === id)?.quantity || 0;
-  const isOutOfStock = stock <= currentCartQuantity || !isAvailable;
+  const isOutOfStock = stock <= currentCartQuantity || !isAvailable;  // Set up automatic slideshow
+  useEffect(() => {
+    // Only set up slideshow if there are multiple images
+    if (allImages.length > 1) {
+      slideshowIntervalRef.current = setInterval(() => {
+        setCurrentImageIndex((prevIndex) => 
+          prevIndex === allImages.length - 1 ? 0 : prevIndex + 1
+        );
+      }, 5000); // Change image every 3 seconds
+    }
 
+    // Clean up interval on component unmount
+    return () => {
+      if (slideshowIntervalRef.current) {
+        clearInterval(slideshowIntervalRef.current);
+        slideshowIntervalRef.current = null;
+      }
+    };
+  }, [allImages.length]);
   const handleSlideChange = (index: number) => {
     setCurrentImageIndex(index);
+    // Reset the slideshow timer when manually changing slides
+    if (slideshowIntervalRef.current) {
+      clearInterval(slideshowIntervalRef.current);
+      slideshowIntervalRef.current = null;
+    }
+    
+    // Restart the slideshow
+    if (allImages.length > 1) {
+      slideshowIntervalRef.current = setInterval(() => {
+        setCurrentImageIndex((prevIndex) => 
+          prevIndex === allImages.length - 1 ? 0 : prevIndex + 1
+        );
+      }, 8000);
+    }
+  };
+  const togglePause = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
   };
 
   const handleAddToCart = async (e: React.MouseEvent) => {
@@ -104,19 +140,28 @@ export default function ProductCard({
               Only visible to you
             </span>
           </div>
-        )}
-
-        {/* Product Images Slider */}
+        )}        {/* Product Images Slider */}
         <div className="relative aspect-square group">
           <div className="relative w-full h-full overflow-hidden">
-            <Image
-              src={allImages[currentImageIndex].url}
-              alt={`${name} - Image ${currentImageIndex + 1}`}
-              className={`object-cover group-hover:scale-105 transition-transform duration-300 ${!isAvailable && 'grayscale'}`}
-              fill
-              sizes="100vw, (max-width: 1200px) 50vw, 33vw"
-              priority
-            />
+            <AnimatePresence mode="wait">
+              <motion.div 
+                key={currentImageIndex}
+                initial={{ opacity: .2 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: .1}}
+                transition={{ duration: 0.5, ease: "easeInOut" }}
+                className="relative w-full h-full"
+              >
+                <Image
+                  src={allImages[currentImageIndex].url}
+                  alt={`${name} - Image ${currentImageIndex + 1}`}
+                  className={`object-cover group-hover:scale-105 transition-transform duration-300 ${!isAvailable && 'grayscale'}`}
+                  fill
+                  sizes="100vw, (max-width: 1200px) 50vw, 33vw"
+                  priority
+                />
+              </motion.div>
+            </AnimatePresence>
           </div>
           
           {/* Stock Badge */}
@@ -133,25 +178,61 @@ export default function ProductCard({
               {categories[0].name}
             </div>
           )}
-          
-          {/* Slider Controls */}
+            {/* Slider Controls */}
           {allImages.length > 1 && (
-            <div className="absolute bottom-2 left-0 right-0 flex justify-center gap-2">
-              {allImages.map((_, index) => (
-                <button
-                  key={index}
+            <>
+              {/* Navigation Arrows */}
+              <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 flex justify-between px-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                <motion.button
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
                   onClick={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
-                    handleSlideChange(index);
+                    const newIndex = currentImageIndex === 0 ? allImages.length - 1 : currentImageIndex - 1;
+                    handleSlideChange(newIndex);
                   }}
-                  className={`w-2 h-2 rounded-full bg-white transition-opacity ${
-                    currentImageIndex === index ? 'opacity-75' : 'opacity-50 hover:opacity-75'
-                  }`}
-                  aria-label={`View image ${index + 1}`}
-                />
-              ))}
-            </div>
+                  className="bg-white/80 rounded-full p-1 text-gray-800 shadow-md"
+                  aria-label="Previous image"
+                >
+                  <ChevronLeft className="h-5 w-5" />
+                </motion.button>
+                
+                <motion.button
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const newIndex = currentImageIndex === allImages.length - 1 ? 0 : currentImageIndex + 1;
+                    handleSlideChange(newIndex);
+                  }}
+                  className="bg-white/80 rounded-full p-1 text-gray-800 shadow-md"
+                  aria-label="Next image"
+                >
+                  <ChevronRight className="h-5 w-5" />
+                </motion.button>
+              </div>
+              
+              {/* Dot Indicators */}
+              <div className="absolute bottom-2 left-0 right-0 flex justify-center gap-2">
+                {allImages.map((_, index) => (
+                  <motion.button
+                    key={index}
+                    whileHover={{ scale: 1.2 }}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      handleSlideChange(index);
+                    }}
+                    className={`w-2 h-2 rounded-full bg-white transition-opacity ${
+                      currentImageIndex === index ? 'opacity-75' : 'opacity-50 hover:opacity-75'
+                    }`}
+                    aria-label={`View image ${index + 1}`}
+                  />
+                ))}
+              </div>
+            </>
           )}
         </div>
 
@@ -163,11 +244,12 @@ export default function ProductCard({
           <p className="text-gray-600 text-sm mb-3 line-clamp-2 h-[50px] overflow-auto">
             {description}
           </p>
-          <div className="flex items-center justify-between">
-            <span className="text-xl font-bold text-primary">
+          <div className="flex items-center justify-between">            <span className="text-xl font-bold text-primary">
               {formatPrice(price)}
             </span>
-            <button 
+            <motion.button 
+              whileHover={!isOutOfStock && !isAdding ? { scale: 1.05 } : {}}
+              whileTap={!isOutOfStock && !isAdding ? { scale: 0.95 } : {}}
               className={`flex items-center gap-2 ${
                 isOutOfStock 
                   ? 'bg-gray-400 cursor-not-allowed'
@@ -184,7 +266,12 @@ export default function ProductCard({
                 'Out of Stock'
               ) : isAdding ? (
                 <>
-                  <Check className="h-5 w-5" />
+                  <motion.div
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 0.5, ease: "easeInOut" }}
+                  >
+                    <Check className="h-5 w-5" />
+                  </motion.div>
                   Added!
                 </>
               ) : (
@@ -193,7 +280,7 @@ export default function ProductCard({
                   Add to Cart
                 </>
               )}
-            </button>
+            </motion.button>
           </div>
         </div>
       </div>    

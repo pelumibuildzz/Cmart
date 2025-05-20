@@ -3,7 +3,7 @@ import { getBusinesses, updateBusiness } from '@/lib/services/business.service';
 import { getOrders, updateOrder } from '@/lib/services/order.service';
 import { redirect } from 'next/navigation';
 import { Role } from '@/lib/constants';
-import { OrderStatus, OrderStatusType } from '@/lib/constants/order';
+import { OrderStatusType } from '@/lib/constants/order';
 import { revalidatePath } from 'next/cache';
 import AdminDashboardClient from './AdminDashboardClient';
 import { Order, User } from '@/types/business';
@@ -62,11 +62,14 @@ export default async function AdminDashboard() {
   // Type cast the data to match the expected types
   const businesses = businessesData as unknown as AdminBusiness[];
   const orders = ordersData as unknown as Order[];
-
   async function verifyBusiness(businessId: string, isVerified: boolean) {
     'use server';
     await updateBusiness(businessId, { isVerified });
+    // Revalidate both admin dashboard and home page to update featured markets
     revalidatePath('/admin/dashboard');
+    revalidatePath('/');
+    revalidatePath('/markets');
+    revalidatePath('/products');
   }
 
   async function updateOrderStatus(orderId: string, status: OrderStatusType) {

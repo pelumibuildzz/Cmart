@@ -35,6 +35,7 @@ export async function createProductAction(formData: FormData) {
     const stock = Number(formData.get('stock'));
     const isAvailable = formData.get('isAvailable') === 'true';
     const additionalImages = formData.getAll('images') as File[];
+    const videos = formData.getAll('videos') as File[];
     
     // Handle multiple categories
     const categoryIds = formData.getAll('categoryIds') as string[];
@@ -59,6 +60,7 @@ export async function createProductAction(formData: FormData) {
       subCategoryIds: subCategoryIds.length > 0 ? subCategoryIds : undefined,
       isAvailable,
       images: additionalImages,
+      videos: videos.length > 0 ? videos : undefined,
     });
 
     revalidatePath('/markets/[businessId]', 'page');
@@ -124,6 +126,12 @@ export async function updateProductAction(productId: string, formData: FormData)
     const newImages = formData.getAll('images');
     if (newImages.length > 0 && newImages.every(img => img instanceof File && img.size > 0)) {
       updateData.images = newImages as File[];
+    }
+
+    // Only add videos field if new videos are provided and they're valid Files
+    const newVideos = formData.getAll('videos');
+    if (newVideos.length > 0 && newVideos.every(video => video instanceof File && video.size > 0)) {
+      updateData.videos = newVideos as File[];
     }
 
     const updatedProduct = await updateProduct(productId, updateData);

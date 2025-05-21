@@ -13,6 +13,13 @@ interface ProductImage {
   productId: string;
 }
 
+interface ProductVideo {
+  id: string;
+  url: string;
+  thumbnailUrl?: string;
+  productId: string;
+}
+
 interface Product {
   id: string;
   name: string;
@@ -27,6 +34,7 @@ interface Product {
   categories: { id: string; name: string }[];
   subCategories: { id: string; name: string; categoryId: string }[];
   images?: ProductImage[];
+  videos?: ProductVideo[];
 }
 
 interface Category {
@@ -43,9 +51,15 @@ interface SubCategory {
 interface ImageError {
   main?: string;
   additional?: string;
+  video?: string;
 }
 
 interface ImagePreview {
+  url: string;
+  file: File;
+}
+
+interface VideoPreview {
   url: string;
   file: File;
 }
@@ -64,6 +78,7 @@ export default function ProductForm({ type, product, businessId, categories }: P
   const [imageErrors, setImageErrors] = useState<ImageError>({});
   const [mainImagePreview, setMainImagePreview] = useState<ImagePreview | null>(null);
   const [additionalImagePreviews, setAdditionalImagePreviews] = useState<ImagePreview[]>([]);
+  const [videoPreviews, setVideoPreviews] = useState<VideoPreview[]>([]);
   const [basePrice, setBasePrice] = useState<number>(product?.basePrice || 0);
   const [markupPercent, ] = useState<number>(product?.markupPercent || 15);
   const [finalPrice, setFinalPrice] = useState<number>(product?.finalPrice || 0);
@@ -79,8 +94,11 @@ export default function ProductForm({ type, product, businessId, categories }: P
   const router = useRouter();
 
   const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+  const MAX_VIDEO_SIZE = 20 * 1024 * 1024; // 20MB
   const MAX_ADDITIONAL_IMAGES = 6;
-  const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
+  const MAX_VIDEOS = 2;
+  const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
+  const ALLOWED_VIDEO_TYPES = ['video/mp4', 'video/webm', 'video/quicktime'];
   
   // Image compression options
   const compressionOptions = {
@@ -111,11 +129,21 @@ export default function ProductForm({ type, product, businessId, categories }: P
   }, [selectedCategoryId]);
 
   const validateImage = (file: File): string | null => {
-    if (!ALLOWED_TYPES.includes(file.type)) {
+    if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
       return 'Invalid file type. Only JPEG, PNG, and WebP images are allowed.';
     }
     if (file.size > MAX_FILE_SIZE) {
       return 'File size too large. Maximum size is 5MB.';
+    }
+    return null;
+  };
+
+  const validateVideo = (file: File): string | null => {
+    if (!ALLOWED_VIDEO_TYPES.includes(file.type)) {
+      return 'Invalid file type. Only MP4, WebM, and QuickTime videos are allowed.';
+    }
+    if (file.size > MAX_VIDEO_SIZE) {
+      return 'File size too large. Maximum size is 20MB.';
     }
     return null;
   };
@@ -188,6 +216,46 @@ export default function ProductForm({ type, product, businessId, categories }: P
     setAdditionalImagePreviews(newPreviews);
   };
 
+  const handleVideosChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    setImageErrors((prev) => ({ ...prev, video: undefined }));
+
+    if (files.length > MAX_VIDEOS) {
+      setImageErrors((prev) => ({ 
+        ...prev, 
+        video: `Maximum ${MAX_VIDEOS} videos allowed` 
+      }));
+      e.target.value = '';
+      return;
+    }
+
+    const newPreviews: VideoPreview[] = [];
+    const errors: string[] = [];
+
+    files.forEach(file => {
+      const error = validateVideo(file);
+      if (error) {
+        errors.push(`${file.name}: ${error}`);
+      } else {
+        newPreviews.push({
+          url: URL.createObjectURL(file),
+          file
+        });
+      }
+    });
+
+    if (errors.length) {
+      setImageErrors((prev) => ({ 
+        ...prev, 
+        video: errors.join('\n') 
+      }));
+      e.target.value = '';
+      return;
+    }
+
+    setVideoPreviews(newPreviews);
+  };
+
   const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const categoryId = e.target.value;
     setSelectedCategoryId(categoryId);
@@ -237,8 +305,9 @@ export default function ProductForm({ type, product, businessId, categories }: P
     return () => {
       if (mainImagePreview) URL.revokeObjectURL(mainImagePreview.url);
       additionalImagePreviews.forEach(preview => URL.revokeObjectURL(preview.url));
+      videoPreviews.forEach(preview => URL.revokeObjectURL(preview.url));
     };
-  }, [mainImagePreview, additionalImagePreviews]);
+  }, [mainImagePreview, additionalImagePreviews, videoPreviews]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -302,6 +371,19 @@ export default function ProductForm({ type, product, businessId, categories }: P
         formData.delete('images');
       }
 
+      // Handle videos (no compression)
+      if (videoPreviews.length > 0) {
+        // Remove existing 'videos' entries from the FormData
+        formData.delete('videos');
+        
+        // Add each video to the FormData
+        videoPreviews.forEach(preview => {
+          formData.append('videos', preview.file);
+        });
+      } else {
+        formData.delete('videos');
+      }
+
       setIsCompressing(false);
 
       const result = type === 'create' 
@@ -319,6 +401,7 @@ export default function ProductForm({ type, product, businessId, categories }: P
 
       if (mainImagePreview) URL.revokeObjectURL(mainImagePreview.url);
       additionalImagePreviews.forEach(preview => URL.revokeObjectURL(preview.url));
+      videoPreviews.forEach(preview => URL.revokeObjectURL(preview.url));
 
       if (type === 'create') {
         router.push(`/markets/${businessId}`);
@@ -617,6 +700,66 @@ export default function ProductForm({ type, product, businessId, categories }: P
                     fill
                     className="rounded-md object-cover"
                   />
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* New video upload section */}
+      <div>
+        <label htmlFor="videos" className="block text-sm font-medium text-gray-700">
+          Product Videos
+        </label>
+        <input
+          type="file"
+          name="videos"
+          id="videos"
+          accept="video/mp4,video/webm,video/quicktime"
+          multiple
+          onChange={handleVideosChange}
+          className="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-primary file:text-white hover:file:bg-primary/90"
+        />
+        <p className="mt-1 text-xs text-gray-500">
+          Upload videos to showcase your product in action. Max size: 20MB. Supported formats: MP4, WebM, QuickTime. 
+          Maximum {MAX_VIDEOS} videos allowed.
+        </p>
+        {imageErrors.video && (
+          <p className="mt-2 text-sm text-red-600 whitespace-pre-line">{imageErrors.video}</p>
+        )}
+        {videoPreviews.length > 0 && (
+          <div className="mt-2">
+            <p className="text-sm text-gray-500">Video Previews:</p>
+            <div className="mt-2 grid grid-cols-2 gap-4">
+              {videoPreviews.map((preview, index) => (
+                <div key={index} className="relative">
+                  <video 
+                    src={preview.url} 
+                    controls 
+                    className="h-40 w-full rounded-md object-cover"
+                  >
+                    Your browser does not support the video tag.
+                  </video>
+                  <p className="mt-1 text-xs text-gray-500 truncate">{preview.file.name}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+        {type === 'edit' && product?.videos && product.videos.length > 0 && (
+          <div className="mt-2">
+            <p className="text-sm text-gray-500">Current videos:</p>
+            <div className="mt-2 grid grid-cols-2 gap-4">
+              {product.videos.map((video) => (
+                <div key={video.id} className="relative">
+                  <video 
+                    src={video.url} 
+                    controls 
+                    className="h-40 w-full rounded-md object-cover"
+                  >
+                    Your browser does not support the video tag.
+                  </video>
                 </div>
               ))}
             </div>

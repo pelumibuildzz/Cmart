@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale eas  orderId    String?   @unique // The order where the discount was used
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -11,16 +5,6 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
-  // Adding connection pooling configuration
-  // Adjust these values based on your needs
-  // connection_limit sets the max number of connections in the pool
-  // pool_timeout sets the timeout in seconds for getting a connection from the pool
-}
-
-enum Role {
-  USER
-  BUSINESS
-  ADMIN
 }
 
 model User {
@@ -30,13 +14,13 @@ model User {
   name         String
   universityId String
   role         Role         @default(USER)
+  totalOrders  Int          @default(0)
+  discountTier String       @default("NONE")
+  business     Business?
+  discounts    Discount[]
   orders       Order[]
   orderGroups  OrderGroup[]
-  business     Business?
   ratings      Rating[]
-  totalOrders  Int          @default(0)
-  discountTier String       @default("NONE") // NONE, BRONZE, SILVER, GOLD
-  discounts    Discount[]
 }
 
 model Business {
@@ -45,29 +29,29 @@ model Business {
   name          String
   description   String
   universityId  String
-  bankName      String? // Bank name for receiving payments
-  accountNumber String? // Account number for receiving payments
   averageRating Float         @default(0)
   totalRatings  Int           @default(0)
-  categories    Category[]
-  subCategories SubCategory[]
-  products      Product[]
-  orders        Order[]
   isVerified    Boolean       @default(false)
+  bankName      String?
+  accountNumber String?
   user          User          @relation(fields: [userId], references: [id])
+  orders        Order[]
+  products      Product[]
+  categories    Category[]    @relation("BusinessToCategory")
+  subCategories SubCategory[] @relation("BusinessToSubCategory")
 }
 
 model Rating {
   id         String      @id @default(cuid())
-  rating     Int // 1-5 stars
+  rating     Int
   comment    String?
   createdAt  DateTime    @default(now())
   userId     String
-  user       User        @relation(fields: [userId], references: [id])
-  orderId    String? // For overall order ratings
+  orderId    String?
+  subOrderId String?
   orderGroup OrderGroup? @relation(fields: [orderId], references: [id])
-  subOrderId String? // For business-specific ratings
   order      Order?      @relation(fields: [subOrderId], references: [id])
+  user       User        @relation(fields: [userId], references: [id])
 }
 
 model Product {
@@ -75,23 +59,23 @@ model Product {
   name          String
   description   String
   imageUrl      String
-  basePrice     Float // Original price set by business
+  basePrice     Float
   markupPercent Float          @default(0)
-  finalPrice    Float // Calculated final price after markup
+  finalPrice    Float
   stock         Int
   isAvailable   Boolean        @default(true)
   businessId    String
-  categories    Category[]
-  subCategories SubCategory[]
+  orderItems    OrderItem[]
   business      Business       @relation(fields: [businessId], references: [id])
   images        ProductImage[]
-  orderItems    OrderItem[]
+  categories    Category[]     @relation("CategoryToProduct")
+  subCategories SubCategory[]  @relation("ProductToSubCategory")
 }
 
 model ProductImage {
   id        String  @id @default(cuid())
-  url       String // URL of the image
-  productId String // Foreign key to Product
+  url       String
+  productId String
   product   Product @relation(fields: [productId], references: [id])
 }
 
@@ -102,12 +86,12 @@ model OrderGroup {
   status               String
   paymentId            String?
   createdAt            DateTime   @default(now())
-  shippingName         String // Recipient's name for shipping
-  shippingHall         String // Hall/building for delivery
-  shippingUniversityId String // University ID for delivery
+  shippingName         String
+  shippingHall         String
+  shippingUniversityId String
+  orders               Order[]
   shippingUniversity   University @relation(fields: [shippingUniversityId], references: [id])
   user                 User       @relation(fields: [userId], references: [id])
-  orders               Order[]
   ratings              Rating[]
 }
 
@@ -117,18 +101,18 @@ model Order {
   businessId             String
   orderGroupId           String?
   total                  Float
-  status                 String // UNVERIFIED, PENDING, PACKAGING, DELIVERING, DELIVERED, COMPLETED, CANCELLED
+  status                 String
   paymentId              String?
   paymentReceiptImageUrl String?
   payerAccountName       String?
   createdAt              DateTime    @default(now())
-  user                   User        @relation(fields: [userId], references: [id])
+  discountId             String?     @unique
   business               Business    @relation(fields: [businessId], references: [id])
+  discount               Discount?   @relation(fields: [discountId], references: [id])
   orderGroup             OrderGroup? @relation(fields: [orderGroupId], references: [id])
+  user                   User        @relation(fields: [userId], references: [id])
   orderItems             OrderItem[]
   ratings                Rating[]
-  discountId             String?     @unique
-  discount               Discount?   @relation(fields: [discountId], references: [id])
 }
 
 model OrderItem {
@@ -136,7 +120,7 @@ model OrderItem {
   orderId   String
   productId String
   quantity  Int
-  price     Float // Price at the time of purchase
+  price     Float
   order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
   product   Product @relation(fields: [productId], references: [id])
 }
@@ -145,9 +129,9 @@ model Category {
   id            String        @id @default(cuid())
   name          String        @unique
   isCustom      Boolean       @default(false)
-  businesses    Business[]
-  products      Product[]
   subCategories SubCategory[]
+  businesses    Business[]    @relation("BusinessToCategory")
+  products      Product[]     @relation("CategoryToProduct")
 }
 
 model SubCategory {
@@ -155,8 +139,8 @@ model SubCategory {
   name       String     @unique
   categoryId String
   category   Category   @relation(fields: [categoryId], references: [id])
-  businesses Business[]
-  products   Product[]
+  businesses Business[] @relation("BusinessToSubCategory")
+  products   Product[]  @relation("ProductToSubCategory")
 }
 
 model University {
@@ -173,7 +157,13 @@ model Discount {
   expiresAt  DateTime?
   createdAt  DateTime  @default(now())
   usedAt     DateTime?
-  orderId    String?   @unique // The order where the discount was used
-  order      Order?
+  orderId    String?   @unique
   user       User      @relation(fields: [userId], references: [id])
+  order      Order?
+}
+
+enum Role {
+  USER
+  BUSINESS
+  ADMIN
 }

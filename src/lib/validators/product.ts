@@ -10,6 +10,7 @@ export const productSchema = z.object({
   categoryId: z.string(),
   isAvailable: z.boolean().optional().default(true),
   images: z.instanceof(File).array().optional(),
+  videos: z.instanceof(File).array().optional(),
 });
 
 export type ProductInput = z.infer<typeof productSchema>;

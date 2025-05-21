@@ -22,7 +22,10 @@ export const uploadImage = async (
       folder,
     });
 
-    return result.url;
+    return { 
+      url: result.url,
+      fileId: result.fileId 
+    };
   } catch (error) {
     console.error('Error uploading image:', error);
     throw error;
@@ -36,6 +39,46 @@ export const uploadMultipleImages = async (
   const uploadPromises = files.map((file) => {
     const fileName = `${Date.now()}-${file.name}`;
     return uploadImage(file, fileName, folder);
+  });
+
+  return Promise.all(uploadPromises);
+};
+
+// New function for uploading videos
+export const uploadVideo = async (
+  file: File,
+  fileName: string,
+  folder: string = 'product-videos'
+) => {
+  try {
+    // Convert File to base64
+    const buffer = await file.arrayBuffer();
+    const base64 = Buffer.from(buffer).toString('base64');
+
+    const result = await imagekit.upload({
+      file: base64,
+      fileName,
+      folder,
+    });
+
+    return { 
+      url: result.url,
+      fileId: result.fileId 
+    };
+  } catch (error) {
+    console.error('Error uploading video:', error);
+    throw error;
+  }
+};
+
+// New function for uploading multiple videos
+export const uploadMultipleVideos = async (
+  files: File[],
+  folder: string = 'product-videos'
+) => {
+  const uploadPromises = files.map((file) => {
+    const fileName = `${Date.now()}-${file.name}`;
+    return uploadVideo(file, fileName, folder);
   });
 
   return Promise.all(uploadPromises);

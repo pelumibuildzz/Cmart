@@ -1,12 +1,13 @@
 import { prisma } from '../server/prisma';
-import { CreateProductData, ProductImage } from '@/types/product';
-import { uploadImage, uploadMultipleImages, deleteImage } from './imagekit.service';
+import { CreateProductData, ProductImage, ProductVideo } from '@/types/product';
+import { uploadImage, uploadMultipleImages, deleteImage, uploadVideo, uploadMultipleVideos } from './imagekit.service';
 
 export async function getProductById(id: string) {
   return prisma.product.findUnique({
     where: { id },
     include: {
       images: true,
+      videos: true,
       business: true,
       categories: true,
       subCategories: true
@@ -82,6 +83,7 @@ export async function createProduct(data: CreateProductData) {
 
     // Upload main image
     let mainImageUrl: string;
+    let mainImageFileId: string;
     try {
       // Extract only necessary properties from the image File object
       // to avoid serialization issues with function properties
@@ -96,18 +98,21 @@ export async function createProduct(data: CreateProductData) {
         text: data.image.text?.bind(data.image),
       };
       
-      mainImageUrl = await uploadImage(
+      const uploadResult = await uploadImage(
         safeImage as File, 
         `${Date.now()}-${safeImage.name}`,
         'products'
       );
+      
+      mainImageUrl = uploadResult.url;
+      mainImageFileId = uploadResult.fileId;
     } catch (error) {
       console.error('Error uploading main image:', error);
       throw new Error('Failed to upload main image');
     }
 
     // Handle additional image uploads if present
-    let additionalImages: { url: string }[] = [];
+    let additionalImages: { url: string; fileId: string }[] = [];
     if (data.images && data.images.length > 0) {
       try {
         // Create safe versions of each image to avoid serialization issues
@@ -123,18 +128,40 @@ export async function createProduct(data: CreateProductData) {
         }));
         
         const uploadedImages = await uploadMultipleImages(safeImages as File[]);
-        additionalImages = uploadedImages.map(url => ({
-          url,
-        }));
+        additionalImages = uploadedImages;
       } catch (error) {
         console.error('Error uploading additional images:', error);
         // Don't fail the whole operation if additional images fail
       }
     }
 
-    // Create product with main image and additional images
+    // Handle video uploads if present
+    let productVideos: { url: string; fileId: string }[] = [];
+    if (data.videos && data.videos.length > 0) {
+      try {
+        // Create safe versions of each video to avoid serialization issues
+        const safeVideos = data.videos.map(video => ({
+          name: video.name,
+          size: video.size,
+          type: video.type,
+          lastModified: video.lastModified,
+          arrayBuffer: video.arrayBuffer.bind(video),
+          slice: video.slice.bind(video),
+          stream: video.stream?.bind(video),
+          text: video.text?.bind(video),
+        }));
+        
+        const uploadedVideos = await uploadMultipleVideos(safeVideos as File[]);
+        productVideos = uploadedVideos;
+      } catch (error) {
+        console.error('Error uploading videos:', error);
+        // Don't fail the whole operation if videos fail
+      }
+    }
+
+    // Create product with main image, additional images, and videos
     // Extract only serializable data and avoid including any functions
-    const { categoryIds, subCategoryIds, image, images, ...productData } = data;
+    const { categoryIds, subCategoryIds, image, images, videos, ...productData } = data;
     
     return await prisma.product.create({
       data: {
@@ -142,7 +169,16 @@ export async function createProduct(data: CreateProductData) {
         finalPrice: productData.finalPrice || 0, 
         imageUrl: mainImageUrl,
         images: {
-          create: additionalImages,
+          create: additionalImages.map(img => ({
+            url: img.url,
+            fileId: img.fileId
+          })),
+        },
+        videos: {
+          create: productVideos.map(video => ({
+            url: video.url,
+            fileId: video.fileId
+          })),
         },
         ...(categoryIds && categoryIds.length > 0 && {
           categories: {
@@ -157,6 +193,7 @@ export async function createProduct(data: CreateProductData) {
       },
       include: {
         images: true,
+        videos: true,
         categories: true,
         subCategories: true,
         business: {
@@ -177,6 +214,7 @@ export async function updateProduct(id: string, data: Partial<CreateProductData>
     where: { id },
     include: { 
       images: true,
+      videos: true,
       categories: true,
       subCategories: true
     },
@@ -187,7 +225,7 @@ export async function updateProduct(id: string, data: Partial<CreateProductData>
   }
 
   // Handle additional image uploads if present
-  let additionalImages: ProductImage[] = [];
+  let additionalImages: { url: string; fileId: string }[] = [];
   if (data.images && data.images.length > 0) {
     try {
       // Create safe versions of each image to avoid serialization issues
@@ -202,39 +240,83 @@ export async function updateProduct(id: string, data: Partial<CreateProductData>
         text: img.text?.bind(img),
       }));
       
-      // Upload new images
+      // Upload all images
       const uploadedImages = await uploadMultipleImages(safeImages as File[]);
-      additionalImages = uploadedImages.map((url) => ({
-        url, // Map the uploaded image URLs correctly
-      }));
+      
+      // Create image records (not persisted yet, just for the Prisma query)
+      additionalImages = uploadedImages;
     } catch (error) {
       console.error('Error uploading additional images:', error);
-      // Continue with the update even if image uploads fail
+      // Don't fail the whole operation if additional images fail
+    }
+  }
+
+  // Handle video uploads if present
+  let productVideos: { url: string; fileId: string }[] = [];
+  if (data.videos && data.videos.length > 0) {
+    try {
+      // Create safe versions of each video to avoid serialization issues
+      const safeVideos = data.videos.map(video => ({
+        name: video.name,
+        size: video.size,
+        type: video.type,
+        lastModified: video.lastModified,
+        arrayBuffer: video.arrayBuffer.bind(video),
+        slice: video.slice.bind(video),
+        stream: video.stream?.bind(video),
+        text: video.text?.bind(video),
+      }));
+
+      // Upload all videos
+      const uploadedVideos = await uploadMultipleVideos(safeVideos as File[]);
+      
+      // Create video records (not persisted yet, just for the Prisma query)
+      productVideos = uploadedVideos;
+    } catch (error) {
+      console.error('Error uploading videos:', error);
+      // Don't fail the whole operation if videos fail
     }
   }
 
   // Delete old images from ImageKit if we have new images to replace them
   if (additionalImages.length > 0 && product.images.length > 0) {
     try {
-      // Extract the file IDs from the image URLs
-      // ImageKit URLs typically look like: https://ik.imagekit.io/your_imagekit_id/filename
-      // The file ID is the part after the last slash
-      const deletePromises = product.images.map((image) => {
-        const urlParts = image.url.split('/');
-        const fileId = urlParts[urlParts.length - 1];
-        return deleteImage(fileId);
-      });
+      // Delete the old images from ImageKit using the stored fileIds
+      const deletePromises: Promise<void>[] = product.images
+        .filter(image => image.fileId) // Only process images with fileId
+        .map(image => deleteImage(image.fileId!));
       
       // Use Promise.allSettled to continue even if some deletions fail
+      if (deletePromises.length > 0) {
       await Promise.allSettled(deletePromises);
+      }
     } catch (error) {
       console.error('Error deleting old images:', error);
       // Continue with the update even if image deletion fails
     }
   }
 
+  // Delete old videos from ImageKit if we have new videos to replace them
+  if (productVideos.length > 0 && product.videos.length > 0) {
+    try {
+      // Delete the old videos from ImageKit using the stored fileIds
+      const deletePromises: Promise<void>[] = product.videos
+        .filter(video => video.fileId) // Only process videos with fileId
+        .map(video => deleteImage(video.fileId!));
+      
+      // Use Promise.allSettled to continue even if some deletions fail
+      if (deletePromises.length > 0) {
+        await Promise.allSettled(deletePromises);
+      }
+    } catch (error) {
+      console.error('Error deleting old videos:', error);
+      // Continue with the update even if video deletion fails
+    }
+  }
+
   // Handle main image update if present
   let mainImageUrl;
+  let mainImageFileId;
   if (data.image) {
     try {
       // Create a safe image object to avoid serialization issues
@@ -249,11 +331,14 @@ export async function updateProduct(id: string, data: Partial<CreateProductData>
         text: data.image.text?.bind(data.image),
       };
       
-      mainImageUrl = await uploadImage(
+      const uploadResult = await uploadImage(
         safeImage as File,
         `${Date.now()}-${safeImage.name}`,
         'products'
       );
+      
+      mainImageUrl = uploadResult.url;
+      mainImageFileId = uploadResult.fileId;
     } catch (error) {
       console.error('Error uploading main image:', error);
       // Continue with the update even if main image upload fails
@@ -261,7 +346,7 @@ export async function updateProduct(id: string, data: Partial<CreateProductData>
   }
 
   // Prepare update data - remove all non-serializable elements
-  const { images, image, categoryIds, subCategoryIds, ...updateData } = data;
+  const { images, image, videos, categoryIds, subCategoryIds, ...updateData } = data;
   
   // Prepare categories update if needed
   const categoryUpdates = categoryIds ? {
@@ -286,7 +371,19 @@ export async function updateProduct(id: string, data: Partial<CreateProductData>
       ...(additionalImages.length > 0 && {
         images: {
           deleteMany: {}, // Clear old images from the database
-          create: additionalImages, // Add new images
+          create: additionalImages.map(img => ({
+            url: img.url,
+            fileId: img.fileId
+          })),
+        },
+      }),
+      ...(productVideos.length > 0 && {
+        videos: {
+          deleteMany: {}, // Clear old videos from the database
+          create: productVideos.map(video => ({
+            url: video.url,
+            fileId: video.fileId
+          })),
         },
       }),
       ...categoryUpdates,
@@ -294,6 +391,7 @@ export async function updateProduct(id: string, data: Partial<CreateProductData>
     },
     include: {
       images: true,
+      videos: true,
       business: true,
       categories: true,
       subCategories: true
@@ -322,7 +420,7 @@ export async function updateProductMainImage(productId: string, newImage: File) 
     text: newImage.text?.bind(newImage),
   };
 
-  const newImageUrl = await uploadImage(
+  const uploadResult = await uploadImage(
     safeImage as File,
     `${Date.now()}-${safeImage.name}`,
     'products'
@@ -331,10 +429,11 @@ export async function updateProductMainImage(productId: string, newImage: File) 
   return prisma.product.update({
     where: { id: productId },
     data: {
-      imageUrl: newImageUrl,
+      imageUrl: uploadResult.url,
     },
     include: {
       images: true,
+      videos: true,
       business: true,
       categories: true,
       subCategories: true
@@ -345,7 +444,10 @@ export async function updateProductMainImage(productId: string, newImage: File) 
 export async function deleteProduct(id: string) {
   const product = await prisma.product.findUnique({
     where: { id },
-    include: { images: true },
+    include: { 
+      images: true,
+      videos: true
+    },
   });
 
   if (!product) {
@@ -353,30 +455,47 @@ export async function deleteProduct(id: string) {
   }
 
   try {
-    // Extract file IDs from image URLs
-    const deletePromises = [];
+    const deletePromises: Promise<void>[] = [];
     
-    // Handle main image if it exists
-    if (product.imageUrl) {
-      const mainUrlParts = product.imageUrl.split('/');
-      const mainFileId = mainUrlParts[mainUrlParts.length - 1];
-      deletePromises.push(deleteImage(mainFileId));
-    }
-    
-    // Handle additional images
-    product.images.forEach(image => {
-      const urlParts = image.url.split('/');
-      const fileId = urlParts[urlParts.length - 1];
-      deletePromises.push(deleteImage(fileId));
+    // Delete all product images from ImageKit using their fileIds
+    product.images
+      .filter(image => image.fileId) // Only process images with fileId
+      .forEach(image => {
+        deletePromises.push(deleteImage(image.fileId!));
+      });
+
+    // Delete all product videos from ImageKit using their fileIds
+    product.videos
+      .filter(video => video.fileId) // Only process videos with fileId
+      .forEach(video => {
+        deletePromises.push(deleteImage(video.fileId!));
     });
     
     // Use Promise.allSettled to continue even if some deletions fail
+    if (deletePromises.length > 0) {
     await Promise.allSettled(deletePromises);
+    }
   } catch (error) {
-    console.error('Error deleting images:', error);
-    // Continue with product deletion even if image deletion fails
+    console.error('Error deleting media files:', error);
+    // Continue with product deletion even if media deletion fails
   }
 
+  // Handle cascading deletion to avoid foreign key constraint errors
+  // First, delete all associated images
+  if (product.images.length > 0) {
+    await prisma.productImage.deleteMany({
+      where: { productId: id }
+    });
+  }
+
+  // Then, delete all associated videos
+  if (product.videos.length > 0) {
+    await prisma.productVideo.deleteMany({
+      where: { productId: id }
+    });
+  }
+
+  // Finally, delete the product itself
   return prisma.product.delete({
     where: { id },
   });
@@ -417,9 +536,10 @@ export async function addProductImages(productId: string, images: File[]) {
     text: img.text?.bind(img),
   }));
 
-  const uploadedImages = await uploadMultipleImages(safeImages as File[]);
-  const imageData = uploadedImages.map(url => ({
-    url,
+  const uploadResults = await uploadMultipleImages(safeImages as File[]);
+  const imageData = uploadResults.map(result => ({
+    url: result.url,
+    fileId: result.fileId,
     productId,
   }));
 
@@ -432,6 +552,7 @@ export async function addProductImages(productId: string, images: File[]) {
     },
     include: {
       images: true,
+      videos: true,
       business: true,
       categories: true,
       subCategories: true
@@ -452,12 +573,10 @@ export async function removeProductImage(productId: string, imageId: string) {
   }
 
   try {
-    // Extract the file ID from the image URL
-    const urlParts = image.url.split('/');
-    const fileId = urlParts[urlParts.length - 1];
-    
-    // Delete image from ImageKit
-    await deleteImage(fileId);
+    // Delete image from ImageKit using the fileId if it exists
+    if (image.fileId) {
+      await deleteImage(image.fileId);
+    }
   } catch (error) {
     console.error('Error deleting image from ImageKit:', error);
     // Continue with database deletion even if ImageKit deletion fails
@@ -583,5 +702,92 @@ export async function updateProductStock(productId: string, quantity: number) {
         decrement: quantity
       }
     }
+  });
+}
+
+// Add new function to handle adding videos to a product
+export async function addProductVideos(productId: string, videos: File[]) {
+  const product = await prisma.product.findUnique({
+    where: { id: productId },
+    include: { videos: true },
+  });
+
+  if (!product) {
+    throw new Error('Product not found');
+  }
+
+  // Create safe versions of each video to avoid serialization issues
+  const safeVideos = videos.map(video => ({
+    name: video.name,
+    size: video.size,
+    type: video.type,
+    lastModified: video.lastModified,
+    arrayBuffer: video.arrayBuffer.bind(video),
+    slice: video.slice.bind(video),
+    stream: video.stream?.bind(video),
+    text: video.text?.bind(video),
+  }));
+
+  const uploadResults = await uploadMultipleVideos(safeVideos as File[]);
+  const videoData = uploadResults.map(result => ({
+    url: result.url,
+    fileId: result.fileId,
+    productId,
+  }));
+
+  return prisma.product.update({
+    where: { id: productId },
+    data: {
+      videos: {
+        create: videoData,
+      },
+    },
+    include: {
+      images: true,
+      videos: true,
+      business: true,
+      categories: true,
+      subCategories: true
+    },
+  });
+}
+
+// Add new function to remove a video from a product
+export async function removeProductVideo(productId: string, videoId: string) {
+  const video = await prisma.productVideo.findFirst({
+    where: { 
+      id: videoId,
+      productId 
+    }
+  });
+
+  if (!video) {
+    throw new Error('Video not found or does not belong to this product');
+  }
+
+  try {
+    // Delete video from ImageKit using the fileId if it exists
+    if (video.fileId) {
+      await deleteImage(video.fileId);
+    }
+  } catch (error) {
+    console.error('Error deleting video from ImageKit:', error);
+    // Continue with database deletion even if ImageKit deletion fails
+  }
+
+  // Delete from database
+  await prisma.productVideo.delete({
+    where: { id: videoId }
+  });
+
+  return prisma.product.findUnique({
+    where: { id: productId },
+    include: {
+      images: true,
+      videos: true,
+      business: true,
+      categories: true,
+      subCategories: true
+    },
   });
 }

@@ -1,7 +1,8 @@
 export interface ProductImage {
-  id?: string;
+  id: string;
   url: string;
-  productId?: string;
+  fileId?: string;
+  productId: string;
 }
 
 export interface CreateProductData {
@@ -17,6 +18,7 @@ export interface CreateProductData {
   subCategoryIds?: string[]; // Optional subcategories
   isAvailable?: boolean;
   images?: File[];  // Additional product images
+  videos?: File[];  // Product videos
 }
 
 export interface ProductImageUploadResult {
@@ -35,4 +37,12 @@ export interface SubCategory {
   name: string;
   categoryId: string;
   category?: Category;
+}
+
+export interface ProductVideo {
+  id: string;
+  url: string;
+  fileId?: string;
+  thumbnailUrl?: string;
+  productId: string;
 } 

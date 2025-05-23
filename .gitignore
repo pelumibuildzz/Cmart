@@ -41,7 +41,10 @@ yarn-error.log*
 next-env.d.ts
 
 # prisma
-/prisma/seed/realdb.ts
-/prisma/seed/index.ts
+/prisma/seed/
 
 /docs
+
+c-mart-backup.dump
+
+/prisma/migrations_backup

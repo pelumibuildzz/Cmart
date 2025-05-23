@@ -129,7 +129,7 @@ export default function ProductCard({
 
   return (
     <Link href={`/products/${id}`} >
-      <div className={`bg-white rounded-lg shadow-md overflow-hidden ${!isAvailable && 'relative opacity-80'}`}>
+      <div className={`bg-white rounded-lg shadow-md overflow-hidden ${!isAvailable && 'relative opacity-80 max-h-[500px]'}`}>
         {/* Unavailable Overlay for Owner */}
         {!isAvailable && isOwner && (
           <div className="absolute inset-0 bg-gray-900 bg-opacity-30 z-10 flex flex-col items-center justify-center">

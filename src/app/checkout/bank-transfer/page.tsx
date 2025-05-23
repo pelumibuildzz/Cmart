@@ -77,10 +77,20 @@ export default function BankTransferCheckoutPage() {
         const parsedDetails = JSON.parse(savedOrderDetails);
         setOrderDetails(parsedDetails);
         setOrderGroupId(parsedDetails.orderGroupId || '');
-      }
-      
-      if (savedStep && Object.values(CheckoutStep).includes(savedStep as CheckoutStep)) {
-        setCurrentStep(savedStep as CheckoutStep);
+        
+        // If we have order details, we can load the saved step
+        if (savedStep && Object.values(CheckoutStep).includes(savedStep as CheckoutStep)) {
+          setCurrentStep(savedStep as CheckoutStep);
+        } else {
+          // If we have order details but no saved step, go to confirmation
+          setCurrentStep(CheckoutStep.CONFIRMATION);
+        }
+      } else {
+        // If there's no saved order details, we should always start from shipping
+        setCurrentStep(CheckoutStep.SHIPPING);
+        
+        // Clear any potentially saved step when starting a new order
+        localStorage.removeItem('bankTransferCheckoutStep');
       }
     }
   }, []);

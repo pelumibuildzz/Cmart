@@ -14,8 +14,8 @@ model User {
   name         String
   universityId String
   role         Role         @default(USER)
-  totalOrders  Int          @default(0)
   discountTier String       @default("NONE")
+  totalOrders  Int          @default(0)
   business     Business?
   discounts    Discount[]
   orders       Order[]
@@ -29,11 +29,11 @@ model Business {
   name          String
   description   String
   universityId  String
+  isVerified    Boolean       @default(false)
   averageRating Float         @default(0)
   totalRatings  Int           @default(0)
-  isVerified    Boolean       @default(false)
-  bankName      String?
   accountNumber String?
+  bankName      String?
   user          User          @relation(fields: [userId], references: [id])
   orders        Order[]
   products      Product[]
@@ -59,15 +59,16 @@ model Product {
   name          String
   description   String
   imageUrl      String
-  basePrice     Float
-  markupPercent Float          @default(0)
-  finalPrice    Float
   stock         Int
   isAvailable   Boolean        @default(true)
   businessId    String
+  basePrice     Float
+  finalPrice    Float
+  markupPercent Float          @default(0)
   orderItems    OrderItem[]
   business      Business       @relation(fields: [businessId], references: [id])
   images        ProductImage[]
+  videos        ProductVideo[]
   categories    Category[]     @relation("CategoryToProduct")
   subCategories SubCategory[]  @relation("ProductToSubCategory")
 }
@@ -76,7 +77,17 @@ model ProductImage {
   id        String  @id @default(cuid())
   url       String
   productId String
+  fileId    String?
   product   Product @relation(fields: [productId], references: [id])
+}
+
+model ProductVideo {
+  id           String  @id @default(cuid())
+  url          String
+  thumbnailUrl String?
+  productId    String
+  fileId       String?
+  product      Product @relation(fields: [productId], references: [id])
 }
 
 model OrderGroup {
@@ -86,8 +97,8 @@ model OrderGroup {
   status               String
   paymentId            String?
   createdAt            DateTime   @default(now())
-  shippingName         String
   shippingHall         String
+  shippingName         String
   shippingUniversityId String
   orders               Order[]
   shippingUniversity   University @relation(fields: [shippingUniversityId], references: [id])
@@ -99,14 +110,14 @@ model Order {
   id                     String      @id @default(cuid())
   userId                 String
   businessId             String
-  orderGroupId           String?
   total                  Float
   status                 String
   paymentId              String?
-  paymentReceiptImageUrl String?
-  payerAccountName       String?
   createdAt              DateTime    @default(now())
+  orderGroupId           String?
   discountId             String?     @unique
+  payerAccountName       String?
+  paymentReceiptImageUrl String?
   business               Business    @relation(fields: [businessId], references: [id])
   discount               Discount?   @relation(fields: [discountId], references: [id])
   orderGroup             OrderGroup? @relation(fields: [orderGroupId], references: [id])

@@ -16,24 +16,24 @@ interface BankAccount {
 const BANK_ACCOUNTS: Record<string, BankAccount> = {
   'bank-1': {
     id: 'bank-1',
-    bankName: 'First Bank',
-    accountName: 'C-Mart Ltd',
-    accountNumber: '1234567890',
-    bankLogo: '/images/banks/firstbank.png',
+    bankName: 'Moniepoint MFB',
+    accountName: 'SOMTOCHUKWU EDWIN-IKU',
+    accountNumber: '9071976196',
+    bankLogo: '/banks/moniepoint.jpeg',
   },
   'bank-2': {
     id: 'bank-2',
-    bankName: 'GTBank',
-    accountName: 'C-Mart Ltd',
-    accountNumber: '0987654321',
-    bankLogo: '/images/banks/gtbank.png',
+    bankName: 'Nombank Mfb',
+    accountName: 'SOMTOCHUKWU EDWIN-IKU',
+    accountNumber: '1466933912',
+    bankLogo: '/banks/nombank.png',
   },
   'bank-3': {
     id: 'bank-3',
-    bankName: 'Zenith Bank',
-    accountName: 'C-Mart Ltd',
-    accountNumber: '5678901234',
-    bankLogo: '/images/banks/zenithbank.png',
+    bankName: 'Kuda Mfb',
+    accountName: 'SOMTOCHUKWU EDWIN-IKU',
+    accountNumber: '3002523540',
+    bankLogo: '/banks/kuda.svg',
   },
 };
 

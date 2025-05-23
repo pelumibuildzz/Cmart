@@ -10,7 +10,7 @@
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
     "db:push": "prisma db push",
-    "seed": "node --loader ts-node/esm prisma/seed/index.ts",
+    "seed": "node --loader ts-node/esm prisma/seed/realdb.ts",
     "postinstall": "prisma generate"
   },
   "dependencies": {

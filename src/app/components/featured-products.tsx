@@ -37,7 +37,10 @@ export default async function FeaturedProducts() {
                     description={product.description}
                     price={product.finalPrice}
                     imageUrl={product.imageUrl}
-                    images={product.images}
+                    images={product.images?.map(image => ({
+                      ...image,
+                      fileId: image.fileId || undefined // Convert null to undefined
+                    }))}
                     stock={product.stock}
                     businessId={product.business.id}
                     categories={product.categories}
@@ -57,7 +60,10 @@ export default async function FeaturedProducts() {
                 description={product.description}
                 price={product.finalPrice}
                 imageUrl={product.imageUrl}
-                images={product.images}
+                images={product.images?.map(image => ({
+                  ...image,
+                  fileId: image.fileId || undefined // Convert null to undefined
+                }))}
                 stock={product.stock}
                 businessId={product.business.id}
                 categories={product.categories}

@@ -100,15 +100,17 @@ export default async function CategoryDetails({ params }: { params: Promise<{ ca
             Products in {category.name}
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {products.map((product) => (
-              <ProductCard
+            {products.map((product) => (              <ProductCard
                 key={product.id}
                 id={product.id}
                 name={product.name}
                 description={product.description}
                 price={product.finalPrice}
                 imageUrl={product.imageUrl}
-                images={product.images}
+                images={product.images?.map(image => ({
+                  ...image,
+                  fileId: image.fileId || undefined // Convert null to undefined
+                }))}
                 stock={product.stock}
                 businessId={product.business.id}
                 categories={product.categories}

@@ -71,15 +71,17 @@ export default async function MarketDetails({ params }: {params: Promise<{ busin
 
       {/* Products Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        {business.products.map((product) => (
-          <ProductCard
+        {business.products.map((product) => (          <ProductCard
             key={product.id}
             id={product.id}
             name={product.name}
             description={product.description}
             price={product.finalPrice}
             imageUrl={product.imageUrl}
-            images={product.images || []}
+            images={(product.images || []).map(image => ({
+              ...image,
+              fileId: image.fileId || undefined // Convert null to undefined
+            }))}
             stock={product.stock}
             businessId={business.id}
             isAvailable={product.isAvailable}

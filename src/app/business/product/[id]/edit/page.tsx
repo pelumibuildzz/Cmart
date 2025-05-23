@@ -31,12 +31,16 @@ export default async function EditProduct({ params }: { params : Promise<{ id: s
   if (!product || product.businessId !== business.id) {
     redirect('/business/dashboard');
   }
-
   // Transform the product to match what ProductForm expects
   const transformedProduct = {
     ...product,
     price: product.finalPrice, // Map finalPrice to price property
     categoryId: product.categories?.[0]?.id || '', // Get first categoryId if available
+    // Fix video thumbnailUrl from string|null to string|undefined
+    videos: product.videos?.map(video => ({
+      ...video,
+      thumbnailUrl: video.thumbnailUrl || undefined // Convert null to undefined
+    }))
   };
 
   return (

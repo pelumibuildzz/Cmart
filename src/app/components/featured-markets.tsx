@@ -29,13 +29,17 @@ export default async function FeaturedMarkets() {
           <div className="px-6">
             <ClientCarousel>
               {markets.map((business) => (
-                <CarouselItem key={business.id} className="pl-4 md:basis-1/2 lg:basis-1/4">
-                  <Link 
+                <CarouselItem key={business.id} className="pl-4 md:basis-1/2 lg:basis-1/4">                  <Link 
                     href={`/markets/${business.id}`}
-                    className="group relative overflow-hidden rounded-lg bg-white shadow-md hover:shadow-lg transition-shadow duration-300 block"
+                    className="group relative overflow-hidden rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 block"
                   >
-                    <div className="aspect-square w-full bg-gray-200" />
-                    <div className="absolute inset-0 flex items-center justify-center bg-secondary/60 group-hover:bg-secondary/70 transition-colors">
+                    <div 
+                      className="aspect-square w-full bg-white bg-cover bg-center"
+                      style={business.imageUrl ? {
+                        backgroundImage: `url('${business.imageUrl}')`,
+                      } : {}}
+                    />
+                    <div className="absolute inset-0 flex items-center justify-center bg-secondary/10 group-hover:bg-secondary/0 transition-colors">
                       <span className="text-white text-lg font-medium">{business.name}</span>
                     </div>
                   </Link>
@@ -43,16 +47,20 @@ export default async function FeaturedMarkets() {
               ))}
             </ClientCarousel>
           </div>
-        ) : (
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+        ) : (          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             {markets.map((business) => (
               <Link 
                 key={business.id} 
                 href={`/markets/${business.id}`}
                 className="group relative overflow-hidden rounded-lg bg-white shadow-md hover:shadow-lg transition-shadow duration-300"
               >
-                <div className="aspect-square w-full bg-gray-200" />
-                <div className="absolute inset-0 flex items-center justify-center bg-secondary/60 group-hover:bg-secondary/70 transition-colors">
+                <div 
+                  className="aspect-square w-full bg-gray-100/5 bg-cover bg-center"
+                  style={business.imageUrl ? {
+                    backgroundImage: `url('${business.imageUrl}')`,
+                  } : {}}
+                />
+                <div className="absolute inset-0 flex items-center justify-center bg-secondary/60 group-hover:bg-secondary/30 transition-colors">
                   <span className="text-white text-lg font-medium">{business.name}</span>
                 </div>
               </Link>

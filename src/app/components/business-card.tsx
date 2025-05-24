@@ -1,10 +1,26 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { Store, Tag } from 'lucide-react';
 
 export default function BusinessCard({ business }: { business: any }) {
   return (
     <Link href={`/markets/${business.id}`}>
       <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
+        {business.imageUrl ? (
+          <div className="w-full h-40 relative">
+            <Image 
+              src={business.imageUrl} 
+              alt={business.name}
+              fill
+              className="object-cover"
+            />
+          </div>
+        ) : (
+          <div className="w-full h-40 bg-gray-100 flex items-center justify-center">
+            <Store className="h-16 w-16 text-gray-400" />
+          </div>
+        )}
+        
         <div className="p-6">
           <div className="flex items-start justify-between">
             <div>

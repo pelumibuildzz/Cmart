@@ -30,6 +30,10 @@ export interface Business {
   averageRating: number;
   totalRatings: number;
   isVerified: boolean;
+  imageUrl: string | null;
+  imageFileId: string | null;
+  accountNumber: string | null;
+  bankName: string | null;
   categories: { id: string; name: string }[];
   subCategories: { id: string; name: string; categoryId: string }[];
 }

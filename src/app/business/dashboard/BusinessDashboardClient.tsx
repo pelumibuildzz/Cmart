@@ -63,7 +63,14 @@ export default function BusinessDashboardClient({
               <h1 className="text-3xl font-bold text-secondary">{business.name}</h1>
               <p className="text-gray-600 mt-1">{business.description}</p>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-3">
+              <Link 
+                href="/business/profile" 
+                className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
+              >
+                <Edit className="w-4 h-4 mr-2" />
+                Edit Profile
+              </Link>
               {business.isVerified ? (
                 <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
                   <CheckCircle className="w-4 h-4 mr-1" />

@@ -34,6 +34,8 @@ model Business {
   totalRatings  Int           @default(0)
   accountNumber String?
   bankName      String?
+  imageUrl      String?
+  imageFileId   String?
   user          User          @relation(fields: [userId], references: [id])
   orders        Order[]
   products      Product[]

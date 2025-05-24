@@ -3,10 +3,12 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import { University, Category, SubCategory } from '@prisma/client';
 import { fetchUniversities } from '@/app/actions/university.action';
 import { fetchCategories, fetchSubCategoriesByCategory, createSubCategoryAction } from '@/app/actions/category.action';
 import { Role } from '@/lib/constants';
+import { Upload, X } from 'lucide-react';
 
 export default function SignUp() {
   const router = useRouter();
@@ -26,6 +28,8 @@ export default function SignUp() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [selectedCategoryIds, setSelectedCategoryIds] = useState<string[]>([]);
   const [selectedSubCategoryIds, setSelectedSubCategoryIds] = useState<string[]>([]);
+  const [businessImage, setBusinessImage] = useState<File | null>(null);
+  const [businessImagePreview, setBusinessImagePreview] = useState<string | null>(null);
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isFetchingData, setIsFetchingData] = useState(true);
@@ -81,7 +85,6 @@ export default function SignUp() {
       }
     });
   };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -113,40 +116,115 @@ export default function SignUp() {
     setError('');
     
     try {
-      const response = await fetch('/api/auth/signup', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          name,
-          email,
-          password,
-          universityId,
-          role,
-          business: role === Role.BUSINESS ? {
-            name: businessName,
-            description: businessDescription,
-            bankName,
-            accountNumber,
-            categoryIds: selectedCategoryIds,
-            subCategoryIds: selectedSubCategoryIds.length > 0 ? selectedSubCategoryIds : undefined,
+    // Create FormData if we have a business image
+      if (role === Role.BUSINESS && businessImage) {
+        const formData = new FormData();
+        formData.append('name', name);
+        formData.append('email', email);
+        formData.append('password', password);
+        formData.append('universityId', universityId);
+        formData.append('role', role);
+        formData.append('businessName', businessName);
+        formData.append('businessDescription', businessDescription);
+        
+        // Add bank details
+        if (bankName) formData.append('bankName', bankName);
+        if (accountNumber) formData.append('accountNumber', accountNumber);
+        
+        // Add the business image
+        formData.append('businessImage', businessImage);
+        
+        // Add category and subcategory IDs
+        selectedCategoryIds.forEach(id => {
+          formData.append('categoryIds', id);
+        });
+        
+        if (selectedSubCategoryIds.length > 0) {
+          selectedSubCategoryIds.forEach(id => {
+            formData.append('subCategoryIds', id);
+          });
+        }
+
+        // Use the API route to handle the signup with image
+        const response = await fetch('/api/auth/signup-with-image', {
+          method: 'POST',
+          body: formData,
+        });
+        
+        const data = await response.json();
+        
+        if (!response.ok) {
+          throw new Error(data.message || 'Something went wrong');
+        }
+        
+        router.push('/auth/signin');
+      } else {
+        // Use the existing JSON-based signup for non-business users or business without image
+        const response = await fetch('/api/auth/signup', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            name,
+            email,
+            password,
             universityId,
-          } : undefined,
-        }),
-      });
-      
-      const data = await response.json();
-      
-      if (!response.ok) {
-        throw new Error(data.message || 'Something went wrong');
+            role,
+            business: role === Role.BUSINESS ? {
+              name: businessName,
+              description: businessDescription,
+              bankName,
+              accountNumber,
+              categoryIds: selectedCategoryIds,
+              subCategoryIds: selectedSubCategoryIds.length > 0 ? selectedSubCategoryIds : undefined,
+              universityId,
+            } : undefined,
+          }),
+        });
+        
+        const data = await response.json();
+        
+        if (!response.ok) {
+          throw new Error(data.message || 'Something went wrong');
+        }
+        
+        router.push('/auth/signin');
       }
-      
-      router.push('/auth/signin');
     } catch (error: any) {
       setError(error.message || 'An error occurred. Please try again.');
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleBusinessImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file
+    const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
+    const MAX_SIZE = 5 * 1024 * 1024; // 5MB
+
+    if (!ALLOWED_TYPES.includes(file.type)) {
+      setError('Invalid file type. Only JPEG, PNG, and WebP images are allowed.');
+      return;
+    }
+
+    if (file.size > MAX_SIZE) {
+      setError('File size too large. Maximum size is 5MB.');
+      return;
+    }
+
+    setBusinessImage(file);
+    setBusinessImagePreview(URL.createObjectURL(file));
+  };
+
+  const handleRemoveBusinessImage = () => {
+    setBusinessImage(null);
+    if (businessImagePreview) {
+      URL.revokeObjectURL(businessImagePreview);
+      setBusinessImagePreview(null);
     }
   };
 
@@ -251,8 +329,7 @@ export default function SignUp() {
                 disabled={isLoading}
                 required
               />
-            </div>
-
+            </div>            
             <div>
               <label htmlFor="businessDescription" className="block mb-1 font-medium text-secondary">
                 Business Description
@@ -394,6 +471,56 @@ export default function SignUp() {
             required
           />
         </div>
+
+        {formData.role === Role.BUSINESS && (
+          <div>
+            <label className="block mb-1 font-medium text-secondary">
+              Business Image
+            </label>
+            <div className="flex items-center space-x-4">
+              {businessImagePreview ? (
+                <div className="relative">
+                  <img
+                    src={businessImagePreview}
+                    alt="Business Image Preview"
+                    className="w-16 h-16 object-cover rounded-md"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleRemoveBusinessImage}
+                    className="absolute top-0 right-0 bg-red-500 text-white rounded-full p-1 shadow-md hover:bg-red-600 transition-colors"
+                    disabled={isLoading}
+                    title="Remove image"
+                  >
+                    &times;
+                  </button>
+                </div>
+              ) : (
+                <span className="text-sm text-gray-500">
+                  No image selected
+                </span>
+              )}
+              
+              <label className="flex items-center cursor-pointer">
+                <span className="text-sm text-gray-700 mr-2">
+                  {businessImagePreview ? 'Change Image' : 'Upload Image'}
+                </span>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleBusinessImageChange}
+                  className="hidden"
+                  disabled={isLoading}
+                />
+                <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-primary text-white hover:bg-primary/90 transition-colors">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                  </svg>
+                </span>
+              </label>
+            </div>
+          </div>
+        )}
         
         <div>
           <button

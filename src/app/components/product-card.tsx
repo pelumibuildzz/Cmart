@@ -116,8 +116,8 @@ export default function ProductCard({
         count = count + 1
       }
     }))
-    if(count == 0 && items.length == 2){
-      alert("Just a heads up! We're currently limiting carts to 2 items. Thanks for understanding! 😊")
+    if(count == 0 && items.length == 4){
+      alert("Just a heads up! We're currently limiting carts to 4 items. Thanks for understanding! 😊")
       setIsAdding(false)
     }
 

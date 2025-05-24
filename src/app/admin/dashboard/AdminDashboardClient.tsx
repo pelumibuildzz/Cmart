@@ -55,7 +55,23 @@ export default function AdminDashboardClient({
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h1 className="text-3xl font-bold text-secondary mb-8">Admin Dashboard</h1>
+        <h1 className="text-3xl font-bold text-secondary mb-4">Admin Dashboard</h1>
+        
+        {/* Admin Navigation */}
+        <div className="flex space-x-4 mb-8">
+          <a 
+            href="/admin/dashboard" 
+            className="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/90"
+          >
+            Dashboard
+          </a>
+          <a 
+            href="/admin/markup" 
+            className="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/90"
+          >
+            Manage Markups
+          </a>
+        </div>
 
         {/* Businesses Section */}
         <BusinessesTable businesses={businesses} onVerifyBusiness={verifyBusiness} />

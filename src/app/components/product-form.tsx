@@ -80,7 +80,7 @@ export default function ProductForm({ type, product, businessId, categories }: P
   const [additionalImagePreviews, setAdditionalImagePreviews] = useState<ImagePreview[]>([]);
   const [videoPreviews, setVideoPreviews] = useState<VideoPreview[]>([]);
   const [basePrice, setBasePrice] = useState<number>(product?.basePrice || 0);
-  const [markupPercent, ] = useState<number>(product?.markupPercent || 15);
+  const markupPercent= product?.markupPercent || 10;
   const [finalPrice, setFinalPrice] = useState<number>(product?.finalPrice || 0);
   const [selectedCategoryId, setSelectedCategoryId] = useState<string>(
     product?.categories?.[0]?.id || ''

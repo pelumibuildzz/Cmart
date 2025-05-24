@@ -1,5 +1,5 @@
 // require('dotenv').config();
-// const { PrismaClient } = require('../../src/generated/prisma');
+// const { PrismaClient } = require('@prisma/client');
 // const bcrypt = require('bcryptjs');
 
 // const Role = {
@@ -12,7 +12,7 @@
 // const defaultImageUrl = process.env.IMAGEKIT_URL_ENDPOINT + "/default-image.jpg";
 
 // // Helper function to hash passwords
-// async function hashPassword(password) {
+// async function hashPassword(password : string) {
 //   const salt = await bcrypt.genSalt(10);
 //   const pepper = process.env.BCRYPT_SECRET;
 //   return bcrypt.hash(password + pepper, salt);

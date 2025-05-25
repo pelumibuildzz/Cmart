@@ -2,7 +2,7 @@
 
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth/options';
-import { createProduct, updateProduct, deleteProduct, getProductById } from '@/lib/services/product.service';
+import { createProduct, updateProduct, deleteProduct, getProductById, getRelatedProducts } from '@/lib/services/product.service';
 import { Role } from '@/lib/constants';
 import { revalidatePath } from 'next/cache';
 import { CreateProductData } from '@/types/product';
@@ -173,5 +173,20 @@ export async function deleteProductAction(productId: string) {
   } catch (error) {
     console.error('Error deleting product:', error);
     return { error: 'Error deleting product' };
+  }
+}
+
+export async function getRelatedProductsAction(productId: string) {
+  try {
+    if (!productId) {
+      return { error: 'Product ID is required' };
+    }
+
+    const relatedProducts = await getRelatedProducts(productId);
+    
+    return { success: true, data: relatedProducts };
+  } catch (error) {
+    console.error('Error fetching related products:', error);
+    return { error: 'Failed to fetch related products' };
   }
 }

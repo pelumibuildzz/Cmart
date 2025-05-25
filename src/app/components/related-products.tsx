@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import ProductCard from './product-card';
+import { getRelatedProductsAction } from '@/app/actions/product.action';
 
 interface RelatedProductsProps {
   productId: string;
@@ -26,19 +27,27 @@ export default function RelatedProducts({ productId }: RelatedProductsProps) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    async function fetchRelatedProducts() {
+  useEffect(() => {    async function fetchRelatedProducts() {
       try {
         setLoading(true);
         setError(null);
+          const result = await getRelatedProductsAction(productId);
         
-        const response = await fetch(`/api/products/${productId}/related`);
-        if (!response.ok) {
-          throw new Error('Failed to fetch related products');
+        if (result.error) {
+          throw new Error(result.error);
         }
         
-        const products = await response.json();
-        setRelatedProducts(products);
+        // Transform the data to match our Product interface
+        const transformedProducts = (result.data || []).map(product => ({
+          ...product,
+          businessId: product.business.id,
+          images: product.images.map(image => ({
+            ...image,
+            fileId: image.fileId || undefined // Convert null to undefined
+          }))
+        }));
+        
+        setRelatedProducts(transformedProducts);
       } catch (err) {
         console.error('Error fetching related products:', err);
         setError('Failed to load related products');

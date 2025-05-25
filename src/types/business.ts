@@ -16,6 +16,7 @@ export interface User {
   name: string;
   email: string;
   universityId: string;
+  phoneNumber: string | null;
   role: string;
   totalOrders: number;
   discountTier: string;
@@ -81,6 +82,7 @@ export interface Order {
   status: string;
   paymentId?: string;
   paymentReceiptImageUrl?: string;
+  paymentReceiptFileId?: string;
   payerAccountName?: string;
   createdAt: Date;
   user: User;
@@ -104,6 +106,7 @@ export interface OrderModalData {
   status: string;
   paymentId?: string;
   paymentReceiptImageUrl?: string;
+  paymentReceiptFileId?: string;
   payerAccountName?: string;
   createdAt: Date;
   user: User;

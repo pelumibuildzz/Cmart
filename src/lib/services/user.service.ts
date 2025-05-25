@@ -1,3 +1,4 @@
+import { Role } from '../constants';
 import { prisma } from '../server/prisma';
 import bcrypt from 'bcryptjs';
 
@@ -13,8 +14,7 @@ export async function getUserByEmail(email: string) {
   });
 }
 
-export async function createUser(data: any) {
-  // Hash the password with bcrypt using 10 salt rounds and the BCRYPT_SECRET as pepper
+export async function createUser(data: {name: string, email: string, password: string, phoneNumber?: string, universityId: string, role: Role }) {
   const salt = await bcrypt.genSalt(10);
   const pepper = process.env.BCRYPT_SECRET;
   const hashedPassword = await bcrypt.hash(data.password + pepper, salt);

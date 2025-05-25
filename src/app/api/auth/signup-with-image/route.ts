@@ -13,7 +13,8 @@ export async function POST(request: Request) {
     const email = formData.get('email') as string;
     const password = formData.get('password') as string;
     const universityId = formData.get('universityId') as string;
-    const role = formData.get('role') as string;
+    const phoneNumber = formData.get('phoneNumber') as string;
+    const role = formData.get('role') as Role;
     const businessName = formData.get('businessName') as string;
     const businessDescription = formData.get('businessDescription') as string;
     const bankName = formData.get('bankName') as string;
@@ -23,9 +24,8 @@ export async function POST(request: Request) {
     // Get category and subcategory IDs
     const categoryIds = formData.getAll('categoryIds') as string[];
     const subCategoryIds = formData.getAll('subCategoryIds') as string[];
-    
-    // Validate input
-    if (!name || !email || !password || !universityId || !role) {
+      // Validate input
+    if (!name || !email || !password || !universityId || !role || !phoneNumber) {
       return NextResponse.json(
         { message: 'Missing required fields' },
         { status: 400 }
@@ -102,6 +102,7 @@ export async function POST(request: Request) {
         name,
         email,
         password,
+        phoneNumber,
         universityId,
         role,
       });

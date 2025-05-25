@@ -58,10 +58,8 @@ export async function processBankTransferPayment(
 
     if (receiptImage.size > MAX_FILE_SIZE) {
       return { error: 'File size too large. Maximum size is 10MB.' };
-    }
-
-    // Upload receipt image
-    const receiptImageUrl = await uploadImage(
+    }    // Upload receipt image
+    const receiptImageData = await uploadImage(
       receiptImage,
       `receipt-${Date.now()}-${receiptImage.name}`,
       'payment-receipts'
@@ -96,17 +94,14 @@ export async function processBankTransferPayment(
       orders: {
         create: [] // We'll create orders separately
       }
-    });
-
-    // Create individual orders for each business
+    });    // Create individual orders for each business
     const orderPromises = businessGroups.map(group => 
-      createOrder({
-        userId,
+      createOrder({        userId,
         businessId: group.businessId,
         orderGroupId: orderGroup.id,
         total: group.subtotal,
         status: OrderStatus.UNVERIFIED,
-        paymentReceiptImageUrl: receiptImageUrl,
+        paymentReceiptImageUrl: receiptImageData.url,
         payerAccountName,
         orderItems: {
           create: group.items.map(item => ({

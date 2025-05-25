@@ -11,10 +11,10 @@ import { Role } from '@/lib/constants';
 import { Upload, X } from 'lucide-react';
 
 export default function SignUp() {
-  const router = useRouter();
-  const [formData, setFormData] = useState({
+  const router = useRouter();  const [formData, setFormData] = useState({
     name: '',
     email: '',
+    phoneNumber: '',
     password: '',
     confirmPassword: '',
     universityId: '',
@@ -84,13 +84,11 @@ export default function SignUp() {
         return [...prev, categoryId];
       }
     });
-  };
-  const handleSubmit = async (e: React.FormEvent) => {
+  };  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+      const { name, email, phoneNumber, password, confirmPassword, universityId, role, businessName, businessDescription, bankName, accountNumber } = formData;
     
-    const { name, email, password, confirmPassword, universityId, role, businessName, businessDescription, bankName, accountNumber } = formData;
-    
-    if (!name || !email || !password || !confirmPassword || !universityId) {
+    if (!name || !email || !phoneNumber || !password || !confirmPassword || !universityId) {
       setError('Please fill in all required fields');
       return;
     }
@@ -117,10 +115,10 @@ export default function SignUp() {
     
     try {
     // Create FormData if we have a business image
-      if (role === Role.BUSINESS && businessImage) {
-        const formData = new FormData();
+      if (role === Role.BUSINESS && businessImage) {        const formData = new FormData();
         formData.append('name', name);
         formData.append('email', email);
+        formData.append('phoneNumber', phoneNumber);
         formData.append('password', password);
         formData.append('universityId', universityId);
         formData.append('role', role);
@@ -164,10 +162,10 @@ export default function SignUp() {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
+          },          body: JSON.stringify({
             name,
             email,
+            phoneNumber,
             password,
             universityId,
             role,
@@ -272,8 +270,7 @@ export default function SignUp() {
             required
           />
         </div>
-        
-        <div>
+          <div>
           <label htmlFor="email" className="block mb-1 font-medium text-secondary">
             Email
           </label>
@@ -285,6 +282,22 @@ export default function SignUp() {
             onChange={handleChange}
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/50"
             disabled={isLoading}
+            required
+          />
+        </div>
+        
+        <div>
+          <label htmlFor="phoneNumber" className="block mb-1 font-medium text-secondary">
+            Phone Number
+          </label>          <input
+            id="phoneNumber"
+            name="phoneNumber"
+            type="tel"
+            value={formData.phoneNumber}
+            onChange={handleChange}
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/50"
+            disabled={isLoading}
+            placeholder="Enter your phone number"
             required
           />
         </div>
@@ -477,12 +490,13 @@ export default function SignUp() {
             <label className="block mb-1 font-medium text-secondary">
               Business Image
             </label>
-            <div className="flex items-center space-x-4">
-              {businessImagePreview ? (
+            <div className="flex items-center space-x-4">              {businessImagePreview ? (
                 <div className="relative">
-                  <img
+                  <Image
                     src={businessImagePreview}
                     alt="Business Image Preview"
+                    width={64}
+                    height={64}
                     className="w-16 h-16 object-cover rounded-md"
                   />
                   <button
@@ -492,7 +506,7 @@ export default function SignUp() {
                     disabled={isLoading}
                     title="Remove image"
                   >
-                    &times;
+                    <X size={12} />
                   </button>
                 </div>
               ) : (
@@ -504,8 +518,7 @@ export default function SignUp() {
               <label className="flex items-center cursor-pointer">
                 <span className="text-sm text-gray-700 mr-2">
                   {businessImagePreview ? 'Change Image' : 'Upload Image'}
-                </span>
-                <input
+                </span>                <input
                   type="file"
                   accept="image/*"
                   onChange={handleBusinessImageChange}
@@ -513,9 +526,7 @@ export default function SignUp() {
                   disabled={isLoading}
                 />
                 <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-primary text-white hover:bg-primary/90 transition-colors">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                  </svg>
+                  <Upload size={20} />
                 </span>
               </label>
             </div>

@@ -8,11 +8,11 @@ declare module 'next-auth' {
       universityId: string;
     } & DefaultSession['user'];
   }
-
   interface User {
     id: string;
     role: string;
     universityId: string;
+    phoneNumber?: string;
   }
 }
 

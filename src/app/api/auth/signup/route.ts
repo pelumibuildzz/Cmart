@@ -6,10 +6,10 @@ import { prisma } from '@/lib/server/prisma';
 
 export async function POST(request: Request) {
   try {
-    const { name, email, password, universityId, role, business } = await request.json();
+    const { name, email, phoneNumber, password, universityId, role, business } = await request.json();
     
     // Validate input
-    if (!name || !email || !password || !universityId || !role) {
+    if (!name || !email || !password || !universityId || !role || !phoneNumber) {
       return NextResponse.json(
         { message: 'Missing required fields' },
         { status: 400 }
@@ -46,7 +46,8 @@ export async function POST(request: Request) {
       const user = await createUser({
         name,
         email,
-        password, // In production, you would hash this password
+        password,
+        phoneNumber, 
         universityId,
         role,
       });

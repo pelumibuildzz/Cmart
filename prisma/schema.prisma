@@ -12,6 +12,7 @@ model User {
   email        String       @unique
   password     String
   name         String
+  phoneNumber  String?
   universityId String
   role         Role         @default(USER)
   discountTier String       @default("NONE")
@@ -120,6 +121,7 @@ model Order {
   discountId             String?     @unique
   payerAccountName       String?
   paymentReceiptImageUrl String?
+  paymentReceiptFileId   String?
   business               Business    @relation(fields: [businessId], references: [id])
   discount               Discount?   @relation(fields: [discountId], references: [id])
   orderGroup             OrderGroup? @relation(fields: [orderGroupId], references: [id])

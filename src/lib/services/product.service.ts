@@ -791,3 +791,121 @@ export async function removeProductVideo(productId: string, videoId: string) {
     },
   });
 }
+
+export async function getRelatedProducts(productId: string) {
+  // First, get the current product to analyze its attributes
+  const currentProduct = await prisma.product.findUnique({
+    where: { id: productId },
+    include: {
+      categories: true,
+      subCategories: true,
+      business: true
+    }
+  });
+
+  if (!currentProduct) {
+    return [];
+  }
+
+  // Calculate price range (±20%)
+  const priceMin = currentProduct.finalPrice * 0.8;
+  const priceMax = currentProduct.finalPrice * 1.2;
+
+  // Get category and subcategory IDs for matching
+  const categoryIds = currentProduct.categories.map(cat => cat.id);
+  const subCategoryIds = currentProduct.subCategories.map(subCat => subCat.id);
+
+  // Build complex query to find related products using hybrid approach
+  const relatedProducts = await prisma.product.findMany({
+    where: {
+      AND: [
+        { id: { not: productId } }, // Exclude current product
+        { isAvailable: true }, // Only available products
+        { 
+          business: { 
+            isVerified: true // Only from verified businesses
+          } 
+        },
+        {
+          OR: [
+            // Match by categories
+            categoryIds.length > 0 ? {
+              categories: {
+                some: {
+                  id: { in: categoryIds }
+                }
+              }
+            } : {},
+            // Match by subcategories
+            subCategoryIds.length > 0 ? {
+              subCategories: {
+                some: {
+                  id: { in: subCategoryIds }
+                }
+              }
+            } : {},
+            // Match by similar price range
+            {
+              finalPrice: {
+                gte: priceMin,
+                lte: priceMax
+              }
+            }
+          ].filter(condition => Object.keys(condition).length > 0) // Remove empty conditions
+        }
+      ]
+    },
+    include: {
+      images: true,
+      business: true,
+      categories: true,
+      subCategories: true
+    },
+    take: 8, // Get more than needed for better scoring
+  });
+
+  // Score products based on multiple factors
+  const scoredProducts = relatedProducts.map(product => {
+    let score = 0;
+    
+    // Category match (highest priority)
+    const matchingCategories = product.categories.filter(cat => 
+      categoryIds.includes(cat.id)
+    ).length;
+    score += matchingCategories * 10;
+    
+    // Subcategory match (high priority)
+    const matchingSubCategories = product.subCategories.filter(subCat => 
+      subCategoryIds.includes(subCat.id)
+    ).length;
+    score += matchingSubCategories * 8;
+    
+    // Price similarity (medium priority)
+    const priceDifference = Math.abs(product.finalPrice - currentProduct.finalPrice);
+    const maxPriceDifference = currentProduct.finalPrice * 0.2; // 20% range
+    if (priceDifference <= maxPriceDifference) {
+      score += (1 - (priceDifference / maxPriceDifference)) * 5;
+    }
+    
+    // Same business (low priority bonus)
+    if (product.businessId === currentProduct.businessId) {
+      score += 2;
+    }
+    
+    // Stock availability bonus
+    if (product.stock > 0) {
+      score += 1;
+    }
+
+    return {
+      ...product,
+      score
+    };
+  });
+
+  // Sort by score and return top 4
+  return scoredProducts
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 4)
+    .map(({ score, ...product }) => product); // Remove score from final result
+}

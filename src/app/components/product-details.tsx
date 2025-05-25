@@ -9,6 +9,7 @@ import Link from 'next/link';
 import { useCartStore } from '@/lib/store/cart';
 import { deleteProductAction } from '@/app/actions/product.action';
 import { formatPrice } from '@/lib/utils/format';
+import RelatedProducts from './related-products';
 
 interface ProductDetailsProps {
   product: any; // Replace with proper type
@@ -304,6 +305,9 @@ export default function ProductDetails({ product, onDelete, isOwner }: ProductDe
             <p className="whitespace-pre-line">{product.description}</p>
           </div>
         </div>
+
+        {/* Related Products Section */}
+        <RelatedProducts productId={product.id} />
       </div>
     </div>
   );

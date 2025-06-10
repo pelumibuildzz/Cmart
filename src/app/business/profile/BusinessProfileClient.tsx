@@ -107,18 +107,8 @@ export default function BusinessProfileClient({ business, categories }: Business
       const formData = new FormData();
       formData.append('image', imageFile);
 
-      console.log('Uploading image:', {
-        fileName: imageFile.name,
-        fileSize: imageFile.size,
-        fileType: imageFile.type
-      });
-
-      const result = await updateBusinessImageAction(formData);
-      
-      console.log('Upload result:', result);
-
+      const result = await updateBusinessImageAction(formData);      
       if (result.error) {
-        console.error('Upload error from server:', result.error);
         toast.error(result.error);
         return;
       }
@@ -136,10 +126,8 @@ export default function BusinessProfileClient({ business, categories }: Business
       setImageFile(null);
       
       // Refresh the page to show the updated image
-      router.refresh();
-    } catch (error) {
-      console.error('Client-side upload error:', error);
-      toast.error(`Failed to update business image: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      router.refresh();    } catch (error) {
+      toast.error("Failed to update business image");
     } finally {
       setImageLoading(false);
     }

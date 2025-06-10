@@ -5,10 +5,10 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { University, Category, SubCategory } from '@prisma/client';
-import { fetchUniversities } from '@/app/actions/university.action';
+import { fetchUniversities, createUniversityAction } from '@/app/actions/university.action';
 import { fetchCategories, fetchSubCategoriesByCategory, createSubCategoryAction } from '@/app/actions/category.action';
 import { Role } from '@/lib/constants';
-import { Upload, X } from 'lucide-react';
+import { Upload, X, Plus } from 'lucide-react';
 
 export default function SignUp() {
   const router = useRouter();  const [formData, setFormData] = useState({
@@ -29,10 +29,11 @@ export default function SignUp() {
   const [selectedCategoryIds, setSelectedCategoryIds] = useState<string[]>([]);
   const [selectedSubCategoryIds, setSelectedSubCategoryIds] = useState<string[]>([]);
   const [businessImage, setBusinessImage] = useState<File | null>(null);
-  const [businessImagePreview, setBusinessImagePreview] = useState<string | null>(null);
-  const [error, setError] = useState('');
+  const [businessImagePreview, setBusinessImagePreview] = useState<string | null>(null);  const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isFetchingData, setIsFetchingData] = useState(true);
+  const [showNewUniversityInput, setShowNewUniversityInput] = useState(false);
+  const [newUniversityName, setNewUniversityName] = useState('');
 
   useEffect(() => {
     const loadData = async () => {
@@ -226,6 +227,34 @@ export default function SignUp() {
     }
   };
 
+  const handleAddNewUniversity = async () => {
+    if (!newUniversityName.trim()) return;
+    
+    setIsLoading(true);
+    setError('');
+    
+    try {
+      const result = await createUniversityAction(newUniversityName);
+      
+      if (result.error) {
+        setError(result.error);
+        return;
+      }
+      
+      if (result.success && result.university) {
+        // Add the new university to the list and select it
+        setUniversities(prev => [...prev, result.university]);
+        setFormData(prev => ({ ...prev, universityId: result.university.id }));
+        setNewUniversityName('');
+        setShowNewUniversityInput(false);
+      }
+    } catch (err: any) {
+      setError(err.message || 'Failed to create university');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <main className="container mx-auto px-4 py-8 max-w-md">
       <h1 className="text-3xl font-bold mb-6 text-center text-secondary">Sign Up</h1>
@@ -301,29 +330,74 @@ export default function SignUp() {
             required
           />
         </div>
-        
-        <div>
+          <div>
           <label htmlFor="universityId" className="block mb-1 font-medium text-secondary">
             University
           </label>
-          <select
-            id="universityId"
-            name="universityId"
-            value={formData.universityId}
-            onChange={handleChange}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/50 bg-white"
-            disabled={isLoading || isFetchingData}
-            required
-          >
-            <option value="" disabled>
-              {isFetchingData ? 'Loading...' : 'Select your university'}
-            </option>
-            {universities.map((uni) => (
-              <option key={uni.id} value={uni.id}>
-                {uni.name}
+          <div className="space-y-2">
+            <select
+              id="universityId"
+              name="universityId"
+              value={formData.universityId}
+              onChange={handleChange}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/50 bg-white"
+              disabled={isLoading || isFetchingData}
+              required
+            >
+              <option value="" disabled>
+                {isFetchingData ? 'Loading...' : 'Select your university'}
               </option>
-            ))}
-          </select>
+              {universities.map((uni) => (
+                <option key={uni.id} value={uni.id}>
+                  {uni.name}
+                </option>
+              ))}
+            </select>
+            
+            <div>
+              {showNewUniversityInput ? (
+                <div className="flex items-center space-x-2">
+                  <input
+                    type="text"
+                    value={newUniversityName}
+                    onChange={(e) => setNewUniversityName(e.target.value)}
+                    placeholder="Enter university name"
+                    className="flex-1 rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+                    disabled={isLoading}
+                  />
+                  <button
+                    type="button"
+                    onClick={handleAddNewUniversity}
+                    disabled={isLoading || !newUniversityName.trim()}
+                    className="inline-flex items-center rounded-md border border-transparent bg-primary px-3 py-2 text-sm font-medium text-white hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {isLoading ? 'Adding...' : 'Add'}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowNewUniversityInput(false);
+                      setNewUniversityName('');
+                    }}
+                    className="inline-flex items-center rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+                    disabled={isLoading}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => setShowNewUniversityInput(true)}
+                  className="inline-flex items-center text-sm font-medium text-primary hover:text-primary/80 focus:outline-none"
+                  disabled={isLoading}
+                >
+                  <Plus size={16} className="mr-1" />
+                  Don't see your university? Add it here
+                </button>
+              )}
+            </div>
+          </div>
         </div>
         
         {formData.role === Role.BUSINESS && (
@@ -541,6 +615,41 @@ export default function SignUp() {
           >
             {isLoading ? 'Signing up...' : 'Sign Up'}
           </button>
+        </div>
+        
+        {showNewUniversityInput && (
+          <div className="mt-4">
+            <input
+              type="text"
+              value={newUniversityName}
+              onChange={(e) => setNewUniversityName(e.target.value)}
+              placeholder="Enter new university name"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary/50"
+              disabled={isLoading}
+            />
+          </div>
+        )}
+        
+        <div className="flex items-center justify-between mt-4">
+          <button
+            type="button"
+            onClick={() => setShowNewUniversityInput(prev => !prev)}
+            className="text-sm font-medium text-primary hover:text-primary/80"
+            disabled={isLoading}
+          >
+            {showNewUniversityInput ? 'Cancel' : 'Add New University'}
+          </button>
+          
+          {showNewUniversityInput && (
+            <button
+              type="button"
+              onClick={handleAddNewUniversity}
+              className="inline-flex items-center rounded-md border border-transparent bg-primary px-3 py-2 text-sm font-medium text-white hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={isLoading || !newUniversityName.trim()}
+            >
+              {isLoading ? 'Adding...' : 'Add'}
+            </button>
+          )}
         </div>
       </form>
       
